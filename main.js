@@ -38,6 +38,20 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			on.emit(target,"startTransition", opts);
 		},
 
+			//		app-unload-view event parameter. It should be like this: {"view":view, "callback":function(){...}}
+		unloadView: function(/*Object*/view, /*function?*/callback){
+			// summary:
+			//		A convenience function to fire the app-unload-view event to unload the view and the children of the view.
+			//
+			// view:
+			//		The view to be unloaded.
+			// callback:
+			//		The callback function to call after the view and all child views are unloaded.
+			var evt = {"view":view, "callback":callback};
+			on.emit(this,"app-unload-view", evt);
+		},
+
+
 		_createDataStore: function(){
 			// summary:
 			//		Create data store instance

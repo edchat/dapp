@@ -1,6 +1,6 @@
 define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "dojo/_base/declare", "dojo/_base/lang",
-	"dojo/Deferred", "./utils/constraints"],
-	function(require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints){
+	"dojo/Deferred", "./utils/constraints", "dojo/dom-construct"],
+	function(require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints, domConstruct){
 	return declare(null, {
 		// summary:
 		//		View base class with controller capabilities. Subclass must implement rendering capabilities.
@@ -21,6 +21,14 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 			this.children = {};
 			this.selectedChildren = {};
 			this.loadedStores = {};
+			this.transitionCount = 0;
+
+			// skipNodeCache: [protected] Boolean (from dijit._TemplatedMixin)
+			//		If using a cached widget template nodes poses issues for a
+			//		particular widget class, it can set this property to ensure
+			//		that its template is always re-built from a string
+			this._skipNodeCache = true; // use true to avoid Detached domNodes for each view created.
+
 			// private
 			this._started = false;
 			lang.mixin(this, params);
