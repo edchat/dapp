@@ -516,6 +516,8 @@ define(["require", "dojo/_base/lang", "dojo/_base/declare", "dojo/has", "dojo/on
 				return;
 			}
 			this.app.log("logLoadViews:",F," _handleViewUnloads called for ["+viewToUnload.id+"]");
+			console.time("timing check-app-unload-view");
+
 			// if alwaysAutoUnload is true unload the viewToUnload view and its children
 			if(viewToUnload.alwaysAutoUnload){
 				var params = {};
@@ -523,6 +525,8 @@ define(["require", "dojo/_base/lang", "dojo/_base/declare", "dojo/has", "dojo/on
 				this.app.log("logLoadViews:",F," viewToUnload.alwaysAutoUnload true emit app-unload-view for ["+viewToUnload.id+"]");
 				console.time("timing app-unload-view");
 				this.app.emit("app-unload-view", params);
+				console.timeEnd("timing check-app-unload-view");
+
 				return true;
 			}
 			//if autoUnloadCount is set we need to check other sibling views to see if any views should be unloaded.
@@ -542,12 +546,16 @@ define(["require", "dojo/_base/lang", "dojo/_base/declare", "dojo/has", "dojo/on
 							var params = {};
 							params.view = otherChild;
 							this.app.log("logLoadViews:",F," over unload count emit app-unload-view for ["+otherChild.id+"]");
+							console.time("timing app-unload-view");
 							this.app.emit("app-unload-view", params);
+							console.timeEnd("timing check-app-unload-view");
+							return true;
 						}
 					}
 				}
 
 			}
+			console.timeEnd("timing check-app-unload-view");
 		},
 
 
