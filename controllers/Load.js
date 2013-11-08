@@ -62,7 +62,7 @@ define(["require", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/Def
 			var viewArray = [];
 			// create an array from the diff views in event.viewId (they are separated by +)
 			var parts = views.split('+');
-			while(parts.length > 0){ 	
+			while(parts.length > 0){
 				var viewId = parts.shift();
 				viewArray.push(viewId);
 			}
@@ -370,9 +370,6 @@ define(["require", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/Def
 
 			this.unloadChild(parent, view);
 
-			// call Load event callback
-			console.timeEnd("timing app-unload-view");
-
 			if(event.callback){
 				event.callback();
 			}
@@ -389,7 +386,7 @@ define(["require", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/Def
 			// viewToUnload: Object
 			//		the view to be unloaded.
 			var F = MODULE+":unloadChild";
-			this.app.log("logLoadViews:",F," called for ["+viewToUnload.id+"]");
+			this.app.log("logLoadViews:",F," unloadChild called for ["+viewToUnload.id+"]");
 
 			for(var child in viewToUnload.children){
 				this.app.log("logLoadViews:",F," calling unloadChild for for ["+child+"]");
