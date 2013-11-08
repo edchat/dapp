@@ -1,6 +1,6 @@
 define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "dojo/_base/declare", "dojo/_base/lang",
-	"dojo/Deferred", "./utils/constraints", "dojo/dom-construct"],
-	function(require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints, domConstruct){
+	"dojo/Deferred", "./utils/constraints"],
+	function(require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints){
 	return declare(null, {
 		// summary:
 		//		View base class with controller capabilities. Subclass must implement rendering capabilities.
