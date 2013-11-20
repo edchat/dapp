@@ -5,6 +5,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 	function (require, kernel, lang, declare, config, win, Evented, Deferred, when, has, on, domReady,
 			  domConstruct, domAttr, nls, lifecycle, hash, constraints, configUtils) {
 
+		has.add("delite-ViewController", null);
 		has.add("app-log-api", (config.app || {}).debugApp);
 
 		var Application = declare(Evented, {
@@ -136,6 +137,8 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 					when(def, lang.hitch(this, function () {
 						for (var i = 0; i < arguments[0].length; i++) {
 							// instantiate controllers, set Application object, and perform auto binding
+							// TODO: what do we need an array that contains them as we don't allows to remove/add
+							// them dynamically anyway?
 							this.loadedControllers.push((new arguments[0][i](this)).bind());
 						}
 						controllerDef.resolve(this);
