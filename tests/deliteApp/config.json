@@ -1,0 +1,34 @@
+{
+	"id": "deliteApp",
+
+	"loaderConfig": {
+		"paths": {
+			"globalizedApp": "../dapp/tests/deliteApp"
+		}
+	},
+
+	"modules": [
+	],
+
+	"controllers": [
+		"dapp/controllers/delite/Load",
+		"dapp/controllers/delite/Transition"
+	],
+
+	"defaultView": "home",
+
+	"views": {
+		"home": {
+			"template": "globalizedApp/home.html",
+			"nls": "globalizedApp/nls/home",
+			"dependencies":	[
+				"dojox/mobile/RoundRectList",
+				"dojox/mobile/ListItem"
+			]
+		},
+		"detail": {
+			"controller" : "globalizedApp/detail.js",
+			"template": "globalizedApp/detail.html"
+		}
+	}
+}
