@@ -20,11 +20,7 @@
 	"views": {
 		"home": {
 			"template": "globalizedApp/home.html",
-			"nls": "globalizedApp/nls/home",
-			"dependencies":	[
-				"dojox/mobile/RoundRectList",
-				"dojox/mobile/ListItem"
-			]
+			"nls": "globalizedApp/nls/home"
 		},
 		"detail": {
 			"controller" : "globalizedApp/detail.js",
