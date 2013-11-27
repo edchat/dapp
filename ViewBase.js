@@ -164,11 +164,10 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 					"callback": lang.hitch(this, function () {
 						//start widget
 						this.startup();
-
+		   			    this.init();
 						// call view assistant's init() method to initialize view
 						this.app.log("  > in app/ViewBase calling init() name=[", this.name, "], parent.name=[",
 							this.parent.name, "]");
-						this.init();
 						this._started = true;
 						if (this._startDef) {
 							this._startDef.resolve(this);
@@ -177,6 +176,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				});
 				*/
 
+				this.init();
 				this._startDef.resolve(this);
 			},
 
