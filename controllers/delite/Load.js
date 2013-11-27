@@ -7,22 +7,25 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 		_loadHandler: function (event) {
 			// load the actual view
 			// TODO: don't I have two cases here, when the parent is a delite display container and when not?
+			// probably to be solved by having all dui containers support the eventing mechanism
 			var viewId = event.dest || "";
-			var parts = viewId.split(",");
-			var childId = parts.shift();
 			var params = event.params || "";
-			this._createView(event.loadDeferred, name, params, parent.views[childId].type);
+			// TOD
+			this._createView(event.loadDeferred, viewId, params, event.parent, event.parent.views[viewId].type);
 		},
 
-		_createView: function (deferred, name, params, type) {
+		_createView: function (deferred, name, params, parent, type) {
 			var app = this.app;
-			require([type ? type : "../View"], function (View) {
-				var newView = new View(dcl.mixin({
+			require([type ? type : "../../View"], function (View) {
+				var params = {
 					"app": app,
-					"id": name
-					// "parent": parent
-				}, { "params": params }));
-				deferred.resolve(newView);
+					"id": name,
+					"parent": parent
+				};
+				dcl.mix(params, { "params": params });
+				new View(params).start().then(function (newView) {
+					deferred.resolve(newView.domNode);
+				});
 			});
 		}
 	});

@@ -11,6 +11,7 @@
 	],
 
 	"controllers": [
+		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
 		"dapp/controllers/delite/Transition"
 	],

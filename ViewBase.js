@@ -34,7 +34,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				lang.mixin(this, params);
 				// mixin views configuration to current view instance.
 				if (this.parent.views) {
-					lang.mixin(this, this.parent.views[this.name]);
+					lang.mixin(this, this.parent.views[this.id]);
 				}
 			},
 
@@ -132,6 +132,10 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				this._initViewHidden();
 				this._needsResize = true; // flag used to be sure resize has been called before transition
 
+				this.containerNode = this.domNode.children[0];
+				domAttr.set(this.domNode, "id", this.id);	// Set the id for the domNode
+
+
 				this._startLayout();
 			},
 
@@ -144,6 +148,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				//		startup widgets in view template.
 				// tags:
 				//		private
+				/*
 				this.app.log("  > in app/ViewBase _startLayout firing layout for name=[", this.name,
 					"], parent.name=[",
 					this.parent.name, "]");
@@ -170,6 +175,9 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 						}
 					})
 				});
+				*/
+
+				this._startDef.resolve(this);
 			},
 
 
