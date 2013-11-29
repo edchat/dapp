@@ -29,6 +29,7 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "dojo/_base
 				// "myview": { container: "a query string" }
 				// and when specified use the query string here to get the container instead of the only child
 				subEvent = Object.create(event);
+				subEvent.dest = viewTarget;
 				subEvent.transitionDeferred = deferred;
 				subEvent.parent = parent;
 				parent.containerNode.emit("delite-display", subEvent);

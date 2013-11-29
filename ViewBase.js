@@ -134,6 +134,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 
 				this.containerNode = this.domNode.children[0];
 				domAttr.set(this.domNode, "id", this.id);	// Set the id for the domNode
+				// FIXME: do not force override, just add new classes
+				domAttr.set(this.domNode, "class", this.constraint);
 
 
 				this._startLayout();

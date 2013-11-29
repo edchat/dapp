@@ -4,12 +4,12 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 	var resolveView = function (event, newView) {
 		event.nextView = newView;
 		event.previousView = event.parent._activeView;
-		event.loadDeferred.resolve(newView.domNode);
+		event.loadDeferred.resolve({ child: newView.domNode });
 	};
 
 	return dcl(Controller, {
 		constructor: function () {
-			document.addEventListener("delite-load", lang.hitch(this, "_loadHandler"), true);
+			document.addEventListener("delite-display-load", lang.hitch(this, "_loadHandler"));
 		},
 		_loadHandler: function (event) {
 			// load the actual view
@@ -30,6 +30,7 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 			});
 			// once transition we will be ready to call afterActivate
 			event.transitionDeferred.then(function () {
+				// TODO works for StackView but what about containers with several views visible same time
 				event.parent._activeView = event.nextView;
 				if (event.nextView) {
 					event.nextView.afterActivate(event.previousView);

@@ -3,11 +3,19 @@
 
 	"loaderConfig": {
 		"paths": {
-			"globalizedApp": "../dapp/tests/deliteApp"
+			"deliteApp": "../dapp/tests/deliteApp"
 		}
 	},
 
+	"containerSelector" : "#main",
+
 	"modules": [
+	],
+
+	"parseOnLoad": true,
+
+	"dependencies": [
+		"dui/BasicLayout"
 	],
 
 	"controllers": [
@@ -16,16 +24,26 @@
 		"dapp/controllers/delite/Transition"
 	],
 
-	"defaultView": "home",
+	"defaultView": "header+content",
 
 	"views": {
-		"home": {
-			"template": "globalizedApp/home.html",
-			"nls": "globalizedApp/nls/home"
+		"header": {
+			"template": "deliteApp/header.html"
 		},
-		"detail": {
-			"controller" : "globalizedApp/detail.js",
-			"template": "globalizedApp/detail.html"
+		"content": {
+			"template": "deliteApp/content.html",
+			"defaultView": "home",
+			"views": {
+				"home": {
+					"template": "deliteApp/home.html",
+					"nls": "deliteApp/nls/home",
+					"constraint": "fill"
+				},
+				"detail": {
+					"controller" : "deliteApp/detail.js",
+					"template": "deliteApp/detail.html"
+				}
+			}
 		}
 	}
 }

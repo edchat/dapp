@@ -5,7 +5,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady,
 			  domConstruct, domAttr, nls, lifecycle, hash, constraints, configUtils) {
 
-		has.add("delite-ViewController", null);
+		has.add("delite-DisplayController", null);
 		has.add("app-log-api", (config.app || {}).debugApp);
 
 		var Application = declare(Evented, {
@@ -27,6 +27,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				// TODO hide should either just hide or optionally unload it as well
 			},
 
+			// TODO: move to a Store controller?
 			_createDataStore: function () {
 				// summary:
 				//		Create data store instance
@@ -157,13 +158,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				}
 				when(controllers, lang.hitch(this, function () {
 					// emit "app-init" event so that the Init controller can initialize the app and the root view
-					this.emit("app-init", {
-						name: this.name,
-						type: this.type,
-						parent: this,
-						templateString: this.templateString,
-						controller: this.controller
-					});
+					this.emit("app-init", {});
 				}));
 			}
 		});
@@ -216,7 +211,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				var App = declare(modules, ext);
 
 				domReady(function () {
-					var app = new App(config, node);
+					var app = new App(config, node || document.body);
 
 					if (has("app-log-api")) {
 						app.log = function () {
