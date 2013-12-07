@@ -48,7 +48,9 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/on", "dojo/Deferred", "..
 			on.emit(document, "delite-display", {
 				// TODO is that really defaultView a good name? Shouldn't it be defaultTarget or defaultView_s_?
 				dest: this.app.defaultView,
-				transitionDeferred: deferred
+				transitionDeferred: deferred,
+				bubbles: true,
+				cancelable: true
 			});
 			// TODO views in the hash MUST be handled by history controller?
 			if (this.app.setStatus) {
