@@ -31,6 +31,9 @@
 			"template": "deliteApp/header.html"
 		},
 		"content": {
+			"dependencies": [
+				"dui/ViewStack"
+			],
 			"template": "deliteApp/content.html",
 			"defaultView": "home",
 			"views": {
