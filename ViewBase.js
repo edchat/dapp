@@ -1,6 +1,6 @@
 define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "dojo/_base/declare", "dojo/_base/lang",
-	"dojo/Deferred", "./utils/constraints"],
-	function (require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints) {
+	"dojo/Deferred", "./utils/constraints", "dui/register"],
+	function (require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints, register) {
 		return declare(null, {
 			// summary:
 			//		View base class with controller capabilities. Subclass must implement rendering capabilities.
@@ -132,10 +132,14 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				this._initViewHidden();
 				this._needsResize = true; // flag used to be sure resize has been called before transition
 
+				// parse the content of the template
+				// FIXME: should be transparent with delite/handlebar...
+				register.parse(this.domNode);
 				this.containerNode = this.domNode.children[0];
 				domAttr.set(this.domNode, "id", this.id);	// Set the id for the domNode
 				// FIXME: do not force override, just add new classes
 				domAttr.set(this.domNode, "class", this.constraint);
+
 
 
 				this._startLayout();

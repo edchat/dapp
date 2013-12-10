@@ -2,9 +2,13 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 	function (require, dcl, lang, Deferred, Controller) {
 
 	var resolveView = function (event, newView) {
-		event.nextView = newView;
-		event.previousView = event.parent._activeView;
-		event.loadDeferred.resolve({ child: newView.domNode });
+		// in addition to arguments required by delite we pass our own needed arguments
+		// to get them back in the transitionDeferred
+		event.loadDeferred.resolve({ child: newView.domNode, dapp: {
+				nextView: newView,
+				previousView: event.parent._activeView
+			}
+		});
 	};
 
 	return dcl(Controller, {
@@ -20,23 +24,23 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 			var params = event.params || "";
 			var view = event.parent.children[viewId];
 			// once loaded we will be ready to call beforeActivate
-			event.loadDeferred.then(function () {
-				if (event.previousView) {
-					event.previousView.beforeDeactivate(event.nextView);
+			event.loadDeferred.then(function (value) {
+				if (value.dapp.previousView) {
+					value.dapp.previousView.beforeDeactivate(value.dapp.nextView);
 				}
-				if (event.nextView) {
-					event.nextView.beforeActivate(event.previousView);
+				if (value.dapp.nextView) {
+					value.dapp.nextView.beforeActivate(value.dapp.previousView);
 				}
 			});
 			// once transition we will be ready to call afterActivate
-			event.transitionDeferred.then(function () {
+			event.transitionDeferred.then(function (value) {
 				// TODO works for StackView but what about containers with several views visible same time
-				event.parent._activeView = event.nextView;
-				if (event.nextView) {
-					event.nextView.afterActivate(event.previousView);
+				event.parent._activeView = value.dapp.nextView;
+				if (value.dapp.nextView) {
+					value.dapp.nextView.afterActivate(value.dapp.previousView);
 				}
-				if (event.previousView) {
-					event.previousView.afterDeactivate(event.nextView);
+				if (value.dapp.previousView) {
+					value.dapp.previousView.afterDeactivate(value.dapp.nextView);
 				}
 			});
 			if (view) {
@@ -44,7 +48,7 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 				if (params) {
 					view.params = params;
 				}
-				resolveView(event, null);
+				resolveView(event, view);
 			} else {
 				this._createView(event, viewId, params, event.parent, event.parent.views[viewId].type);
 			}
@@ -61,6 +65,7 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred", "../../Control
 				};
 				dcl.mix(params, { "params": params });
 				new View(params).start().then(function (newView) {
+					parent.children[name] = newView;
 					resolveView(event, newView);
 				});
 			});

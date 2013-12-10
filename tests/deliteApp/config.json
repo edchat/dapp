@@ -15,7 +15,7 @@
 	"parseOnLoad": true,
 
 	"dependencies": [
-		"dui/BasicLayout"
+		"dui/LinearLayout"
 	],
 
 	"controllers": [
@@ -34,13 +34,13 @@
 			"dependencies": [
 				"dui/ViewStack"
 			],
+			"constraint": "fill",
 			"template": "deliteApp/content.html",
 			"defaultView": "home",
 			"views": {
 				"home": {
 					"template": "deliteApp/home.html",
-					"nls": "deliteApp/nls/home",
-					"constraint": "fill"
+					"nls": "deliteApp/nls/home"
 				},
 				"detail": {
 					"controller" : "deliteApp/detail.js",

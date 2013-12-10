@@ -5,7 +5,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady,
 			  domConstruct, domAttr, nls, lifecycle, hash, constraints, configUtils) {
 
-		has.add("delite-DisplayController", null);
 		has.add("app-log-api", (config.app || {}).debugApp);
 
 		var Application = declare(Evented, {
@@ -19,7 +18,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			displayView: function (view, params) {
 				// TODO: complete implementation
 				var opts = lang.mixin({ bubbles: true, cancelable: true, dest: view },
-					params ? {transition: "slide", direction: "end"} : params);
+					params ? params : {transition: "slide", direction: "end"});
 				on.emit(document, "delite-display", opts);
 			},
 
@@ -182,6 +181,12 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			if (!config.loaderConfig.paths) {
 				config.loaderConfig.paths = {};
 			}
+			if (!config.loaderConfig.map) {
+				config.loaderConfig.map = {};
+			}
+			// we don't want delite display controller to be loaded as we have our own controllers
+			// point to an already loaded module to make this no-op
+			config.loaderConfig.map["*"] = { "dui/DisplayController": "dapp/main" };
 			require(config.loaderConfig);
 
 			if (!config.modules) {
