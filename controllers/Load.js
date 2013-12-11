@@ -161,7 +161,9 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/on", "dojo/Deferred", "do
 								viewId: this.childViews,
 								defaultView: true,
 								forceTransitionNone: loadEvent.forceTransitionNone,
-								opts: { params: params }
+								origDetail: loadEvent.origDetail,
+							//	opts: { params: params }
+								opts: loadEvent.details
 							});
 						}
 						loadEvent.callback(this._handleDefault, this._defaultHasPlus);

@@ -156,6 +156,41 @@ define(["dojo/_base/lang"], function (lang) {
 			return paramStr; // String
 		},
 
+		getAllSelectedChildrenHash: function (view, selChildren, subChildFlag) {
+			// summary:
+			//		get current all selected children for this view and it's selected subviews
+			//
+			// view: View
+			//		the View to get the child from
+			//
+			// returns:
+			//		string with all of the selChildren added
+			//
+			//	selChildren = "";
+			if (view && view.selectedChildren) {
+				var childCount = 0;
+				var initSelChildren = selChildren;
+				for (var hash in view.selectedChildren) {
+					childCount++;
+					if (view.selectedChildren[hash]) {
+						var subChild = view.selectedChildren[hash];
+						if (selChildren.length === 0) {
+							selChildren = subChild.name;
+						} else if (subChildFlag && childCount === 1) {
+							selChildren = selChildren + "," + subChild.name;
+						} else if (subChildFlag && childCount > 1) {
+							selChildren = selChildren + "+" + initSelChildren + "," + subChild.name;
+						} else {
+							selChildren = selChildren + "+" + subChild.name;
+						}
+						var subChildren2 = hashUtil.getAllSelectedChildrenHash(subChild, selChildren, true);
+						selChildren = subChildren2;
+					}
+				}
+			}
+			return selChildren;
+		},
+
 		getTarget: function (/*String*/ hash, /*String?*/ defaultView) {
 			// summary:
 			//		return the target string

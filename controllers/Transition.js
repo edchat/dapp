@@ -166,7 +166,8 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 				}
 
 				// transition to the target view
-				this.transition({ "viewId": target, opts: lang.mixin({}, evt.detail), data: evt.detail.data });
+				this.transition({ "viewId": target, opts: lang.mixin({}, evt.detail), data: evt.detail.data,
+					origDetail: evt.detail });
 			},
 
 			_addTransitionEventToWaitingQueue: function (transitionEvt) {
@@ -221,10 +222,13 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 				if (!transitionEvt.opts) {
 					transitionEvt.opts = {};
 				}
+				transitionEvt.origDetail = transitionEvt.origDetail || transitionEvt.opts;
+
 				var params = transitionEvt.params || transitionEvt.opts.params;
 				this.app.emit("app-load", {
 					"viewId": transitionEvt.viewId,
 					"params": params,
+					"origDetail": transitionEvt.origDetail,
 					"forceTransitionNone": transitionEvt.forceTransitionNone,
 					"callback": lang.hitch(this, function (needToHandleDefaultView, defaultHasPlus) {
 						if (needToHandleDefaultView) { // do not process this view if needToHandleDefaultView true
@@ -238,9 +242,9 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 								this.proceedTransition(nextEvt);
 							}
 						} else {
-							var transitionDef = this._doTransition(transitionEvt.viewId, transitionEvt.opts, params,
-								transitionEvt.opts.data, this.app, transitionEvt._removeView, transitionEvt._doResize,
-								transitionEvt.forceTransitionNone);
+							var transitionDef = this._doTransition(transitionEvt.origDetail, transitionEvt.viewId,
+								transitionEvt.opts, params, transitionEvt.opts.data, this.app,
+								transitionEvt._removeView, transitionEvt._doResize, transitionEvt.forceTransitionNone);
 							when(transitionDef, lang.hitch(this, function () {
 								this.proceeding = false;
 								this.processingQueue = true;
@@ -326,7 +330,7 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 			},
 
 			/* jshint maxcomplexity: 27 */
-			_doTransition: function (transitionTo, opts, params, data, parent, removeView, doResize,
+			_doTransition: function (origDetail, transitionTo, opts, params, data, parent, removeView, doResize,
 				forceTransitionNone, nested) {
 				// summary:
 				//		Transitions from the currently visible view to the defined view.
@@ -418,8 +422,8 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 					this.app.log(KEY, F,
 						"Transition current and next DO MATCH From=[" + currentSubNames + "] TO=[" + nextSubNames +
 							"]");
-					this._handleMatchingViews(nextSubViewArray, next, current, parent, data, removeView, doResize,
-						subIds, currentSubNames, toId, forceTransitionNone, opts);
+					this._handleMatchingViews(origDetail, nextSubViewArray, next, current, parent, data, removeView,
+						doResize, subIds, currentSubNames, toId, forceTransitionNone, opts);
 
 				} else {
 					this.app.log(KEY, F,
@@ -472,8 +476,8 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 						nextLastSubChild = this.nextLastSubChildMatch || next;
 						var trans = this._getTransition(nextLastSubChild, parent, toId, opts, forceTransitionNone);
 						this.app.log(F + " calling _handleLayoutAndResizeCalls trans=" + trans);
-						this._handleLayoutAndResizeCalls(nextSubViewArray, removeView, doResize, subIds,
-							forceTransitionNone, trans);
+						this._handleLayoutAndResizeCalls(origDetail, nextSubViewArray, removeView, doResize, subIds,
+							forceTransitionNone, opts, trans);
 					} else {
 						// for removeView need to set visible before transition do it here
 						for (var j = 0; j < nextSubViewArray.length; j++) {
@@ -499,6 +503,7 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 							this._handleTransit(next, parent, this.currentLastSubChildMatch, opts, toId, removeView,
 								forceTransitionNone, doResize);
 					}
+					var _origDetail = origDetail;
 					when(result, lang.hitch(this, function () {
 						if (next) {
 							this.app.log(F + " back from transit for next =" + next.name);
@@ -506,8 +511,8 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 						if (removeView) {
 							var nextLastSubChild = this.nextLastSubChildMatch || next;
 							var trans = this._getTransition(nextLastSubChild, parent, toId, opts, forceTransitionNone);
-							this._handleLayoutAndResizeCalls(nextSubViewArray, removeView, doResize, subIds,
-								forceTransitionNone, trans);
+							this._handleLayoutAndResizeCalls(origDetail, nextSubViewArray, removeView, doResize, subIds,
+								forceTransitionNone, opts, trans);
 						}
 
 						// Add call to handleAfterDeactivate and handleAfterActivate here!
@@ -517,6 +522,12 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 							this.nextLastSubChildMatch || next);
 						this._handleAfterActivateCalls(nextSubViewArray, removeView,
 							this.currentLastSubChildMatch || current, data);
+						if (doResize) {
+							console.log("HEY THIS MAY BE TIME TO FIRE HISTORY with _origDetail", _origDetail);
+							this.app.log("  > in Transition._doTransition calling app-finishedTransition");
+							// after last layoutView fire app-finishedTransition
+							this.app.emit("app-finishedTransition", {"origDetail": _origDetail});
+						}
 					}));
 					return result; // dojo/promise/all
 				}
@@ -590,7 +601,7 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 			/* jshint maxcomplexity: 10 */
 
 
-			_handleMatchingViews: function (subs, next, current, parent, data, removeView, doResize, subIds,
+			_handleMatchingViews: function (origDetail, subs, next, current, parent, data, removeView, doResize, subIds,
 				currentSubNames, toId, forceTransitionNone, opts) {
 				// summary:
 				//		Called when the current views and the next views match
@@ -602,7 +613,7 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 				this._handleBeforeActivateCalls(subs, this.currentLastSubChildMatch || current, data);
 				var nextLastSubChild = this.nextLastSubChildMatch || next;
 				var trans = this._getTransition(nextLastSubChild, parent, toId, opts, forceTransitionNone);
-				this._handleLayoutAndResizeCalls(subs, removeView, doResize, subIds, trans);
+				this._handleLayoutAndResizeCalls(origDetail, subs, removeView, doResize, subIds, trans, opts);
 				this._handleAfterActivateCalls(subs, removeView, this.currentLastSubChildMatch || current, data);
 			},
 
@@ -652,7 +663,7 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 				}
 			},
 
-			_handleLayoutAndResizeCalls: function (subs, removeView, doResize, subIds, forceTransitionNone,
+			_handleLayoutAndResizeCalls: function (origDetail, subs, removeView, doResize, subIds, forceTransitionNone, opts,
 				transition) {
 				// summary:
 				//		fire app-layoutView for each of the next views about to be activated, and fire app-resize if
@@ -675,6 +686,9 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 					if (transition === "none") {
 						this._showSelectedChildren(this.app); // Need to set visible too before transition do it now.
 					}
+				//	this.app.log("  > in Transition._doTransition calling app-finishedTransition");
+					// after last layoutView fire app-finishedTransition
+				//	this.app.emit("app-finishedTransition", {"origDetail": origDetail});
 				}
 
 			},
