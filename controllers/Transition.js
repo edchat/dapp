@@ -514,6 +514,12 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 							this._handleLayoutAndResizeCalls(origDetail, nextSubViewArray, removeView, doResize, subIds,
 								forceTransitionNone, opts, trans);
 						}
+						if (doResize) {
+							console.log("HEY THIS MAY BE TIME TO FIRE HISTORY with _origDetail", _origDetail);
+							this.app.log("  > in Transition._doTransition calling app-finishedTransition");
+							// after last layoutView fire app-finishedTransition
+							this.app.emit("app-finishedTransition", {"origDetail": _origDetail});
+						}
 
 						// Add call to handleAfterDeactivate and handleAfterActivate here!
 						this._handleAfterDeactivateCalls(currentSubViewArray, this.nextLastSubChildMatch || next,
@@ -522,12 +528,6 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 							this.nextLastSubChildMatch || next);
 						this._handleAfterActivateCalls(nextSubViewArray, removeView,
 							this.currentLastSubChildMatch || current, data);
-						if (doResize) {
-							console.log("HEY THIS MAY BE TIME TO FIRE HISTORY with _origDetail", _origDetail);
-							this.app.log("  > in Transition._doTransition calling app-finishedTransition");
-							// after last layoutView fire app-finishedTransition
-							this.app.emit("app-finishedTransition", {"origDetail": _origDetail});
-						}
 					}));
 					return result; // dojo/promise/all
 				}
