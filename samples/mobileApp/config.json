@@ -1,0 +1,109 @@
+{
+	"id": "mobileApp",
+
+	"loaderConfig": {
+		"paths": {
+			"mobileApp": "../dapp/samples/mobileApp"
+		}
+	},
+
+	"containerSelector" : "#main",
+
+	"modules": [
+	],
+
+	"parseOnLoad": true,
+
+	"dependencies": [
+		"delite/register",
+		"deliteful/ViewStack",
+		"deliteful/SidePane",
+		"deliteful/LinearLayout",
+		"deliteful/Button"
+	],
+
+	"controllers": [
+		"dapp/controllers/delite/Init",
+		"dapp/controllers/delite/Load",
+		"dapp/controllers/delite/Transition",
+		"dapp/controllers/delite/Layout"
+	],
+
+
+	"defaultView": "aaa",
+
+	"views": {
+		"sidemenu":{
+				"constraint": "leftStack",
+				"controller" : "mobileApp/sidepane.js",
+				"template": "mobileApp/sidepane.html"
+		},
+		"sidepane": {
+			"constraint": "sidePaneContainer",
+			"controller" : "mobileApp/sidepane.js",
+			"template": "mobileApp/sidepane.html",
+			"nls": "mobileApp/nls/home"
+		},
+		"aaa": {
+			"constraint": "vs",
+			"controller" : "mobileApp/aaa.js",
+			"template": "mobileApp/aaa.html"
+		},
+		"bbb": {
+			"constraint": "vs",
+			"controller" : "mobileApp/bbb.js",
+			"template": "mobileApp/bbb.html"
+		},
+		"ccc": {
+			"constraint": "vs",
+			"controller" : "mobileApp/ccc.js",
+			"template": "mobileApp/ccc.html"
+		},
+		"ddd": {
+			"constraint": "vs",
+			"controller" : "mobileApp/ddd.js",
+			"template": "mobileApp/ddd.html"
+		},
+		"main": {
+			"constraint": "mainContainer",
+			"controller" : "mobileApp/main.js",
+			"template": "mobileApp/main.html"
+		},
+		"header": {
+			"constraint": "main",
+			"template": "mobileApp/header.html"
+		},
+		"home2": {
+			"constraint": "main-view-stack",
+			"controller" : "mobileApp/home.js",
+			"template": "mobileApp/home.html",
+			"nls": "mobileApp/nls/home"
+		},
+		"detail2": {
+			"constraint": "main-view-stack",
+			"controller" : "mobileApp/detail.js",
+			"template": "mobileApp/detail.html"
+		},
+		"content": {
+			"dependencies": [
+				"deliteful/ViewStack"
+			],
+			"constraint": "main",
+			"template": "mobileApp/content.html",
+			"defaultView": "home",
+			"views": {
+				"home": {
+					"constraint": "main-view-stack",
+					"controller" : "mobileApp/home.js",
+					"template": "mobileApp/home.html",
+					"nls": "mobileApp/nls/home"
+				},
+				"detail": {
+					"constraint": "main-view-stack",
+					"controller" : "mobileApp/detail.js",
+					"template": "mobileApp/detail.html"
+				}
+			}
+		}
+	}
+}

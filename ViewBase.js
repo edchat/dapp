@@ -1,10 +1,11 @@
-define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "dojo/_base/declare", "dojo/_base/lang",
-        "dojo/Deferred", "./utils/constraints"
+define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "dojo/dom-class", "dojo/_base/declare",
+        "dojo/_base/lang", "dojo/Deferred", "./utils/constraints"
     ],
-    function (require, when, on, domAttr, domStyle, declare, lang, Deferred, constraints) {
+    function (require, when, on, domAttr, domStyle, domClass, declare, lang, Deferred, constraints) {
         return declare(null, {
             // summary:
             //		View base class with controller capabilities. Subclass must implement rendering capabilities.
+            attributes: {},
             constructor: function (params) {
                 // summary:
                 //		Constructs a ViewBase instance.
@@ -33,10 +34,19 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 // private
                 this._started = false;
                 lang.mixin(this, params);
-                // mixin views configuration to current view instance.
-                if (this.parent.views) {
-                    lang.mixin(this, this.parent.views[this.name]);
+                //TODO: this is a hack need better way to get the parent
+                var p = this.parent;
+                if (!p || !p.views) {
+                    //	var constraint = constraints.getConstraintForViewTarget(event.dest, this.app);
+                    //	p = document.getElementById(constraint);
+                    //	this.parent = p;
+                    p = this.app;
                 }
+                // mixin views configuration to current view instance.
+                if (p && p.views) {
+                    lang.mixin(this, p.views[this.id]);
+                }
+                console.log("dapp/ViewBase:constructor called for " + this.id);
             },
 
             // start view
@@ -44,6 +54,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 // summary:
                 //		start view object.
                 //		load view template, view controller implement and startup all widgets in view template.
+                console.log("dapp/ViewBase:start called for " + this.id);
                 if (this._started) {
                     return this;
                 }
@@ -56,6 +67,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
             },
 
             load: function () {
+                console.log("dapp/ViewBase:load called for " + this.id);
                 var vcDef = this._loadViewController();
                 when(vcDef, lang.hitch(this, function (controller) {
                     if (controller) {
@@ -71,6 +83,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 //
                 // TODO: move this into a common place for use by main and ViewBase
                 //
+                console.log("dapp/ViewBase:_createDataStores called for " + this.id);
                 if (this.parent.loadedStores) {
                     lang.mixin(this.loadedStores, this.parent.loadedStores);
                 }
@@ -97,6 +110,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 //
                 // TODO: move this into a common place for use by main and ViewBase
                 //
+                console.log("dapp/ViewBase:_createDataStore called for " + this.id);
                 var StoreCtor;
                 try {
                     StoreCtor = require(type);
@@ -129,14 +143,12 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 //		startup widgets in view template.
                 // tags:
                 //		private
+                console.log("dapp/ViewBase:_startup called for " + this.id);
 
-                this._initViewHidden();
-                this._needsResize = true; // flag used to be sure resize has been called before transition
-
-                this._startLayout();
             },
 
             _initViewHidden: function () {
+                console.log("dapp/ViewBase:_initViewHidden called for " + this.id);
                 domStyle.set(this.domNode, "visibility", "hidden");
             },
 
@@ -145,6 +157,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 //		startup widgets in view template.
                 // tags:
                 //		private
+                console.log("dapp/ViewBase:_startLayout called for " + this.id);
+
                 this.app.log("  > in app/ViewBase _startLayout firing layout for name=[", this.name,
                     "], parent.name=[",
                     this.parent.name, "]");
@@ -160,11 +174,10 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                     "callback": lang.hitch(this, function () {
                         //start widget
                         this.startup();
-
+                        this.init();
                         // call view assistant's init() method to initialize view
                         this.app.log("  > in app/ViewBase calling init() name=[", this.name, "], parent.name=[",
                             this.parent.name, "]");
-                        this.init();
                         this._started = true;
                         if (this._startDef) {
                             this._startDef.resolve(this);
@@ -180,6 +193,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
                 // tags:
                 //		private
                 //
+                console.log("dapp/ViewBase:_loadViewController called for " + this.id);
                 var viewControllerDef = new Deferred();
                 var path;
 

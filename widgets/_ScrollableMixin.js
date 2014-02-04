@@ -144,7 +144,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base
                 //		Checks if the given node is a fixed bar or not.
                 if (node.nodeType === 1) {
                     var fixed = node.getAttribute("data-app-constraint") || (registry.byNode(node) &&
-						registry.byNode(node)["data-app-constraint"]);
+                        registry.byNode(node)["data-app-constraint"]);
                     /*	if(fixed === "top"){
 					 domClass.add(node, "mblFixedHeaderBar");
 					 if(local){

@@ -1,9 +1,9 @@
 define(["dcl/dcl", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/window",
         "dojo/query", "dojo/dom-geometry", "dojo/dom-attr", "dojo/dom-style", "dijit/registry",
-        "./LayoutBase", "../utils/layout", "../utils/constraints"
+        "./LayoutBase", "../utils/layout", "../utils/constraints", "dojo/dom-class"
     ],
     function (dcl, lang, array, win, query, domGeom, domAttr, domStyle, registry, LayoutBase, layout,
-        constraints) {
+        constraints, domClass) {
         // module:
         //		dapp/controllers/Layout
         // summary:
@@ -67,7 +67,26 @@ define(["dcl/dcl", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/window",
                         event.view.parent.name, "]");
 
                     if (!event.view.domNode.parentNode) {
-                        event.view.parent.domNode.appendChild(event.view.domNode);
+                        //						event.view.parent.domNode.appendChild(event.view.domNode);
+                        var p = document.getElementById(event.view.constraint);
+                        //	p.appendChild(event.view.domNode);
+                        //	p.parentNode.addChild(event.view.domNode);
+                        if (p) {
+                            p.addChild(event.view.domNode);
+                        } else {
+                            //	event.view.parent.domNode.appendChild(event.view.domNode);
+                            event.view.parent.containerNode.addChild(event.view.domNode);
+                        }
+                        event.view.containerNode = event.view.domNode.children[0];
+                        //	register.parse();
+
+                        // set the id and class
+                        domAttr.set(event.view.domNode, "id", event.view.id); // Set the id for the domNode
+                        if (event.view.constraint) {
+                            domClass.add(event.view.domNode, event.view.constraint);
+                        }
+
+
                     }
 
                     domAttr.set(event.view.domNode, "data-app-constraint", event.view.constraint);
