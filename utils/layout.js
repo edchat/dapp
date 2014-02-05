@@ -1,58 +1,56 @@
-define([
-	"dojo/_base/array", // array.filter array.forEach
-	"dojo/dom-class", // domClass.add domClass.remove
-	"dojo/dom-geometry", // domGeometry.marginBox
-	"dojo/dom-style", // domStyle.getComputedStyle
-	"dojo/_base/lang" // lang.mixin
-], function (array, domClass, domGeometry, domStyle, lang) {
+define(["dojo/_base/array", /* array.filter array.forEach */ "dojo/dom-class", /* domClass.add domClass.remove */
+		"dojo/dom-geometry", /* domGeometry.marginBox */ "dojo/dom-style", /* domStyle.getComputedStyle */
+		"dojo/_base/lang" /* lang.mixin */
+	],
+	function (array, domClass, domGeometry, domStyle, lang) {
 
-	// module:
-	//		dijit/layout/utils
-	// summary:
-	//		marginBox2contentBox() and layoutChildren()
-
-	var layout = {};
-	/*===== layout = dijit/layout =====*/
-
-	layout.marginBox2contentBox = function (/*DomNode*/ node, /*Object*/ mb) {
+		// module:
+		//		dijit/layout/utils
 		// summary:
-		//		Given the margin-box size of a node, return its content box size.
-		//		Functions like domGeometry.contentBox() but is more reliable since it doesn't have
-		//		to wait for the browser to compute sizes.
-		var cs = domStyle.getComputedStyle(node);
-		var me = domGeometry.getMarginExtents(node, cs);
-		var pb = domGeometry.getPadBorderExtents(node, cs);
-		return {
-			l: domStyle.toPixelValue(node, cs.paddingLeft),
-			t: domStyle.toPixelValue(node, cs.paddingTop),
-			w: mb.w - (me.w + pb.w),
-			h: mb.h - (me.h + pb.h)
+		//		marginBox2contentBox() and layoutChildren()
+
+		var layout = {};
+		/*===== layout = dijit/layout =====*/
+
+		layout.marginBox2contentBox = function ( /*DomNode*/ node, /*Object*/ mb) {
+			// summary:
+			//		Given the margin-box size of a node, return its content box size.
+			//		Functions like domGeometry.contentBox() but is more reliable since it doesn't have
+			//		to wait for the browser to compute sizes.
+			var cs = domStyle.getComputedStyle(node);
+			var me = domGeometry.getMarginExtents(node, cs);
+			var pb = domGeometry.getPadBorderExtents(node, cs);
+			return {
+				l: domStyle.toPixelValue(node, cs.paddingLeft),
+				t: domStyle.toPixelValue(node, cs.paddingTop),
+				w: mb.w - (me.w + pb.w),
+				h: mb.h - (me.h + pb.h)
+			};
 		};
-	};
 
-	function capitalize(word) {
-		return word.substring(0, 1).toUpperCase() + word.substring(1);
-	}
-
-	function size(widget, dim) {
-		// size the child
-		var newSize = widget.resize ? widget.resize(dim) : domGeometry.setMarginBox(widget.domNode, dim);
-
-		// record child's size
-		if (newSize) {
-			// if the child returned it's new size then use that
-			lang.mixin(widget, newSize);
-		} else {
-			// otherwise, call getMarginBox(), but favor our own numbers when we have them.
-			// the browser lies sometimes
-			lang.mixin(widget, domGeometry.getMarginBox(widget.domNode));
-			lang.mixin(widget, dim);
+		function capitalize(word) {
+			return word.substring(0, 1).toUpperCase() + word.substring(1);
 		}
-	}
 
-	layout.layoutChildren =
-		function (/*DomNode*/ container, /*Object*/ dim, /*Widget[]*/ children, /*String?*/ changedRegionId, /*Number?*/
-			changedRegionSize) {
+		function size(widget, dim) {
+			// size the child
+			var newSize = widget.resize ? widget.resize(dim) : domGeometry.setMarginBox(widget.domNode, dim);
+
+			// record child's size
+			if (newSize) {
+				// if the child returned it's new size then use that
+				lang.mixin(widget, newSize);
+			} else {
+				// otherwise, call getMarginBox(), but favor our own numbers when we have them.
+				// the browser lies sometimes
+				lang.mixin(widget, domGeometry.getMarginBox(widget.domNode));
+				lang.mixin(widget, dim);
+			}
+		}
+
+		layout.layoutChildren = function ( /*DomNode*/ container, /*Object*/ dim, /*Widget[]*/ children,
+			/*String?*/
+			changedRegionId, /*Number?*/ changedRegionSize) {
 			// summary:
 			//		Layout a bunch of child dom nodes within a parent dom node
 			// container:
@@ -142,8 +140,8 @@ define([
 		};
 
 
-	return {
-		marginBox2contentBox: layout.marginBox2contentBox,
-		layoutChildren: layout.layoutChildren
-	};
-});
+		return {
+			marginBox2contentBox: layout.marginBox2contentBox,
+			layoutChildren: layout.layoutChildren
+		};
+	});
