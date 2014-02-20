@@ -1,6 +1,14 @@
-require(["dapp/main", "dojo/json", "dojo/text!./config.json", "dojo/sniff"],
-	function (Application, json, config, has) {
-		has.add("ie9orLess", has("ie") && (has("ie") <= 9));
+require(["dapp/main", //"dojo/json",
+	"dojo/text!./config.json",
+/*"dojo/text!./dapp/samples/mobileApp/config.json",*/
+	"dojo/sniff"],
+	function (Application, /*json,*/ config, has) {
 		/* jshint nonew: false */
-		new Application(json.parse(config));
+		has.add("requirejs", window.requirejs);
+		var jsonData = config;
+		jsonData = jsonData.replace(/\/\*.*?\*\//g, "");
+		jsonData = jsonData.replace(/\/\/.*/g, "");
+		//jsonData = JSON.minify(jsonData);
+		//new Application(json.parse(config));
+		new Application(JSON.parse(jsonData));
 	});

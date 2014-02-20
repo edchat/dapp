@@ -1,10 +1,10 @@
 define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/config",
-		"dojo/Evented", "dojo/Deferred", "dojo/when", "dojo/has", "dojo/on", "dojo/domReady",
-		"dojo/dom-construct", "dojo/dom-attr", "./utils/nls", "./modules/lifecycle",
-		"./utils/hash", "./utils/constraints", "./utils/config"
-	],
-	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady,
-		domConstruct, domAttr, nls, lifecycle, hash, constraints, configUtils) {
+	"dojo/Evented", "dojo/Deferred", "dojo/when", "dojo/has", "dojo/on", "dojo/domReady",
+	"dojo/dom-construct", "dojo/dom-attr", "./utils/nls", "./modules/lifecycle",
+	"./utils/hash", "./utils/constraints", "./utils/config", "dojo/_base/window"//, "dojo/domReady!"
+],
+	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady, domConstruct, domAttr,
+		nls, lifecycle, hash, constraints, configUtils) {
 
 		has.add("app-log-api", (config.app || {}).debugApp);
 
@@ -14,6 +14,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				this.domNode = node;
 				this.children = {};
 				this.loadedStores = {};
+				this.loadedControllers = [];
 			},
 
 			displayView: function (view, params) {
@@ -80,51 +81,26 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 
 			createControllers: function (controllers) {
 				// summary:
-				//		Create controller instance
+				// Create controller instance
 				//
 				// controllers: Array
-				//		controller configuration array.
+				// controller configuration array.
 				// returns:
-				//		controllerDeferred object
+				// controllerDeferred object
 
 				if (controllers) {
 					var requireItems = [];
 					for (var i = 0; i < controllers.length; i++) {
 						requireItems.push(controllers[i]);
 					}
-
-					var def = new Deferred();
-					var requireSignal;
-					try {
-						requireSignal = require.on("error", function (error) {
-							if (def.isResolved() || def.isRejected()) {
-								return;
-							}
-							def.reject("load controllers error." + error);
-							requireSignal.remove();
-						});
-						require(requireItems, function () {
-							def.resolve.call(def, arguments);
-							requireSignal.remove();
-						});
-					} catch (e) {
-						def.reject(e);
-						if (requireSignal) {
-							requireSignal.remove();
-						}
-					}
-
 					var controllerDef = new Deferred();
-					when(def, lang.hitch(this, function () {
-						for (var i = 0; i < arguments[0].length; i++) {
+					require(requireItems, lang.hitch(this, function () {
+						for (var i = 0; i < arguments.length; i++) {
 							// instantiate controllers, set Application object, and perform auto binding
-							new arguments[0][i](this).bind();
+							this.loadedControllers.push((new arguments[i](this)).bind());
 						}
 						controllerDef.resolve(this);
-					}), function () {
-						//require def error, reject loadChildDeferred
-						controllerDef.reject("load controllers error.");
-					});
+					}));
 					return controllerDef;
 				}
 			},
@@ -144,9 +120,64 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				}));
 			},
 
+			flattenViewDefinitions: function (viewDefs) {
+				var result = {};
+				var resultViews = {};
+
+				function recurse (cur, prop) {
+					for (var p in cur) {
+						result[p] = result[prop] ? result[prop] + "," + p : p; // not used as of now TODO: remove this
+						var vpath = resultViews[prop] && resultViews[prop].viewPath ?
+							resultViews[prop].viewPath + "," + p : p;
+						//resultViews[p] = {"viewPath": vpath, "viewdef": cur[p]}; // do not need to add the def obj
+						resultViews[p] = {"viewPath": vpath};
+						if (cur[p].views) {
+							recurse(cur[p].views, p);
+						}
+					}
+				}
+
+				recurse(viewDefs, "");
+				return resultViews;
+			},
+
+			getViewDefFromViewName: function (viewName) {
+				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
+				if (viewName && viewPath) {
+					var parts = viewPath.split(",");
+					var viewDef = this;
+					for (var item in parts) {
+						viewDef = viewDef.views[parts[item]];
+					}
+					return viewDef;
+				}
+				return null;
+			},
+
+			getParentViewFromViewName: function (viewName) {
+				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
+				if (viewName && viewPath) {
+					var parts = viewPath.split(",");
+					parts.pop();
+					var viewDef = this;
+					for (var item in parts) {
+						viewDef = viewDef.children[parts[item]];
+					}
+					return viewDef;
+				}
+				return null;
+			},
+
 			setupControllers: function () {
 				// create application controller instance
 				// move set _startView operation from history module to application
+
+				// TODO: elc try this, need to setup an array of all views to show their viewpaths
+				this.flatViewDefinitions = this.flattenViewDefinitions(this.views);
+				console.log("back from call to get this.flattenViewDefinitions = ", this.flatViewDefinitions);
+				console.log("back from call to get this.flattenViewDefinitions test = ",
+					this.getViewDefFromViewName("home"));
+
 				var currentHash = window.location.hash;
 				this._startView = hash.getTarget(currentHash, this.defaultView);
 				this._startParams = hash.getParams(currentHash);
@@ -170,14 +201,14 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			}
 		});
 
-		function generateApp(config, node) {
+		function generateApp (config, node) {
 			// summary:
-			//		generate the application
+			// generate the application
 			//
 			// config: Object
-			//		app config
+			// app config
 			// node: domNode
-			//		domNode.
+			// domNode.
 			var path;
 
 			// call configProcessHas to process any has blocks in the config
@@ -186,16 +217,40 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			if (!config.loaderConfig) {
 				config.loaderConfig = {};
 			}
-			require(config.loaderConfig);
+			if (!config.loaderConfig.paths) {
+				config.loaderConfig.paths = {};
+			}
+			if (!config.loaderConfig.paths.app) {
+				// Register application module path
+				path = window.location.pathname;
+				if (path.charAt(path.length) !== "/") {
+					path = path.split("/");
+					path.pop();
+					path = path.join("/");
+				}
+				config.loaderConfig.paths.app = path;
+			}
+
+			/* global requirejs */
+			if (window.requirejs) {
+				requirejs.config(config.loaderConfig);
+			} else {
+				// Dojo loader?
+				require(config.loaderConfig);
+			}
 
 			if (!config.modules) {
 				config.modules = [];
 			}
-
+			// add dapp lifecycle module by default
+			config.modules.push("./modules/lifecycle");
 			var modules = config.modules.concat(config.dependencies ? config.dependencies : []);
 
 			if (config.template) {
 				path = config.template;
+				if (path.indexOf("./") === 0) {
+					path = "app/" + path;
+				}
 				modules.push("dojo/text!" + path);
 			}
 
@@ -211,8 +266,9 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 						templateString: arguments[arguments.length - 1]
 					};
 				}
+				/*global App:true */
+				App = declare(modules, ext);
 
-				var App = declare(modules, ext);
 
 				domReady(function () {
 					var app = new App(config, node || document.body);
@@ -220,29 +276,27 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 					if (has("app-log-api")) {
 						app.log = function () {
 							// summary:
-							//		If config is set to turn on app logging, then log msg to the console
+							// If config is set to turn on app logging, then log msg to the console
 							//
 							// arguments:
-							//		the message to be logged,
-							//		all but the last argument will be treated as Strings and be concatenated together,
-							//      the last argument can be an object it will be added as an argument to console.log
+							// the message to be logged,
+							// all but the last argument will be treated as Strings and be concatenated together,
+							// the last argument can be an object it will be added as an argument to console.log
 							var msg = "";
 							try {
 								for (var i = 0; i < arguments.length - 1; i++) {
 									msg = msg + arguments[i];
 								}
 								console.log(msg, arguments[arguments.length - 1]);
-							} catch (e) {}
+							} catch (e) {
+							}
 						};
 					} else {
-						app.log = function () {}; // noop
+						app.log = function () {
+						}; // noop
 					}
 
-					if (app.setStatus) {
-						// only use lifecyle module if present
-						app.setStatus(app.lifecycle.STARTING);
-					}
-
+					app.setStatus(app.lifecycle.STARTING);
 					// Create global namespace for application.
 					// The global name is application id. For example, modelApp
 					var globalAppName = app.id;
@@ -254,6 +308,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				});
 			});
 		}
+
 
 		return function (config, node) {
 			if (!config) {

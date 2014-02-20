@@ -22,7 +22,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.attributes.testStringReplace = "yyyyed";
 			this.domNode.currentStatus = this.domNode.currentStatus + "-init called";
 			// I put the on click back in the home.html
-			on(document.getElementById("label1"), "click",
+			on(this.domNode.ownerDocument.getElementById("label1"), "click",
 				function () {
 					console.log("in on click");
 					//	deliteApp.displayView('detail2');

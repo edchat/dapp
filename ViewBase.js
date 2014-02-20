@@ -174,7 +174,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 					"callback": lang.hitch(this, function () {
 						//start widget
 						this.startup();
-						this.init();
+						//	this.init(); // moved to Load after startup().then
 						// call view assistant's init() method to initialize view
 						this.app.log("  > in app/ViewBase calling init() name=[", this.name, "], parent.name=[",
 							this.parent.name, "]");
@@ -184,6 +184,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 						}
 					})
 				});
+
 			},
 
 
@@ -207,27 +208,9 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 					path = this.controller.replace(/(\.js)$/, "");
 				}
 
-				var requireSignal;
-				try {
-					requireSignal = require.on("error", function (error) {
-						if (viewControllerDef.isResolved() || viewControllerDef.isRejected()) {
-							return;
-						}
-						if (error.info[0] && (error.info[0].indexOf(path) >= 0)) {
-							viewControllerDef.resolve(false);
-							requireSignal.remove();
-						}
-					});
-					require([path], function (controller) {
-						viewControllerDef.resolve(controller);
-						requireSignal.remove();
-					});
-				} catch (e) {
-					viewControllerDef.reject(e);
-					if (requireSignal) {
-						requireSignal.remove();
-					}
-				}
+				require([path], function (controller) {
+					viewControllerDef.resolve(controller);
+				});
 				return viewControllerDef;
 			},
 

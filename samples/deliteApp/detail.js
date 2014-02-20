@@ -2,6 +2,7 @@ define(["dojo/dom", "dojo/on"], function (dom, on) {
 	return {
 		init: function (previousView, data) {
 			console.log("in detail.js init called");
+		//	on(this.domNode.ownerDocument.getElementById("detaillabel2"), "click",
 			on(document.getElementById("detaillabel2"), "click",
 				function () {
 					console.log("in on click");

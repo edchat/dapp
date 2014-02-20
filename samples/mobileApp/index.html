@@ -10,10 +10,40 @@
 	<link rel="stylesheet" href="../../../delite/themes/defaultapp.css">
 	<link rel="stylesheet" href="app.css">
 
-		<script type="text/javascript" data-dojo-config="async: true" src="../../../dojo/dojo.js"></script>
+	<!-- for dojo -->
+	<!--  -->
+	<script type="text/javascript" data-dojo-config="async: true" src="../../../dojo/dojo.js"></script>
+	<!-- -->
+
+	<!-- for requireJS -->
+	<!--
+	<script src="../../../requirejs/require.js"></script>
 		<script>
-			require(["./deliteApp.js"]);
+			require.config({
+			//    baseUrl: "/another/path",
+			    paths: {
+			        "dapp": "../../../dapp",
+					"dcl": "../../../dcl",
+					"dojo": "../../../dojo",
+					"dpointer": "../../../dpointer",
+					"delite": "../../../delite",
+					"deliteful": "../../../deliteful"
+			    },
+			    waitSeconds: 15
+			  });
         </script>
+	-->
+
+	<!-- for requireJS from a boilerplate -->
+	<!--
+		<script type="text/javascript" src="../boilerplate.js"></script>
+	-->
+
+
+	<script>
+		require(["./deliteApp.js"]);
+	</script>
+
 	</head>
 	<body style="width:100%; height: 100%">
 	<!-- A SidePane for the left menu -->

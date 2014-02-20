@@ -1,13 +1,13 @@
 define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred",
-		"delite/Widget", "delite/template", "delite/Invalidating", "delite/register", "delite/handlebars",
-		"dojo/dom-construct",
-		"dojo/dom-attr", "dojo/dom-style", "dojo/dom-class",
-		"delite/Stateful",
-		//	"dijit/Destroyable",
-		//"dijit/_TemplatedMixin",
-		//"dijit/_WidgetsInTemplateMixin",
-		"./ViewBase", "./utils/nls"
-	],
+	"delite/Widget", "delite/template", "delite/Invalidating", "delite/register", "delite/handlebars",
+	"dojo/dom-construct",
+	"dojo/dom-attr", "dojo/dom-style", "dojo/dom-class",
+	"delite/Stateful",
+	//	"dijit/Destroyable",
+	//"dijit/_TemplatedMixin",
+	//"dijit/_WidgetsInTemplateMixin",
+	"./ViewBase", "./utils/nls"
+],
 	function (require, when, on, dcl, lang, Deferred, Widget, dtemplate, Invalidating, register, handlebars,
 		domConstruct, domAttr, domStyle, domClass, Stateful, //Destroyable,
 		//	_TemplatedMixin,
@@ -90,35 +90,9 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					if (tpl) {
 						deps = deps.concat(["dojo/text!" + tpl]);
 					}
-					var def = new Deferred();
-					if (deps.length > 0) {
-						var requireSignal;
-						try {
-							requireSignal = require.on("error", lang.hitch(this, function (error) {
-								if (def.isResolved() || def.isRejected()) {
-									return;
-								}
-								if (error.info[0] && error.info[0].indexOf(this.template) >= 0) {
-									def.resolve(false);
-									requireSignal.remove();
-								}
-							}));
-							require(deps, function () {
-								def.resolve.call(def, arguments);
-								requireSignal.remove();
-							});
-						} catch (e) {
-							def.resolve(false);
-							if (requireSignal) {
-								requireSignal.remove();
-							}
-						}
-					} else {
-						def.resolve(true);
-					}
 					var loadViewDeferred = new Deferred();
-					when(def, lang.hitch(this, function () {
-						this.templateString = this.template ? arguments[0][arguments[0].length - 1] : "<div></div>";
+					require(deps, lang.hitch(this, function () {
+						this.templateString = this.template ? arguments[arguments.length - 1] : "<div></div>";
 						loadViewDeferred.resolve(this);
 					}));
 					return loadViewDeferred;
@@ -138,10 +112,10 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					when(defDef, lang.hitch(this, function () {
 						when(nlsDef, lang.hitch(this, function (nls) {
 							// we inherit from the parent NLS
-							this.nls = lang.mixin({}, this.parent.nls);
+							this.nls = dcl.mix({}, this.parent.nls) || {};
 							if (nls) {
 								// make sure template can access nls doing ${nls.myprop}
-								lang.mixin(this.nls, nls);
+								dcl.mix(this.nls, nls);
 							}
 							when(this._loadTemplate(), function (value) {
 								tplDef.resolve(value);
@@ -167,45 +141,46 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					// FIXME: should be transparent with delite/handlebar...
 
 					this.domNode = document.getElementById(this.id);
-					if (!this.domNode) {
-						this.attributes.nls = this.nls; // add nls strings to attributes
-						this.attributes.currentStatus = this.currentStatus;
-						var params = {
-							//		attributes: this.attributes,
-							//		nls: {},
-							// either need to have property declared in prototype or call
-							// addInvalidatingProperties to get it to update when it is changed
-							// currentStatus: this.currentStatus,
-							baseClass: "d-" + this.id,
-							buildRendering: handlebars.compile(this.templateString),
-							//	buildRendering: lang.hitch(this, function () {
-							//		console.log("in view buildRendering");
-							//		return handlebars.compile(this.templateString);
-							//	}),
-							preCreate: function () {
-								console.log("in view preCreate");
-							},
+					this.attributes.nls = this.nls; // add nls strings to attributes
 
-							postCreate: function () {
-								console.log("in view postCreate ");
-							},
-							refreshRendering: dcl.after(function (args) {
-								console.log("in view refreshRendering args[0] = " + args[0]);
-							})
-						};
-						lang.mixin(params, this.attributes);
+					var params = {
+						baseClass: "d-" + this.id,
+						buildRendering: handlebars.compile(this.templateString),
+						preCreate: function () {
+							console.log("in view preCreate");
+						},
+						postCreate: function () {
+							console.log("in view postCreate ");
+						},
+						refreshRendering: dcl.after(function (args) {
+							console.log("in view refreshRendering args[0] = " + args[0]);
+						})
+					};
+					dcl.mix(params, this.attributes);
 
-						// try to setup a widget to build the view here
-						this.viewWidget = register(this.id, [HTMLElement, Widget, Invalidating], params);
+					// try to setup a widget to build the view here
+					register(this.id, [HTMLElement, Widget, Invalidating], params);
 
-						this.domNode = register.createElement(this.id);
-						this.domNode.id = this.id;
-						//TODO: try this for wdigets in templates to work
-						this.domNode.containerNode = this.domNode;
 
-						this._initViewHidden();
 
+					/* tried this for christophe
+					if(!this.app.ViewClass){
+						this.app.ViewClass = register("d-app-view", [HTMLElement, Widget, Invalidating]);
 					}
+
+					this.app.ViewClass.prototype.buildRendering = handlebars.compile(this.templateString);
+					var view = new this.app.ViewClass();
+					//view.prototype.buildRendering = handlebars.compile(this.templateString);
+					this.domNode = register.createElement("d-app-view"); //"d-app-view"
+					*/
+					this.domNode = register.createElement(this.id);
+					this.domNode.id = this.id;
+
+					//TODO: had to do this for widgets in templates to work
+					this.domNode.containerNode = this.domNode;
+					this.domNode.startup();
+
+					this._initViewHidden();
 
 					this._startLayout();
 

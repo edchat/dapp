@@ -3,7 +3,14 @@
 
 	"loaderConfig": {
 		"paths": {
-			"deliteApp": "../dapp/samples/deliteApp"
+			"has" : {
+				"requirejs" : {
+					"deliteApp": "../deliteApp"
+				},
+				"!requirejs" : {
+					"deliteApp": "../dapp/samples/deliteApp"
+				}
+			}
 		}
 	},
 
@@ -36,16 +43,19 @@
 		},
 		"header": {
 			"constraint": "main",
+			"parentSelector": "#main",
 			"template": "deliteApp/header.html"
 		},
 		"home2": {
 			"constraint": "main-view-stack",
+			"parentSelector": "#main-view-stack",
 			"controller" : "deliteApp/home.js",
 			"template": "deliteApp/home.html",
 			"nls": "deliteApp/nls/home"
 		},
 		"detail2": {
 			"constraint": "main-view-stack",
+			"parentSelector": "#main-view-stack",
 			"controller" : "deliteApp/detail.js",
 			"template": "deliteApp/detail.html"
 		},
@@ -54,19 +64,42 @@
 				"deliteful/ViewStack"
 			],
 			"constraint": "main",
+			"parentSelector": "#main",
 			"template": "deliteApp/content.html",
 			"defaultView": "home",
 			"views": {
 				"home": {
 					"constraint": "main-view-stack",
+					"parentSelector": "#main-view-stack",
 					"controller" : "deliteApp/home.js",
 					"template": "deliteApp/home.html",
 					"nls": "deliteApp/nls/home"
 				},
 				"detail": {
 					"constraint": "main-view-stack",
+					"parentSelector": "#main-view-stack",
 					"controller" : "deliteApp/detail.js",
 					"template": "deliteApp/detail.html"
+				}
+			}
+		},
+		"p1": {
+			"controller" : "deliteApp/home.js",
+			"template": "deliteApp/home.html",
+			"views": {
+				"s1": {
+					"constraint": "s1constraint",
+					"parentSelector": "#s1constraint",
+					"controller" : "deliteApp/home.js",
+					"template": "deliteApp/home.html",
+					"views": {
+						"child1": {
+							"constraint": "child1constraint",
+							"parentSelector": "#child1constraint",
+							"controller" : "deliteApp/home.js",
+							"template": "deliteApp/home.html"
+						}
+					}
 				}
 			}
 		}
