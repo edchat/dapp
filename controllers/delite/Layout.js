@@ -21,8 +21,8 @@ define(["dcl/dcl", "dojo/_base/lang", "../../Controller", "dojo/dom-attr", "../.
 				// event: Object
 				// |		{"view": view, "callback": function(){}};
 				this.app.log("in app/controllers/Layout.initLayout event=", event);
-				this.app.log("in app/controllers/Layout.initLayout event.view.parent.name=[",
-					event.view.parent.name, "]");
+				this.app.log("in app/controllers/Layout.initLayout event.view.parent.viewName=[",
+					event.view.parent.viewName, "]");
 
 				// TODO: we should have the correct parent and not need to try to find it here
 				if (!event.view.domNode.parentNode) {

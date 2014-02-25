@@ -33,10 +33,21 @@
 	"controllers": [
 		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
+		"dapp/controllers/delite/Logger",
 		"dapp/controllers/delite/Transition",
 		"dapp/controllers/delite/Layout"
 	],
 
+
+	"appLogging": {
+		"logAll": 0,
+		"logTimeStamp": 0,
+		"loggingList": [
+			"app-view:",
+			"controllers/delite/Load:",
+			"controllers/delite/Transition:"
+		]
+	},
 
 	"defaultView": "aaa",
 

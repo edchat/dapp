@@ -1,15 +1,15 @@
 define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred",
-	"delite/Widget", "delite/template", "delite/Invalidating", "delite/register", "delite/handlebars",
-	"dojo/dom-construct",
-	"dojo/dom-attr", "dojo/dom-style", "dojo/dom-class",
-	"delite/Stateful",
-	//	"dijit/Destroyable",
-	//"dijit/_TemplatedMixin",
-	//"dijit/_WidgetsInTemplateMixin",
-	"./ViewBase", "./utils/nls"
-],
+		"delite/Widget", "delite/template", "delite/Invalidating", "delite/register", "delite/handlebars",
+		"dojo/dom-construct",
+		"dojo/dom-attr", "dojo/dom-style", "dojo/dom-class",
+		"delite/Stateful", "dojo/aspect",
+		//	"dijit/Destroyable",
+		//"dijit/_TemplatedMixin",
+		//"dijit/_WidgetsInTemplateMixin",
+		"./ViewBase", "./utils/nls"
+	],
 	function (require, when, on, dcl, lang, Deferred, Widget, dtemplate, Invalidating, register, handlebars,
-		domConstruct, domAttr, domStyle, domClass, Stateful, //Destroyable,
+		domConstruct, domAttr, domStyle, domClass, Stateful, aspect, //Destroyable,
 		//	_TemplatedMixin,
 		//	_WidgetsInTemplateMixin,
 		ViewBase, nls) {
@@ -126,6 +126,9 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 				};
 			}),
 
+			_checkTemplate: function (tag) {
+				console.log(" in _checkTemplate tag = " + tag);
+			},
 			// in another place it was mentioned that may want to change from startup --> enteredViewCallback.
 			_startup: dcl.superCall(function (sup) {
 				return function () {
@@ -142,7 +145,7 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 
 					this.domNode = document.getElementById(this.id);
 					this.attributes.nls = this.nls; // add nls strings to attributes
-
+					//var _self = this;
 					var params = {
 						baseClass: "d-" + this.id,
 						buildRendering: handlebars.compile(this.templateString),
@@ -159,9 +162,19 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					dcl.mix(params, this.attributes);
 
 					// try to setup a widget to build the view here
-					register(this.id, [HTMLElement, Widget, Invalidating], params);
-
-
+					//TODO: why can we not use id here?  it gets an error
+					register(this.id.toLowerCase(), [HTMLElement, Widget, Invalidating], params);
+					/*
+					var B5 = dcl(register, {
+						createElement: dcl.around(function(tag){
+					    return function(tag){
+							console.log("in view before createElement _self.id = "+_self.id);
+					      sub.call(tag);
+					    };
+					  })
+					});
+*/
+					aspect.around(register, "createElement", lang.hitch(this, "_checkTemplate"), true);
 
 					/* tried this for christophe
 					if(!this.app.ViewClass){
@@ -173,7 +186,10 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					//view.prototype.buildRendering = handlebars.compile(this.templateString);
 					this.domNode = register.createElement("d-app-view"); //"d-app-view"
 					*/
-					this.domNode = register.createElement(this.id);
+					//	aspect.before(register.createElement, this.id.toLowerCase(), function(){
+					//		console.log("@@@@@@ hey inside aspect before createElement");
+					//	}, true);
+					this.domNode = register.createElement(this.id.toLowerCase());
 					this.domNode.id = this.id;
 
 					//TODO: had to do this for widgets in templates to work

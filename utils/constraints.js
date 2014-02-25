@@ -45,7 +45,7 @@ define(["dojo/_base/array"], function (arr) {
 			}
 		},
 
-		setSelectedChild: function (view, constraint, child) {
+		setSelectedChild: function (view, constraint, child, app) {
 			// summary:
 			//		set current selected child according to the constraint
 			//
@@ -57,10 +57,13 @@ define(["dojo/_base/array"], function (arr) {
 			//		the child to select
 			var type = typeof (constraint);
 			var hash = (type === "string" || type === "number") ? constraint : constraint.__hash;
+			if (!view.selectedChildren) { // view is a domNode, not a parentView
+				view = app.getParentViewFromViewName(child.name || child.id);
+			}
 			view.selectedChildren[hash] = child;
 			console.log("in constraints.setSelectedChild view.id [" + view.id + "] has selectedChildren set for [" +
 				child.id + "] with hash =[" + hash + "]");
-			if (child && child.app.autoUnloadCount) {
+			if (child && app.autoUnloadCount) {
 				child.transitionCount = 0;
 
 				console.log("in constraints.setSelectedChild looking for sibling for view [" + child.id + "]");
@@ -142,6 +145,6 @@ define(["dojo/_base/array"], function (arr) {
 					constraints.push(constraint);
 				}
 			}
-		},
+		}
 	};
 });

@@ -31,9 +31,19 @@
 		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
 		"dapp/controllers/delite/Transition",
+		"dapp/controllers/delite/Logger",
 		"dapp/controllers/delite/Layout"
 	],
 
+	"appLogging": {
+		"logAll": 0,
+		"logTimeStamp": 0,
+		"loggingList": [
+			"app-view:",
+			"controllers/delite/Load:",
+			"controllers/delite/Transition:"
+		]
+	},
 
 	"defaultView": "header+content,home",
 
@@ -42,19 +52,12 @@
 			"template": "deliteApp/main.html"
 		},
 		"header": {
-			"constraint": "main",
+			"constraint": "header",
 			"parentSelector": "#main",
 			"template": "deliteApp/header.html"
 		},
-		"home2": {
-			"constraint": "main-view-stack",
-			"parentSelector": "#main-view-stack",
-			"controller" : "deliteApp/home.js",
-			"template": "deliteApp/home.html",
-			"nls": "deliteApp/nls/home"
-		},
 		"detail2": {
-			"constraint": "main-view-stack",
+			"constraint": "main",
 			"parentSelector": "#main-view-stack",
 			"controller" : "deliteApp/detail.js",
 			"template": "deliteApp/detail.html"
@@ -66,6 +69,7 @@
 			"constraint": "main",
 			"parentSelector": "#main",
 			"template": "deliteApp/content.html",
+			"controller": "deliteApp/content.js",
 			"defaultView": "home",
 			"views": {
 				"home": {
@@ -82,6 +86,13 @@
 					"template": "deliteApp/detail.html"
 				}
 			}
+		},
+		"home": {
+			"constraint": "main-view-stack",
+			"parentSelector": "#main-view-stack",
+			"controller" : "deliteApp/home.js",
+			"template": "deliteApp/home.html",
+			"nls": "deliteApp/nls/home"
 		},
 		"p1": {
 			"controller" : "deliteApp/home.js",

@@ -17,7 +17,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			console.log("dapp/View:constructor called for " + this.id);
 		},
 
-		init: function (previousView, data) {
+		init: function () {
 			console.log("in home.js init called");
 			this.attributes.testStringReplace = "yyyyed";
 			this.domNode.currentStatus = this.domNode.currentStatus + "-init called";
@@ -30,12 +30,12 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 				}
 			);
 		},
-		beforeActivate: function (previousView, data) {
+		beforeActivate: function (previousView, viewData) {
 			console.log("in home.js beforeActivate called");
 			this.beforeActivateCallCount++;
 			this.domNode.beforeActivateStatus = "called " + this.beforeActivateCallCount + " times";
 		},
-		beforeDeactivate: function (previousView, data) {
+		beforeDeActivate: function (previousView, viewData) {
 			console.log("in home.js beforeDeactivate called previousView=", previousView);
 			this.beforeDeactivateCallCount++;
 			this.domNode.beforeDeactivateStatus = "called " + this.beforeDeactivateCallCount + " times";

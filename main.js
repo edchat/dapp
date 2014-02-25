@@ -1,8 +1,8 @@
 define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/config",
-	"dojo/Evented", "dojo/Deferred", "dojo/when", "dojo/has", "dojo/on", "dojo/domReady",
-	"dojo/dom-construct", "dojo/dom-attr", "./utils/nls", "./modules/lifecycle",
-	"./utils/hash", "./utils/constraints", "./utils/config", "dojo/_base/window"//, "dojo/domReady!"
-],
+		"dojo/Evented", "dojo/Deferred", "dojo/when", "dojo/has", "dojo/on", "dojo/domReady",
+		"dojo/dom-construct", "dojo/dom-attr", "./utils/nls", "./modules/lifecycle",
+		"./utils/hash", "./utils/constraints", "./utils/config", "dojo/_base/window" //, "dojo/domReady!"
+	],
 	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady, domConstruct, domAttr,
 		nls, lifecycle, hash, constraints, configUtils) {
 
@@ -120,17 +120,29 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				}));
 			},
 
+			// flattenViewDefinitions will save the viewPath and viewId for each viewName
 			flattenViewDefinitions: function (viewDefs) {
 				var result = {};
 				var resultViews = {};
 
-				function recurse (cur, prop) {
+				function recurse(cur, prop) {
 					for (var p in cur) {
 						result[p] = result[prop] ? result[prop] + "," + p : p; // not used as of now TODO: remove this
 						var vpath = resultViews[prop] && resultViews[prop].viewPath ?
 							resultViews[prop].viewPath + "," + p : p;
+						var vId = resultViews[prop] && resultViews[prop].viewId ?
+							resultViews[prop].viewId + "_" + p : p;
 						//resultViews[p] = {"viewPath": vpath, "viewdef": cur[p]}; // do not need to add the def obj
-						resultViews[p] = {"viewPath": vpath};
+						if (resultViews[p]) { // This view name is a duplicate, showing the view by view name may fail
+							console.warn("Duplicate view name [" + p +
+								"] attempts to show this view by name will show [" +
+								resultViews[p].viewPath + "] instead of [" + vpath + "]");
+						} else {
+							resultViews[p] = {
+								"viewPath": vpath,
+								"viewId": vId
+							};
+						}
 						if (cur[p].views) {
 							recurse(cur[p].views, p);
 						}
@@ -154,11 +166,38 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				return null;
 			},
 
+			getViewIdFromViewName: function (viewName) {
+				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewId : null;
+				if (viewName && viewPath) {
+					var parts = viewPath.split(",");
+					var viewDef = this;
+					for (var item in parts) {
+						viewDef = viewDef.views[parts[item]];
+					}
+					return viewDef;
+				}
+				return null;
+			},
+
 			getParentViewFromViewName: function (viewName) {
 				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
 				if (viewName && viewPath) {
 					var parts = viewPath.split(",");
 					parts.pop();
+					var viewDef = this;
+					for (var item in parts) {
+						viewDef = viewDef.children[parts[item]];
+					}
+					return viewDef;
+				}
+				return null;
+			},
+
+			getViewFromViewId: function (viewName) {
+				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
+				if (viewName && viewPath) {
+					var parts = viewPath.split(",");
+					//parts.pop();
 					var viewDef = this;
 					for (var item in parts) {
 						viewDef = viewDef.children[parts[item]];
@@ -201,7 +240,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			}
 		});
 
-		function generateApp (config, node) {
+		function generateApp(config, node) {
 			// summary:
 			// generate the application
 			//
@@ -288,12 +327,10 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 									msg = msg + arguments[i];
 								}
 								console.log(msg, arguments[arguments.length - 1]);
-							} catch (e) {
-							}
+							} catch (e) {}
 						};
 					} else {
-						app.log = function () {
-						}; // noop
+						app.log = function () {}; // noop
 					}
 
 					app.setStatus(app.lifecycle.STARTING);

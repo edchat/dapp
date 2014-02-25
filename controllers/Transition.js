@@ -843,11 +843,13 @@ define(["dcl/dcl", "require", "dojo/_base/lang", "dojo/has", "dojo/on", "dojo/De
 				var subViewNames = "";
 				if (backward) {
 					for (var i = subViewArray.length - 1; i >= 0; i--) {
-						subViewNames = subViewNames ? subViewNames + "," + subViewArray[i].name : subViewArray[i].name;
+						subViewNames = subViewNames ? subViewNames + "," +
+							subViewArray[i].viewName : subViewArray[i].viewName;
 					}
 				} else {
 					for (var j = 0; j < subViewArray.length; j++) {
-						subViewNames = subViewNames ? subViewNames + "," + subViewArray[j].name : subViewArray[j].name;
+						subViewNames = subViewNames ? subViewNames + "," +
+							subViewArray[j].viewName : subViewArray[j].viewName;
 					}
 				}
 				return subViewNames;

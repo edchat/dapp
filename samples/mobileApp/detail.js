@@ -1,6 +1,6 @@
 define(["dojo/dom", "dojo/on"], function (dom, on) {
 	return {
-		init: function (previousView, data) {
+		init: function () {
 			console.log("in detail.js init called");
 			on(this.domNode.ownerDocument.getElementById("detaillabel2"), "click",
 				function () {
@@ -9,10 +9,9 @@ define(["dojo/dom", "dojo/on"], function (dom, on) {
 				}
 			);
 		},
-		beforeActivate: function (previousView, data) {
+		beforeActivate: function (previousView, viewData) {
 			if (previousView && previousView.id) {
-				//	dom.byId("label").innerHTML = this.nls[previousView.id] + (data ? ("-" + data) : "");
-				dom.byId("label").innerHTML = " - from - " + previousView.id + (data ? ("-" + data) : "");
+				dom.byId("label").innerHTML = " - from - " + previousView.id + (viewData ? ("-" + viewData) : "");
 			}
 		}
 	};

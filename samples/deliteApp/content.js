@@ -1,26 +1,11 @@
-define(["dojo/dom", "dojo/on"], function (dom, on) {
+define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) {
 	return {
-		attributes: {
-			"viewIdPlusLi": this.id + "test"
-		},
-		MODULE: "detail",
 		init: function () {
-			console.log("in detail.js init called");
-			//	on(this.domNode.ownerDocument.getElementById("detaillabel2"), "click",
-			on(this.domNode.querySelectorAll(".detaillabel2")[0], "click",
-				//	on(document.getElementById(this.viewIdPlusLi), "click",
-				function () {
-					console.log("in on click");
-					deliteApp.displayView("content,home");
-				}
-			);
+			console.log(this.viewName + " init called.");
 		},
 		beforeActivate: function (previousView, viewData) {
 			console.log("beforeActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
 				previousView.id : '') + "] with viewData=", viewData);
-			if (previousView && previousView.id) {
-				dom.byId("label").innerHTML = " - from view - " + previousView.id + (viewData ? ("- viewData - " + viewData) : "");
-			}
 		},
 		beforeDeactivate: function (nextView, viewData) {
 			console.log("beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?

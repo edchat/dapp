@@ -19,7 +19,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				//		- controller: view controller module identifier
 				//		- children: children views
 				this.id = "";
-				this.name = "";
+				this.viewName = "";
 				this.children = {};
 				this.selectedChildren = {};
 				this.loadedStores = {};
@@ -44,7 +44,7 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				}
 				// mixin views configuration to current view instance.
 				if (p && p.views) {
-					lang.mixin(this, p.views[this.id]);
+					lang.mixin(this, p.views[this.viewName]);
 				}
 				console.log("dapp/ViewBase:constructor called for " + this.id);
 			},
@@ -159,9 +159,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				//		private
 				console.log("dapp/ViewBase:_startLayout called for " + this.id);
 
-				this.app.log("  > in app/ViewBase _startLayout firing layout for name=[", this.name,
-					"], parent.name=[",
-					this.parent.name, "]");
+				this.app.log("  > in app/ViewBase _startLayout firing layout for name=[", this.viewName,
+					"], parent.viewName=[", this.parent.viewName, "]");
 
 				if (!this.hasOwnProperty("constraint")) {
 					this.constraint = domAttr.get(this.domNode, "data-app-constraint") || "center";
@@ -176,8 +175,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 						this.startup();
 						//	this.init(); // moved to Load after startup().then
 						// call view assistant's init() method to initialize view
-						this.app.log("  > in app/ViewBase calling init() name=[", this.name, "], parent.name=[",
-							this.parent.name, "]");
+						this.app.log("  > in app/ViewBase calling init() id=[", this.id, "], parent.viewName=[",
+							this.parent.viewName, "]");
 						this._started = true;
 						if (this._startDef) {
 							this._startDef.resolve(this);
@@ -200,8 +199,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 
 				if (!this.controller) { // no longer using this.controller === "none", if we dont have one it means none
 					this.app.log("  > in app/ViewBase _loadViewController no controller set for view name=[",
-						this.name,
-						"], parent.name=[", this.parent.name, "]");
+						this.viewName,
+						"], parent.viewName=[", this.parent.viewName, "]");
 					viewControllerDef.resolve(true);
 					return viewControllerDef;
 				} else {

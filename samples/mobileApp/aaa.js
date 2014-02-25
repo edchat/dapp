@@ -17,20 +17,20 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			console.log("dapp/View:constructor called for " + this.id);
 		},
 		MODULE: "aaa",
-		init: function (previousView, data) {
-			console.log(this.MODULE + " init called");
+		init: function () {
+			this.app.log(this.MODULE, this.viewName + " init called");
 		},
-		beforeActivate: function (previousView, data) {
-			console.log(this.MODULE + " beforeActivate called");
+		beforeActivate: function (previousView, viewData) {
+			console.log(this.viewName + " beforeActivate called previousView.id =[" + (previousView ? previousView.id : '') + "]");
 		},
-		beforeDeactivate: function (previousView, data) {
-			console.log(this.MODULE + " beforeDeactivate called previousView=", previousView);
+		beforeDeactivate: function (nextView, viewData) {
+			console.log(this.viewName + " beforeDeactivate called nextView.id= [" + (nextView ? nextView.id : '') + "]");
 		},
 		afterActivate: function (previousView) {
-			console.log(this.MODULE + " afterActivate called");
+			console.log(this.viewName + " afterActivate called previousView.id =[" + (previousView ? previousView.id : '') + "]");
 		},
-		afterDeactivate: function (previousView) {
-			console.log(this.MODULE + " afterDeactivate called previousView=", previousView);
+		afterDeactivate: function (nextView) {
+			console.log(this.viewName + " afterDeactivate called nextView.id= [" + (nextView ? nextView.id : '') + "]");
 		}
 	};
 });

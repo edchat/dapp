@@ -17,13 +17,13 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			console.log("dapp/View:constructor called for " + this.id);
 		},
 		MODULE: "bbb",
-		init: function (previousView, data) {
+		init: function () {
 			console.log(this.MODULE + " init called");
 		},
-		beforeActivate: function (previousView, data) {
+		beforeActivate: function (previousView, viewData) {
 			console.log(this.MODULE + " beforeActivate called");
 		},
-		beforeDeactivate: function (previousView, data) {
+		beforeDeActivate: function (previousView, viewData) {
 			console.log(this.MODULE + " beforeDeactivate called previousView=", previousView);
 		},
 		afterActivate: function (previousView) {

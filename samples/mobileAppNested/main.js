@@ -1,9 +1,9 @@
 define(["dojo/dom", "dojo/on"], function (dom, on) {
 	return {
-		init: function (previousView, data) {
+		init: function () {
 			console.log("in main.js init called");
 		},
-		beforeActivate: function (previousView, data) {
+		beforeActivate: function (previousView, viewData) {
 			console.log("in main.js beforeActivate called");
 		}
 	};

@@ -14,7 +14,7 @@ define([
 			container = document.createElement("div");
 			document.body.appendChild(container);
 		},
-		"basic tests getChildren" : function () {
+		"basic tests getChildren": function () {
 			var d = this.async(1000);
 			main(json.parse(config), container);
 			// TODO App construction method should probably return a promise which would make all of this a bit simpler
