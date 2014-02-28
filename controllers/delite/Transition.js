@@ -16,7 +16,8 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 				}
 				this._displayViews({
 					dest: dest,
-					viewData: event.viewData
+					viewData: event.viewData,
+					displayDeferred: event.displayDeferred
 					//dest: event.dest
 					// other props
 				});
@@ -79,6 +80,9 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 							(subEvent.parent.containerNode ? subEvent.parent.containerNode.id : "") + "]");
 						//	loadDeferred = parent.containerNode.show(subEvent.dest, subEvent).then(function (value) {
 						if (!p || !p.show) {
+							if(event.displayDeferred) {
+								event.displayDeferred.resolve();
+							}
 							return;
 						}
 						_self.app.log(MODULE, F + "before p.show with subEvent.dest = [" + subEvent.dest +
@@ -88,6 +92,9 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 								subEvent.dest + "] subEvent.parent.id[" + subEvent.parent.id + "]");
 							event.isParent = false;
 							deferred.resolve(value);
+							if(event.displayDeferred) {
+								event.displayDeferred.resolve();
+							}
 							return value;
 						});
 						// if we are at the init view, check if we have defaultView children to display in addition

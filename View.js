@@ -80,19 +80,23 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 				// tags:
 				//		private
 				//
-				console.log("dapp/View:_loadTemplate called for " + this.id);
+				console.log("dapp/View:_loadTemplate called for [" + this.id+"] this.templateString=["+this.templateString+"]");
 
 				if (this.templateString) {
 					return true;
 				} else {
 					var tpl = this.template;
+					console.log("dapp/View:_loadTemplate called with this.template=["+this.template+"]");
 					var deps = this.dependencies ? this.dependencies : [];
 					if (tpl) {
 						deps = deps.concat(["dojo/text!" + tpl]);
 					}
 					var loadViewDeferred = new Deferred();
+					console.log("dapp/View:_loadTemplate before require deps with deps = ",deps);
 					require(deps, lang.hitch(this, function () {
+						console.log("dapp/View:_loadTemplate back from require deps");
 						this.templateString = this.template ? arguments[arguments.length - 1] : "<div></div>";
+						console.log("dapp/View:_loadTemplate with this.templateString=["+this.templateString+"]");
 						loadViewDeferred.resolve(this);
 					}));
 					return loadViewDeferred;
@@ -163,7 +167,8 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 
 					// try to setup a widget to build the view here
 					//TODO: why can we not use id here?  it gets an error
-					register(this.id.toLowerCase(), [HTMLElement, Widget, Invalidating], params);
+					var tag = "my-"+this.id.toLowerCase();
+					register(tag, [HTMLElement, Widget, Invalidating], params);
 					/*
 					var B5 = dcl(register, {
 						createElement: dcl.around(function(tag){
@@ -189,7 +194,7 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					//	aspect.before(register.createElement, this.id.toLowerCase(), function(){
 					//		console.log("@@@@@@ hey inside aspect before createElement");
 					//	}, true);
-					this.domNode = register.createElement(this.id.toLowerCase());
+					this.domNode = register.createElement(tag);
 					this.domNode.id = this.id;
 
 					//TODO: had to do this for widgets in templates to work

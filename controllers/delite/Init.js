@@ -43,19 +43,21 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/on", "dojo/Deferred", "..
 			},
 			_displayInit: function () {
 				// fire the event on the container to load the main view
-				var deferred = new Deferred();
+				var displayDeferred = new Deferred();
+				var _self = this;
 				// let's display default view
 				on.emit(document, "delite-display", {
 					// TODO is that really defaultView a good name? Shouldn't it be defaultTarget or defaultView_s_?
 					dest: this.app.defaultView,
-					transitionDeferred: deferred,
+					displayDeferred: displayDeferred,
 					bubbles: true,
 					cancelable: true
 				});
 				// TODO views in the hash MUST be handled by history controller?
 				if (this.app.setStatus) {
-					deferred.then(function () {
-						this.setStatus(this.app.lifecycle.STARTED);
+					displayDeferred.then(function () {
+						_self.app.appStartedDef.resolve(); // resolve the deferred from new Application
+						_self.app.setStatus(_self.app.lifecycle.STARTED);
 					});
 				}
 			}

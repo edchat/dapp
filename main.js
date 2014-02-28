@@ -249,6 +249,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			// node: domNode
 			// domNode.
 			var path;
+			var appStartedDef = new Deferred();
 
 			// call configProcessHas to process any has blocks in the config
 			config = configUtils.configProcessHas(config);
@@ -341,9 +342,11 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 						lang.mixin(app, window[globalAppName]);
 					}
 					window[globalAppName] = app;
+					app.appStartedDef = appStartedDef;
 					app.start();
 				});
 			});
+			return appStartedDef;
 		}
 
 
@@ -351,6 +354,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			if (!config) {
 				throw new Error("Application Configuration Missing");
 			}
-			generateApp(config, node);
+			return generateApp(config, node);
 		};
 	});
