@@ -1,8 +1,8 @@
 define(
 	["require", "dcl/dcl", "dojo/on", "dojo/_base/lang", "dojo/Deferred", "../../Controller",
-		"../../utils/constraints"
+		"../../utils/constraints", "dojo/dom-construct"
 	],
-	function (require, dcl, on, lang, Deferred, Controller, constraints) {
+	function (require, dcl, on, lang, Deferred, Controller, constraints, domConstruct) {
 		var MODULE = "controllers/delite/Load:";
 		var resolveView = function (event, viewName, newView, parentView) {
 			// in addition to arguments required by delite we pass our own needed arguments
@@ -19,6 +19,7 @@ define(
 					nextView: newView,
 					parentView: parentView,
 					isParent: event.isParent,
+					lastView: event.lastView,
 					id: newView.id,
 					viewName: newView.viewName
 				}
@@ -27,7 +28,16 @@ define(
 
 		return dcl(Controller, {
 			constructor: function () {
-				document.addEventListener("delite-display-load", lang.hitch(this, "_loadHandler"));
+				this.func = lang.hitch(this, "_loadHandler");
+				this.loadHandler = document.addEventListener("delite-display-load", this.func);
+				this.app.on("app-unloadApp", lang.hitch(this, "unloadApp"));
+				this.events = {
+					"app-unload-view": this.unloadView
+				};
+			},
+			unloadApp: function () {
+				//TODO: should also destroy this controller too!
+				document.removeEventListener("delite-display-load", this.func, false);
 			},
 			/* jshint maxcomplexity: 13 */
 			_loadHandler: function (event) {
@@ -449,7 +459,104 @@ define(
 				};
 				//	return currentSubViewArray;
 				return ret;
-			} //,
+			},
+
+			unloadView: function (event) {
+				// summary:
+				//		Response to dapp "unload-view" event.
+				// 		If a view has children loaded the view and any children of the view will be unloaded.
+				//
+				// example:
+				//		Use trigger() to trigger "app-unload-view" event, and this function will response the event.
+				// 		For example:
+				//		|	this.trigger("app-unload-view", {"view":view, "callback":function(){...}});
+				//
+				// event: Object
+				//		app-unload-view event parameter. It should be like this: {"view":view, "parent": parent
+				// 		"callback":function(){...}}
+				var F = MODULE + ":unloadView";
+
+				var view = event.view || {};
+				var parent = event.parent || view.parent || this.app;
+				var viewId = view.id;
+				this.app.log(MODULE, F + " app-unload-view called for [" + viewId + "]");
+
+				if ((!parent && !event.unloadApp) || !view || !viewId) {
+					console.warn("unload-view event for view with no parent or with an invalid view with view = ",
+						view);
+					return;
+				}
+
+				if (event.unloadApp) {
+					// need to clear out selectedChildren
+					parent.selectedChildren = {};
+				}
+
+				if (parent.selectedChildren[viewId]) {
+					console.warn("unload-view event for a view which is still in use so it can not be unloaded for " +
+						"view id = " + viewId + "'.");
+					return;
+				}
+
+				if (!parent.children[viewId] && !event.unloadApp) {
+					console.warn("unload-view event for a view which was not found in parent.children[viewId] for " +
+						"viewId = " + viewId + "'.");
+					return;
+				}
+
+				this.unloadChild(parent, view);
+
+				if (event.callback) {
+					event.callback();
+				}
+			},
+
+			unloadChild: function (parent, viewToUnload) {
+				// summary:
+				//		Unload the view, and all of its child views recursively.
+				// 		Destroy all children, destroy all widgets, destroy the domNode, remove the view from the
+				// 		parent.children, then destroy the view.
+				//
+				// parent: Object
+				//		parent of this view.
+				// viewToUnload: Object
+				//		the view to be unloaded.
+				var F = MODULE + ":unloadChild";
+				this.app.log(MODULE, F + " unloadChild called for [" + viewToUnload.id + "]");
+
+				for (var child in viewToUnload.children) {
+					this.app.log(MODULE, F + " calling unloadChild for for [" + child + "]");
+					// unload children then unload the view itself
+					this.unloadChild(viewToUnload, viewToUnload.children[child]);
+				}
+				if (viewToUnload.domNode) {
+					// destroy all widgets, then destroy the domNode, then destroy the view.
+					/*
+					var widList = registry.findWidgets(viewToUnload.domNode);
+					this.app.log("logLoadViews:", F,
+						" before destroyRecursive loop registry.length = [" + registry.length + "] for view =[" +
+						viewToUnload.id + "]");
+					for (var wid in widList) {
+						widList[wid].destroyRecursive();
+					}
+					this.app.log("logLoadViews:", F,
+						" after destroyRecursive loop registry.length = [" + registry.length + "] for view =[" +
+						viewToUnload.id + "]");
+			*/
+					//TODO: should not be using domConstruct
+					this.app.log("logLoadViews:", F,
+						" calling domConstruct.destroy for the view [" + viewToUnload.id + "]");
+					domConstruct.destroy(viewToUnload.domNode);
+				}
+
+				delete parent.children[viewToUnload.id]; // remove it from the parents children
+				if (viewToUnload.destroy) {
+					this.app.log(MODULE, F + " calling destroy for the view [" + viewToUnload.id + "]");
+					viewToUnload.destroy(); // call destroy for the view.
+				}
+				viewToUnload = null;
+			}
+
 			/*
 			_getCurrentSubViewNamesArray: function (currentSubViewArray) {
 				// summary:

@@ -5,6 +5,7 @@ define(["dcl/dcl", "dojo/_base/lang", "../../Controller", "dojo/dom-attr", "../.
 		// summary:
 		//		binds "app-initLayout", "app-layoutView" and "app-resize" events on
 		// 		application instance.
+		var MODULE = "controllers/delite/Layout:";
 		return dcl(Controller, {
 			constructor: function () {
 				this.app.on("app-initLayout", lang.hitch(this, "initLayout"));
@@ -20,18 +21,18 @@ define(["dcl/dcl", "dojo/_base/lang", "../../Controller", "dojo/dom-attr", "../.
 				//
 				// event: Object
 				// |		{"view": view, "callback": function(){}};
-				this.app.log("in app/controllers/Layout.initLayout event=", event);
-				this.app.log("in app/controllers/Layout.initLayout event.view.parent.viewName=[",
-					event.view.parent.viewName, "]");
+				var F = MODULE + "constructor ";
+				this.app.log(MODULE, F + "event.view.viewName=[" + event.view.viewName + "] " +
+					"event.view.parent.viewName=[" + event.view.parent.viewName + "]");
 
 				// TODO: we should have the correct parent and not need to try to find it here
 				if (!event.view.domNode.parentNode) {
 					//event.view.parent.domNode.appendChild(event.view.domNode);
 					var p = document.getElementById(event.view.constraint);
-					console.log("in Layout controller compare parent event.view.parent=",
+					this.app.log(MODULE, F + "compare parent event.view.parent=",
 						event.view.parent.containerNode ? event.view.parent.containerNode.id : "");
 					if (p) {
-						console.log("in Layout controller compare parent                 p=", p.id);
+						this.app.log(MODULE, F + "compare parent                 p=", p.id);
 						p.addChild(event.view.domNode);
 					} else {
 						event.view.parent.containerNode.addChild(event.view.domNode);

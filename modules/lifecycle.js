@@ -20,7 +20,7 @@ define(["dcl/dcl", "dojo/topic"], function (dcl, topic) {
 
 			// publish /app/status event.
 			// application can subscribe this event to do some status change operation.
-			topic.publish("/app/status", newStatus);
+			topic.publish("/app/status", newStatus, this.id);
 		}
 	});
 });

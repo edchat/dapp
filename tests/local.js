@@ -3,10 +3,12 @@
 
 define({
 	// Browsers to run tests against
-	environments: [
-		{ browserName: "chrome" },
-		{ browserName: "firefox" }
-	//	,{ browserName: "iexplorer" }
+	environments: [{
+			browserName: "chrome"
+		}, {
+			browserName: "firefox"
+		}
+		//	,{ browserName: "iexplorer" }
 	],
 
 	// Whether or not to start Sauce Connect before running tests

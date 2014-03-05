@@ -56,8 +56,8 @@ define(["require", "dcl/dcl", "dojo/_base/lang", "dojo/on", "dojo/Deferred", "..
 				// TODO views in the hash MUST be handled by history controller?
 				if (this.app.setStatus) {
 					displayDeferred.then(function () {
-						_self.app.appStartedDef.resolve(); // resolve the deferred from new Application
 						_self.app.setStatus(_self.app.lifecycle.STARTED);
+						_self.app.appStartedDef.resolve(_self.app); // resolve the deferred from new Application
 					});
 				}
 			}

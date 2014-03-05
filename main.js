@@ -5,6 +5,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 	],
 	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady, domConstruct, domAttr,
 		nls, lifecycle, hash, constraints, configUtils) {
+		var MODULE = "Main:";
 
 		has.add("app-log-api", (config.app || {}).debugApp);
 
@@ -154,15 +155,23 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			},
 
 			getViewDefFromViewName: function (viewName) {
+				var F = MODULE + "getViewDefFromViewName ";
 				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
 				if (viewName && viewPath) {
 					var parts = viewPath.split(",");
 					var viewDef = this;
+					//	this.log(MODULE, F + "parts=["+parts+"] viewDef.id=["+viewDef.id+"]");
 					for (var item in parts) {
 						viewDef = viewDef.views[parts[item]];
+						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
 					}
+					this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath + "]" +
+						" returning viewDef.parentSelector=[" + viewDef.parentSelector + "]");
 					return viewDef;
 				}
+				this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath +
+					"] returning null");
+				this.log(MODULE, F + "returning null");
 				return null;
 			},
 
@@ -210,12 +219,12 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			setupControllers: function () {
 				// create application controller instance
 				// move set _startView operation from history module to application
+				//var F = MODULE + "setupControllers ";
 
 				// TODO: elc try this, need to setup an array of all views to show their viewpaths
 				this.flatViewDefinitions = this.flattenViewDefinitions(this.views);
-				console.log("back from call to get this.flattenViewDefinitions = ", this.flatViewDefinitions);
-				console.log("back from call to get this.flattenViewDefinitions test = ",
-					this.getViewDefFromViewName("home"));
+				//console.log because the logger controller is not setup yet
+				//console.log(MODULE, F + "this.flattenViewDefinitions = ", this.flatViewDefinitions);
 
 				var currentHash = window.location.hash;
 				this._startView = hash.getTarget(currentHash, this.defaultView);
@@ -237,7 +246,36 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 					// emit "app-init" event so that the Init controller can initialize the app and the root view
 					this.emit("app-init", {});
 				}));
-			}
+			},
+
+			unloadApp: function () {
+				// summary:
+				//		Unload the application, and all of its child views.
+				// 		set the status for STOPPING during the unload and STOPPED when complete
+				// 		emit app-unload-view to have controllers stop, and delete the global app reference.
+				//
+				var F = MODULE + "unloadApp ";
+				var appStoppedDef = new Deferred();
+				this.setStatus(this.lifecycle.STOPPING);
+				this.emit("app-unloadApp", {}); // for controllers to cleanup
+
+				var params = {};
+				params.view = this;
+				params.parent = this;
+				params.unloadApp = true;
+				params.callback = lang.hitch(this, function () {
+					this.setStatus(this.lifecycle.STOPPED);
+					delete window[this.name]; // remove the global for the app
+					appStoppedDef.resolve();
+				});
+				this.log(MODULE, F + "emit app-unload-view for [" + this.id + "]");
+				this.emit("app-unload-view", params);
+				return appStoppedDef;
+			},
+
+			log: function () {} // noop may be replaced by a logger controller
+
+
 		});
 
 		function generateApp(config, node) {
@@ -312,28 +350,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 
 				domReady(function () {
 					var app = new App(config, node || document.body);
-
-					if (has("app-log-api")) {
-						app.log = function () {
-							// summary:
-							// If config is set to turn on app logging, then log msg to the console
-							//
-							// arguments:
-							// the message to be logged,
-							// all but the last argument will be treated as Strings and be concatenated together,
-							// the last argument can be an object it will be added as an argument to console.log
-							var msg = "";
-							try {
-								for (var i = 0; i < arguments.length - 1; i++) {
-									msg = msg + arguments[i];
-								}
-								console.log(msg, arguments[arguments.length - 1]);
-							} catch (e) {}
-						};
-					} else {
-						app.log = function () {}; // noop
-					}
-
 					app.setStatus(app.lifecycle.STARTING);
 					// Create global namespace for application.
 					// The global name is application id. For example, modelApp

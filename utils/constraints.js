@@ -1,5 +1,6 @@
 define(["dojo/_base/array"], function (arr) {
 	var constraints = [];
+	var MODULE = "utils/constraints:";
 	return {
 		getSelectedChild: function (view, constraint) {
 			// summary:
@@ -55,18 +56,19 @@ define(["dojo/_base/array"], function (arr) {
 			//		tbe constraint object
 			// child: View
 			//		the child to select
+			var F = MODULE + "setSelectedChild ";
 			var type = typeof (constraint);
 			var hash = (type === "string" || type === "number") ? constraint : constraint.__hash;
 			if (!view.selectedChildren) { // view is a domNode, not a parentView
 				view = app.getParentViewFromViewName(child.name || child.id);
 			}
 			view.selectedChildren[hash] = child;
-			console.log("in constraints.setSelectedChild view.id [" + view.id + "] has selectedChildren set for [" +
+			app.log(MODULE, F + "view.id [" + view.id + "] has selectedChildren set for [" +
 				child.id + "] with hash =[" + hash + "]");
 			if (child && app.autoUnloadCount) {
 				child.transitionCount = 0;
 
-				console.log("in constraints.setSelectedChild looking for sibling for view [" + child.id + "]");
+				app.log(MODULE, F + "looking for sibling for view [" + child.id + "]");
 				// add code to bump the transitionCounter to see when to unload other child views
 				for (var otherChildKey in view.children) {
 					var otherChild = view.children[otherChildKey];
@@ -76,7 +78,7 @@ define(["dojo/_base/array"], function (arr) {
 						otherChildConstraint.__hash;
 					if (hash === childhash && otherChild !== child) {
 						otherChild.transitionCount++;
-						console.log("in constraints.setSelectedChild otherChild.transitionCount for view [" +
+						app.log(MODULE, F + "otherChild.transitionCount for view [" +
 							otherChildKey + "] =[" + otherChild.transitionCount + "]");
 					}
 				}

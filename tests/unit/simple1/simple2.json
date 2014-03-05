@@ -1,0 +1,66 @@
+{
+	"id": "simple1App2",
+	"name": "simple1App2",
+	"loaderConfig": {
+		"paths": {
+			"simple1App2": "dapp/tests/unit"
+		}
+	},
+	"modules": [
+	],
+	"controllers": [
+		"dapp/controllers/delite/Init",
+		"dapp/controllers/delite/Load",
+		"dapp/controllers/delite/Transition",
+		"dapp/controllers/delite/Layout",
+		"dapp/controllers/delite/Logger"
+	],
+
+	"dependencies": [
+		"deliteful/LinearLayout",
+		"dapp/tests/unit/simple1/simple1"
+	],
+
+
+
+	"appLogging": {
+		"logAll": 0,
+		"logTimeStamp": 0,
+		"loggingList": [
+			"app-view:"
+			,"testApp:"
+		//	,"Main:"
+		//	,"ViewBase:"
+		//	,"View:"
+		//	,"controllers/delite/Load:"
+		//	,"controllers/delite/Layout:"
+		//	,"controllers/delite/Transition:"
+		]
+	},
+
+	//TODO: There is a problem with using duplicate view names across tests, getting duplicate view error!!!
+	"defaultView": "simp2Home1+simp2Home2+simp2Home3NoController",
+	"views": {
+		"simp2Home1": {
+			"constraint": "main1",
+			"parentSelector": "#dlayout2",
+		// TODO, I could not use the loaderConfig path for simple1App2 here, not sure why it did not find the template
+		//	"template": "simple1App2/simple.html"
+			"controller": "dapp/tests/unit/simple1/simple1.js",
+			"template": "dapp/tests/unit/simple1/simple.html"
+		},
+		"simp2Home2": {
+			"constraint": "main2",
+			"parentSelector": "#dlayout2",
+			"controller": "dapp/tests/unit/simple1/simple1.js",
+			"template": "dapp/tests/unit/simple1/simple.html"
+		},
+		"simp2Home3NoController": {
+			"constraint": "main3",
+			"parentSelector": "#dlayout2",
+	//		"controller": "dapp/ViewBase.js",
+			"template": "dapp/tests/unit/simple1/simple.html"
+		}
+
+	}
+}

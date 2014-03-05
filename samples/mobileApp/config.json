@@ -43,9 +43,14 @@
 		"logAll": 0,
 		"logTimeStamp": 0,
 		"loggingList": [
-			"app-view:",
-			"controllers/delite/Load:",
-			"controllers/delite/Transition:"
+			"app-view:"
+			,"testApp:"
+			,"Main:"
+			,"ViewBase:"
+			,"View:"
+			,"controllers/delite/Load:"
+			,"controllers/delite/Layout:"
+			,"controllers/delite/Transition:"
 		]
 	},
 

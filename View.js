@@ -1,6 +1,6 @@
 define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/Deferred",
-		"delite/Widget", "delite/template", "delite/Invalidating", "delite/register", "delite/handlebars",
-		"dojo/dom-construct",
+		"delite/Widget", "delite/template", "delite/Invalidating", "delite/Destroyable",
+		"delite/register", "delite/handlebars", "dojo/dom-construct",
 		"dojo/dom-attr", "dojo/dom-style", "dojo/dom-class",
 		"delite/Stateful", "dojo/aspect",
 		//	"dijit/Destroyable",
@@ -8,12 +8,12 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 		//"dijit/_WidgetsInTemplateMixin",
 		"./ViewBase", "./utils/nls"
 	],
-	function (require, when, on, dcl, lang, Deferred, Widget, dtemplate, Invalidating, register, handlebars,
-		domConstruct, domAttr, domStyle, domClass, Stateful, aspect, //Destroyable,
+	function (require, when, on, dcl, lang, Deferred, Widget, dtemplate, Invalidating, Destroyable, register,
+		handlebars, domConstruct, domAttr, domStyle, domClass, Stateful, aspect, //Destroyable,
 		//	_TemplatedMixin,
 		//	_WidgetsInTemplateMixin,
 		ViewBase, nls) {
-
+		var MODULE = "View:";
 		return dcl([ViewBase, Widget, Invalidating /*_TemplatedMixin, _WidgetsInTemplateMixin, Destroyable,*/ ], {
 			// summary:
 			//		View class inheriting from ViewBase adding templating & globalization capabilities.
@@ -65,12 +65,14 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 				//		- parent: parent view
 				//		- children: children views
 				//		- nls: nls definition module identifier
-				console.log("dapp/View:constructor called for " + this.id);
+				var F = MODULE + "constructor ";
+				this.app.log(MODULE, F + "called for [" + this.id + "]");
 			},
 
 			// _TemplatedMixin requires a connect method if data-dojo-attach-* are used
 			connect: function (obj, event, method) {
-				console.log("dapp/View:connect called for " + this.id);
+				var F = MODULE + "connect ";
+				this.app.log(MODULE, F + "called for [" + this.id + "]");
 				return this.own(on(obj, event, lang.hitch(this, method)))[0]; // handle
 			},
 
@@ -80,23 +82,25 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 				// tags:
 				//		private
 				//
-				console.log("dapp/View:_loadTemplate called for [" + this.id+"] this.templateString=["+this.templateString+"]");
+				var F = MODULE + "_loadTemplate ";
+				this.app.log(MODULE, F + "called for [" + this.id + "] this.templateString=[" + this.templateString +
+					"]");
 
 				if (this.templateString) {
 					return true;
 				} else {
 					var tpl = this.template;
-					console.log("dapp/View:_loadTemplate called with this.template=["+this.template+"]");
+					this.app.log(MODULE, F + "called with this.template=[" + this.template + "]");
 					var deps = this.dependencies ? this.dependencies : [];
 					if (tpl) {
 						deps = deps.concat(["dojo/text!" + tpl]);
 					}
 					var loadViewDeferred = new Deferred();
-					console.log("dapp/View:_loadTemplate before require deps with deps = ",deps);
+					this.app.log(MODULE, F + "before require deps with deps = ", deps);
 					require(deps, lang.hitch(this, function () {
-						console.log("dapp/View:_loadTemplate back from require deps");
 						this.templateString = this.template ? arguments[arguments.length - 1] : "<div></div>";
-						console.log("dapp/View:_loadTemplate with this.templateString=["+this.templateString+"]");
+						this.app.log(MODULE, F + "after require deps this.templateString=[" + this.templateString +
+							"]");
 						loadViewDeferred.resolve(this);
 					}));
 					return loadViewDeferred;
@@ -106,7 +110,8 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 			// start view
 			load: dcl.superCall(function (sup) {
 				return function () {
-					console.log("dapp/View:load called for " + this.id);
+					var F = MODULE + "load ";
+					this.app.log(MODULE, F + "called for [" + this.id + "]");
 					var tplDef = new Deferred();
 					var defDef = sup.call(this);
 					var nlsDef = nls(this);
@@ -131,7 +136,8 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 			}),
 
 			_checkTemplate: function (tag) {
-				console.log(" in _checkTemplate tag = " + tag);
+				var F = MODULE + "_checkTemplate ";
+				this.app.log(MODULE, F + "called for [" + this.id + "] tag=" + tag);
 			},
 			// in another place it was mentioned that may want to change from startup --> enteredViewCallback.
 			_startup: dcl.superCall(function (sup) {
@@ -140,7 +146,8 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					//		startup widgets in view template.
 					// tags:
 					//		private
-					console.log("dapp/View:_startup called for " + this.id);
+					var F = MODULE + "_startup ";
+					this.app.log(MODULE, F + "called for [" + this.id + "]");
 
 					this._needsResize = true; // flag used to be sure resize has been called before transition
 
@@ -149,26 +156,26 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 
 					this.domNode = document.getElementById(this.id);
 					this.attributes.nls = this.nls; // add nls strings to attributes
-					//var _self = this;
+					var _self = this;
 					var params = {
 						baseClass: "d-" + this.id,
 						buildRendering: handlebars.compile(this.templateString),
 						preCreate: function () {
-							console.log("in view preCreate");
+							_self.app.log(MODULE, F + "in view preCreate for [" + _self.id + "]");
 						},
 						postCreate: function () {
-							console.log("in view postCreate ");
+							_self.app.log(MODULE, F + "in view postCreate for [" + _self.id + "]");
 						},
-						refreshRendering: dcl.after(function (args) {
-							console.log("in view refreshRendering args[0] = " + args[0]);
+						refreshRendering: dcl.after(function () {
+							_self.app.log(MODULE, F + "in view refreshRendering for [" + _self.id + "]");
 						})
 					};
 					dcl.mix(params, this.attributes);
 
 					// try to setup a widget to build the view here
 					//TODO: why can we not use id here?  it gets an error
-					var tag = "my-"+this.id.toLowerCase();
-					register(tag, [HTMLElement, Widget, Invalidating], params);
+					var tag = "dapp-view-" + this.id.toLowerCase();
+					register(tag, [HTMLElement, Widget, Invalidating, Destroyable], params);
 					/*
 					var B5 = dcl(register, {
 						createElement: dcl.around(function(tag){

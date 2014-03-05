@@ -53,12 +53,12 @@
 		},
 		"header": {
 			"constraint": "header",
-			"parentSelector": "#main",
+		//	"parentSelector": "#main",
 			"template": "deliteApp/header.html"
 		},
 		"detail2": {
 			"constraint": "main",
-			"parentSelector": "#main-view-stack",
+			"parentSelector": "#content-view-stack",
 			"controller" : "deliteApp/detail.js",
 			"template": "deliteApp/detail.html"
 		},
@@ -67,29 +67,29 @@
 				"deliteful/ViewStack"
 			],
 			"constraint": "main",
-			"parentSelector": "#main",
+		//	"parentSelector": "#main",
 			"template": "deliteApp/content.html",
 			"controller": "deliteApp/content.js",
 			"defaultView": "home",
 			"views": {
 				"home": {
-					"constraint": "main-view-stack",
-					"parentSelector": "#main-view-stack",
+					"constraint": "content-view-stack",
+				//	"parentSelector": "#content-view-stack",
 					"controller" : "deliteApp/home.js",
 					"template": "deliteApp/home.html",
 					"nls": "deliteApp/nls/home"
 				},
 				"detail": {
-					"constraint": "main-view-stack",
-					"parentSelector": "#main-view-stack",
+					"constraint": "content-view-stack",
+				//	"parentSelector": "#content-view-stack",
 					"controller" : "deliteApp/detail.js",
 					"template": "deliteApp/detail.html"
 				}
 			}
 		},
 		"home": {
-			"constraint": "main-view-stack",
-			"parentSelector": "#main-view-stack",
+			"constraint": "content-view-stack",
+			"parentSelector": "#content-view-stack",
 			"controller" : "deliteApp/home.js",
 			"template": "deliteApp/home.html",
 			"nls": "deliteApp/nls/home"

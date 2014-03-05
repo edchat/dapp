@@ -32,7 +32,7 @@ define(
 						}
 						if (has("app-log-api") || app.appLogging.logAll) { // log all messages
 							try {
-								for (var i = 0; i < arguments.length - 1; i++) {
+								for (var i = 1; i < arguments.length - 1; i++) {
 									msg = msg + arguments[i] + " ";
 								}
 								console.log(msg, arguments[arguments.length - 1]);
@@ -41,7 +41,7 @@ define(
 							try {
 								// if the 1st arg is in the loggingList log it
 								if (app.appLogging.loggingList.indexOf(arguments[0]) > -1) {
-									for (var j = 2; j < arguments.length - 1; j++) {
+									for (var j = 1; j < arguments.length - 1; j++) {
 										msg = msg + arguments[j];
 									}
 									console.log(msg, arguments[arguments.length - 1]);
