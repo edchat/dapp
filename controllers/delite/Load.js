@@ -56,16 +56,12 @@ define(
 				// TODO: deal with defaultParams?
 				var params = event.params || "";
 
-				// TODO: Need to find the parent
-				//	var view = event.parent.children[viewId];
-				//	var constraint = event.parent.views[viewId].constraint || "main";
-				//var constraint = constraints.getConstraintForViewTarget(event.dapp.fullViewTarget, this.app);
-				var constraint = this.app.getViewDefFromViewName(event.dest) ?
-					this.app.getViewDefFromViewName(event.dest).constraint : null;
-				//TODO: this is a hack need better way to get the parent
+				var viewDef = this.app.getViewDefFromEvent(event);
+				var constraint = viewDef ? viewDef.constraint : null;
+
 				if (!event.parent) {
 					this.app.log(MODULE, F + "called without event.parent!!!!!!! for [" + event.dest + "]");
-					if (!this.app.getViewDefFromViewName(event.dest)) { // problem, we dont have this view
+					if (!viewDef) { // problem, we dont have this view
 						event.loadDeferred.resolve({
 							child: typeof event.dest === "string" ? document.getElementById(event.dest) : event.dest
 						});
@@ -80,11 +76,10 @@ define(
 				if (event.parent && event.parent.children) {
 					view = event.parent.children[viewId];
 				}
-				// once loaded we will be ready to call beforeActivate
 
 				/* jshint maxcomplexity: 16 */
 				event.loadDeferred.then(function (value) {
-					//TODO: ELC need to review this and see if fullViewTarget is really needed, and how best to
+					//TODO: ELC need to review this and see if fullViewTarget and other params are really needed, and how best to
 					// get the parent
 					var parts, toId, subIds, next, parent;
 					if (value.dapp.id) { // need to call the before Activate/Deactivate for the view(s)
@@ -93,7 +88,6 @@ define(
 						// TODO: this needs to change, value.dapp.viewName is actually the id, so change it from name
 						// TODO: to id and add a call in app to get the viewPath from the id, and call that instead.
 						var viewTarget = self.app.flatViewDefinitions[(value.dapp.viewName || value.dapp.id)].viewPath;
-						//	var viewTarget = self.app.flatViewDefinitions[value.dapp.viewName].viewPath;
 						parent = value.parent;
 						var parentView = value.dapp.parentView;
 						if (viewTarget) {
@@ -112,11 +106,9 @@ define(
 						//	next = parent.children[parent.id + '_' + toId];
 						next = parent.children[toId];
 						var nextView = parentView.children[toId];
-						// TODO: this is needed to deal with the case where the parent is not set correctly
-						//	while (!next && parent !== this.app) {
-						//		parent = parent.parent;
-						//		next = parent.children[toId];
-						//	}
+						self.app.log(MODULE, F + "check next.constraint and nextView.constraint next constraint=[",
+							(next ? next.constraint : ""), "], nextView.constraint=[" + (nextView ?
+								nextView.constraint : "") + "] ");
 
 						//	if(!next){
 						//	if(removeView){
@@ -130,7 +122,7 @@ define(
 						// set the subIds to the default view and transition to default view.
 						if (!subIds && next.defaultView) {
 							subIds = next.defaultView;
-							constraints.setSelectedChild(parent, (next.constraint || "center"), next, self.app);
+							constraints.setSelectedChild(parent, (nextView.constraint || "center"), nextView, self.app);
 							return; // do not call beforeActivate for the parent with defaultView wait for last child
 						}
 
@@ -142,7 +134,9 @@ define(
 						}
 
 						var current = constraints.getSelectedChild(parentView, (nextView && nextView.constraint ?
-							nextView.constraint : "center"));
+							nextView.constraint : next && next.constraint ? next.constraint : "center"));
+						self.app.log(MODULE, F + "got current from call to constraints with parentView.id=["+
+							parentView.id, "], got current.id=[" + (current ? current.id : "") +"]");
 						//var current = constraints.getSelectedChild(parent, next.parentSelector || "center");
 						var currentSubViewRet = self._getCurrentSubViewArray(self.app, nextSubViewArray,
 							/*removeView,*/
@@ -157,11 +151,14 @@ define(
 						if (!value.isParent) {
 							if (current && current._active) {
 								self.app.log(MODULE, F + "calling _handleBeforeDeactivateCalls nextView id=[",
-									nextView.id, "], parent.id=[" + (nextView.parent ? nextView.parent.id : "") +
+									(nextView ? nextView.id : ""), "], parent.id=[" + (nextView && nextView.parent ? nextView.parent.id : "") +
 									"] currentSubViewArray =",
 									currentSubViewArray);
 								self._handleBeforeDeactivateCalls(currentSubViewArray, self.nextLastSubChildMatch ||
 									nextView, current, data, subIds);
+							}else if(current){ // TODO: remove this TEMP
+								self.app.log(MODULE, F + "NOT calling _handleBeforeDeactivateCalls current._active=[",
+									current._active, "], current.id=[" + current.id);
 							}
 							value.nextSubViewArray = nextSubViewArray;
 							value.currentSubViewArray = currentSubViewArray;
@@ -177,7 +174,8 @@ define(
 							self._handleBeforeActivateCalls(nextSubViewArray, self.currentLastSubChildMatch || current,
 								data, subIds);
 						}
-						constraints.setSelectedChild(parent, next.constraint || "center", next, self.app);
+						constraints.setSelectedChild(parent, (nextView ? nextView.constraint : next ? next.constraint
+							: "center"), nextView ? nextView :  next, self.app);
 
 					}
 					/*  TODO: should remove the dapp.previousView code, it did not cut it
@@ -191,8 +189,12 @@ define(
 					return value;
 				});
 				// once transition we will be ready to call afterActivate
-				on.once(event.target, "delite-display-complete", function (complete) {
+				var onHandle = on(event.target, "delite-display-complete", function (complete) {
 					//	on(event.target, "delite-display-complete", function (complete) {
+					if(complete.dest !== event.dest){ // if this delite-display-complete is not for this view return
+						return;
+					}
+					onHandle.remove();
 					if (complete.dapp) {
 						//var next = complete.next;
 						var next = complete.next || complete.dapp.nextView;
@@ -219,12 +221,6 @@ define(
 								complete.currentLastSubChildMatch || complete.current, data, complete.subIds);
 						}
 
-						//	if (complete.parentView) {
-						//		complete.parentView.afterActivate(complete.dapp.previousView);
-						//	}
-						//	if (complete.dapp.previousView) {
-						//		complete.dapp.previousView.afterDeactivate(complete.parentView);
-						//	}
 					}
 				});
 				if (view) {
@@ -232,8 +228,8 @@ define(
 					if (params) {
 						view.params = params;
 					}
-					var pTest = this.app.getParentViewFromViewName(event.dest);
-					resolveView(event, event.dest, view, pTest);
+					var parentView = this.app.getParentViewFromViewId(view.id);
+					resolveView(event, event.dest, view, parentView);
 				} else if (event.dest && event.dest.id && this.app.views[event.dest.id]) {
 					viewId = event.dest.id;
 					this._createView(event, viewId, event.dest.viewName, params, event.parent || this.app,
@@ -264,13 +260,12 @@ define(
 						"params": params
 					});
 					new View(params).start().then(function (newView) {
-						//TODO: update this call to use the id instead of viewName to be more exact.
-						var p = parent || app.getParentViewFromViewName(viewName);
+						var p = parent || app.getParentViewFromViewId(id);
+						var pView = app.getParentViewFromViewId(id);
 						p.children[id] = newView;
-						//	parent.children[id] = newView;
+						pView.children[id] = newView;
 						newView.init();
-						var pTest = app.getParentViewFromViewName(event.dest);
-						resolveView(event, id, newView, pTest);
+						resolveView(event, id, newView, pView);
 					});
 				});
 			},
@@ -286,6 +281,8 @@ define(
 				//now we need to loop backwards thru subs calling beforeDeactivate
 				for (var i = subs.length - 1; i >= 0; i--) {
 					var v = subs[i];
+				//	this.app.log(MODULE, F + "in _handleBeforeDeactivateCalls in subs for v.id=[" + v.id + "]" +
+				//	" v.beforeDeactivate=["+v.beforeDeactivate+"] v._active=["+v._active+"]");
 					if (v && v.beforeDeactivate && v._active) {
 						this.app.log(MODULE, F + "beforeDeactivate for v.id=[" + v.id + "]");
 						v.beforeDeactivate(next, data);
@@ -325,7 +322,7 @@ define(
 					for (var i = 0; i < subs.length; i++) {
 						var v = subs[i];
 						if (v && v.beforeDeactivate && v._active) {
-							this.app.log(MODULE, F + "afterDeactivate for v.id=[" + v.id + "]");
+							this.app.log(MODULE, F + "afterDeactivate for v.id=[" + v.id + "] setting _active false");
 							v.afterDeactivate(next, data);
 							v._active = false;
 						}
@@ -346,9 +343,13 @@ define(
 				for (var i = startInt; i < subs.length; i++) {
 					var v = subs[i];
 					if (v.afterActivate) {
-						this.app.log(MODULE, F + "afterActivate for v.id=[" + v.id + "]");
+						this.app.log(MODULE, F + "afterActivate for v.id=[" + v.id + "] setting _active true");
 						v.afterActivate(current, data);
 						v._active = true;
+						//TODO: is this needed????
+						if(v.domNode){
+							v.domNode._active = true;
+						}
 					}
 				}
 			},

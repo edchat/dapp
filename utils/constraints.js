@@ -60,7 +60,7 @@ define(["dojo/_base/array"], function (arr) {
 			var type = typeof (constraint);
 			var hash = (type === "string" || type === "number") ? constraint : constraint.__hash;
 			if (!view.selectedChildren) { // view is a domNode, not a parentView
-				view = app.getParentViewFromViewName(child.name || child.id);
+				view = app.getParentViewFromViewId(child.id);
 			}
 			view.selectedChildren[hash] = child;
 			app.log(MODULE, F + "view.id [" + view.id + "] has selectedChildren set for [" +

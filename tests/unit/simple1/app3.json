@@ -19,7 +19,7 @@
 	"dependencies": [
 		"deliteful/LinearLayout",
 		"deliteful/ViewStack",
-		"dapp/tests/unit/simple1/simple1"
+		"dapp/tests/unit/simple1/viewController1"
 	],
 
 
@@ -28,39 +28,40 @@
 		"logAll": 0,
 		"logTimeStamp": 0,
 		"loggingList": [
-			"app-view:"
-			,"testApp:"
+		//	"app-view:"
+		//	,"testApp:"
 		//	,"Main:"
 		//	,"ViewBase:"
 		//	,"View:"
 		//	,"controllers/delite/Load:"
 		//	,"controllers/delite/Layout:"
 		//	,"controllers/delite/Transition:"
+		//	,"utils/constraints:"
 		]
 	},
 
 	//TODO: There is a problem with using duplicate view names across tests, getting duplicate view error!!!
-	"defaultView": "simp3Home1",
+	"defaultView": "simple1App3Home1",
 	"views": {
-		"simp3Home1": {
+		"simple1App3Home1": {
 			"constraint": "main",
-			"parentSelector": "#dviewStack3",
+			"parentSelector": "#simple1App3dviewStack",
 		// TODO, I could not use the loaderConfig path for simple1App3 here, not sure why it did not find the template
-		//	"template": "simple1App3/simple.html"
-			"controller": "dapp/tests/unit/simple1/simple1.js",
-			"template": "dapp/tests/unit/simple1/simple.html"
+		//	"template": "simple1App3/viewTemplate.html"
+			"controller": "dapp/tests/unit/simple1/viewController1.js",
+			"template": "dapp/tests/unit/simple1/viewTemplate.html"
 		},
-		"simp3Home2": {
+		"simple1App3Home2": {
 			"constraint": "main",
-			"parentSelector": "#dviewStack3",
-			"controller": "dapp/tests/unit/simple1/simple1.js",
-			"template": "dapp/tests/unit/simple1/simple.html"
+			"parentSelector": "#simple1App3dviewStack",
+			"controller": "dapp/tests/unit/simple1/viewController1.js",
+			"template": "dapp/tests/unit/simple1/viewTemplate.html"
 		},
-		"simp3Home3NoController": {
+		"simple1App3Home3NoController": {
 			"constraint": "main",
-			"parentSelector": "#dviewStack3",
-	//		"controller": "dapp/ViewBase.js",
-			"template": "dapp/tests/unit/simple1/simple.html"
+			"parentSelector": "#simple1App3dviewStack",
+			"controller": "dapp/tests/unit/simple1/viewController1.js",
+			"template": "dapp/tests/unit/simple1/viewTemplate.html"
 		}
 
 	}

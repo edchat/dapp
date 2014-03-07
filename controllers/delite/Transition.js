@@ -34,7 +34,8 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 				//	var parentSelector = viewDefinition ? viewDefinition.parentSelector : null;
 				//	var p = parentSelector ? self.app.domNode.querySelector(parentSelector) : null;
 				//	var p = parentSelector ? self.app.domNode.querySelector(parentSelector) : null;
-				var parentSelector = this.app.getViewDefFromViewName(subEvent.dest).parentSelector;
+			//	var parentSelector2 = this.app.getViewDefFromViewName(subEvent.dest).parentSelector;
+				var parentSelector = this.app.getViewDefFromEvent(subEvent).parentSelector;
 				var p = this.app.domNode.querySelector(parentSelector);
 				this.app.log(MODULE, F + "compare p and subEvent.parent p = [" +
 					(p ? p.id : "") + "]");

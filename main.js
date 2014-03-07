@@ -154,6 +154,61 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				return resultViews;
 			},
 
+			getViewDefFromEvent: function (event) {
+				var F = MODULE + "getViewDefFromEvent ";
+				var viewPath;
+				if(event.dapp && event.dapp.fullViewTarget){
+					viewPath = event.dapp.fullViewTarget;
+				}else if(event.parent){
+					viewPath = this.getViewDefFromViewId(event.parent.id);
+				}else{
+					viewPath = viewPath = this.flatViewDefinitions[event.dest] ?
+						this.flatViewDefinitions[event.dest].viewPath : null;
+				}
+				var viewName = event.dest;
+				if (viewName && viewPath) {
+					var parts = viewPath.split(",");
+					var viewDef = this;
+					//	this.log(MODULE, F + "parts=["+parts+"] viewDef.id=["+viewDef.id+"]");
+					for (var item in parts) {
+						viewDef = viewDef.views[parts[item]];
+						if(parts[item] == viewName){
+							break;
+						}
+						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
+					}
+					this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath + "]" +
+						" returning viewDef.parentSelector=[" + viewDef.parentSelector + "]");
+					return viewDef;
+				}
+				this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath +
+					"] returning null");
+				this.log(MODULE, F + "returning null");
+				return null;
+			},
+
+			getViewDefFromViewId: function (viewId) {
+				var F = MODULE + "getViewDefFromViewId ";
+			//	var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
+				if (viewId) {
+					var parts = viewId.split("_");
+					var viewDef = this;
+					//	this.log(MODULE, F + "parts=["+parts+"] viewDef.id=["+viewDef.id+"]");
+					for (var item in parts) {
+						viewDef = viewDef.views[parts[item]];
+						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
+					}
+					this.log(MODULE, F + "called with viewId=[" + viewId +
+						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : '') + "]");
+					return viewDef;
+				}
+				this.log(MODULE, F + "called with viewId=[" + viewId +
+					"] returning null");
+				this.log(MODULE, F + "returning null");
+				return null;
+			},
+
+			//TODO: this should not be needed anymore...
 			getViewDefFromViewName: function (viewName) {
 				var F = MODULE + "getViewDefFromViewName ";
 				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
@@ -174,7 +229,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				this.log(MODULE, F + "returning null");
 				return null;
 			},
-
+/*
 			getViewIdFromViewName: function (viewName) {
 				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewId : null;
 				if (viewName && viewPath) {
@@ -187,7 +242,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				}
 				return null;
 			},
-
+*/
 			getParentViewFromViewName: function (viewName) {
 				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
 				if (viewName && viewPath) {
@@ -202,16 +257,29 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				return null;
 			},
 
-			getViewFromViewId: function (viewName) {
-				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
-				if (viewName && viewPath) {
-					var parts = viewPath.split(",");
-					//parts.pop();
-					var viewDef = this;
+			getViewFromViewId: function (viewId) {
+				//var F = MODULE + "getViewFromViewId ";
+				if (viewId) {
+					var parts = viewId.split("_");
+					var view = this;
 					for (var item in parts) {
-						viewDef = viewDef.children[parts[item]];
+						view = view.children[parts[item]];
 					}
-					return viewDef;
+					return view;
+				}
+				return null;
+			},
+
+			getParentViewFromViewId: function (viewId) {
+				//var F = MODULE + "getParentViewFromViewId ";
+				if (viewId) {
+					var parts = viewId.split("_");
+					parts.pop();
+					var view = this;
+					for (var item in parts) {
+						view = view.children[parts[item]];
+					}
+					return view;
 				}
 				return null;
 			},
