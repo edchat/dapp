@@ -75,6 +75,7 @@ define([
 		},
 		teardown: function () {
 			//	console.log('simple2/Simple test teardown testApp.getStatus()='+testApp.getStatus());
+			testApp.unloadApp();
 		}
 	};
 	registerSuite(sample2Suite1);
@@ -107,6 +108,9 @@ define([
 				// we are ready to test
 				testApp = app;
 
+				//TODO: problem with multiple views in defaultView here: where
+				//TODO: default view is set to simple2App2Home1+simple2App2Home2+simple2App2Home3NoController
+				//TODO:  appStartedDef is firing before all default views are shown!!!!!
 				// check the DOM state to see if we are in the expected state
 				assert.isNotNull(document.getElementById("simple2App2dlayout"), "root simple2App2dlayout must be here");
 				assert.isNotNull(document.getElementById("simple2App2Home1"), "simple2App2Home1 view must be here");

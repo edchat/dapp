@@ -11,7 +11,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			//TODO: why is this not being hit?
 			this.app.log("app-view:", " in [" + this.viewName + "] constructor called for [" + this.id + "]");
 			var tempName = "";
-			if (this.id === "nested1App1Home2") {
+			if (this.id === "multinested1App1Home2") {
 				setTimeout(function () {
 					for (var i = 0; i < 500; i++) {
 						tempName = this.id + i;
@@ -20,9 +20,10 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			}
 		},
 		init: function () {
+			this.app.log("app-view:", "init called for [" + this.viewName + "]");
 			this.domNode.name = this.id;
 			// attempt to slow down the creation of this widget to see if Home3 would be placed before it
-			if (this.id === "nested1App1Home2") {
+			if (this.id === "multinested1App1Home2") {
 				setTimeout(function () {
 					for (var i = 0; i < 500; i++) {
 						tempName = this.id + i;

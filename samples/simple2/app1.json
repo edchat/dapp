@@ -11,59 +11,78 @@
 	"controllers": [
 		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
-		"dapp/controllers/delite/Transition",
+	//	"dapp/controllers/delite/Transition",
+		"dapp/controllers/delite/TestTransition",
+		"dapp/controllers/delite/TestLoad",
 		"dapp/controllers/delite/Layout",
 		"dapp/controllers/delite/Logger"
 	],
 
 	"dependencies": [
 		"deliteful/LinearLayout",
+		"deliteful/ViewStack",
 		"dapp/samples/simple2/viewController1",
-		"deliteful/Button",
-		"deliteful/ViewStack"
+		"dapp/samples/simple2/parentController1"
 	],
 
-	"parseOnLoad": true,
-	"containerSelector" : "#simple2App1dlayout",
+	"containerSelector" : "#nested1App1dviewStack",
 
 	"appLogging": {
 		"logAll": 0,
 		"logTimeStamp": 0,
 		"loggingList": [
-			"app-view:"
-			,"testApp:"
-		//	,"Main:"
-		//	,"ViewBase:"
-		//	,"View:"
-		//	,"controllers/delite/Load:"
-		//	,"controllers/delite/Layout:"
-		//	,"controllers/delite/Transition:"
+			"TestTransition"
+		//	"app-view:" ,"testApp:"
+		//	,"Main:","ViewBase:","View:"
+		//	,"controllers/delite/Load:","controllers/delite/Layout:","controllers/delite/Transition:","utils/constraints:"
 		]
 	},
 
 	//TODO: There is a problem with using duplicate view names across tests, getting duplicate view error!!!
-	"defaultView": "simple2App1Home1+simple2App1Home2+simple2App1Home3NoController",
+	//"defaultView": "P1,S1,V1",
+	"defaultView": "P2",
 	"views": {
-		"simple2App1Home1": {
-			"constraint": "main1",
-			"parentSelector": "#simple2App1dlayout",
-		// TODO, I could not use the loaderConfig path for simple2App1 here, not sure why it did not find the template
-		//	"template": "simple2App1/viewTemplate1.html"
-			"controller": "dapp/samples/simple2/viewController1.js",
-			"template": "dapp/samples/simple2/viewTemplate1.html"
+		"P1": {
+			"constraint": "main",
+			"parentSelector": "#nested1App1dviewStack",
+			"controller": "dapp/samples/simple2/parentController1.js",
+			"template": "dapp/samples/simple2/parentTemplate.html",
+			"defaultView": "S1",
+			"views": {
+				"S1": {
+					"constraint": "main2",
+				//	"parentSelector": "#nested1App1dviewStack",
+					"controller": "dapp/samples/simple2/parentController1.js",
+					"template": "dapp/samples/simple2/subParentTemplate.html",
+					"defaultView": "V1",
+					"views": {
+						"V1": {
+							"constraint": "main3",
+						//	"parentSelector": "#nested1App1dviewStack",
+							"controller": "dapp/samples/simple2/viewController1.js",
+							"template": "dapp/samples/simple2/viewTemplate.html"
+						},
+						"V2": {
+							"constraint": "main3",
+						//	"parentSelector": "#nested1App1dviewStack",
+							"controller": "dapp/samples/simple2/viewController1.js",
+							"template": "dapp/samples/simple2/viewTemplate.html"
+						}
+					}
+				}
+			}
 		},
-		"simple2App1Home2": {
-			"constraint": "main2",
-			"parentSelector": "#simple2App1dlayout",
+		"V7": {
+			"constraint": "main",
+			"parentSelector": "#nested1App1dviewStack",
 			"controller": "dapp/samples/simple2/viewController1.js",
-			"template": "dapp/samples/simple2/viewTemplate1.html"
+			"template": "dapp/samples/simple2/viewTemplate.html"
 		},
-		"simple2App1Home3NoController": {
-			"constraint": "main3",
-			"parentSelector": "#simple2App1dlayout",
-			"controller": "dapp/samples/simple2/viewController1.js",
+		"P2": {
+			"constraint": "main",
+			"parentSelector": "#nested1App1dviewStack",
+			"controller": "dapp/samples/simple2/parentController1.js",
 			"template": "dapp/samples/simple2/viewTemplate1.html"
 		}
-
 	}
 }

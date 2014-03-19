@@ -46,7 +46,7 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 				//		|		app: this.app,
 				//		|		id: this.id,
 				//		|		name: this.name,
-				//		|		parent: this,
+				//		|		parentView: this,
 				//		|		templateString: this.templateString,
 				//		|		template: this.template,
 				//		|		controller: this.controller
@@ -62,7 +62,7 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 				//		- template: view template identifier. If templateString is not empty, this parameter ignored
 				//		- templateString: view template string
 				//		- controller: view controller module identifier
-				//		- parent: parent view
+				//		- parentView: parent view
 				//		- children: children views
 				//		- nls: nls definition module identifier
 				var F = MODULE + "constructor ";
@@ -115,13 +115,13 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					var tplDef = new Deferred();
 					var defDef = sup.call(this);
 					var nlsDef = nls(this);
-					// when parent loading is done (controller), proceed with template
+					// when parentView loading is done (controller), proceed with template
 					// (for data-dojo-* to work we need to wait for controller to be here, this is also
 					// useful when the controller is used as a layer for the view)
 					when(defDef, lang.hitch(this, function () {
 						when(nlsDef, lang.hitch(this, function (nls) {
-							// we inherit from the parent NLS
-							this.nls = dcl.mix({}, this.parent.nls) || {};
+							// we inherit from the parentView NLS
+							this.nls = dcl.mix({}, (this.parentView ? this.parentView.nls : {})) || {};
 							if (nls) {
 								// make sure template can access nls doing ${nls.myprop}
 								dcl.mix(this.nls, nls);
@@ -175,7 +175,11 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					// try to setup a widget to build the view here
 					//TODO: why can we not use id here?  it gets an error
 					var tag = "dapp-view-" + this.id.toLowerCase();
+					try{
 					register(tag, [HTMLElement, Widget, Invalidating, Destroyable], params);
+					}catch(e){
+						//ignore error here if already registered
+					}
 					/*
 					var B5 = dcl(register, {
 						createElement: dcl.around(function(tag){
@@ -207,6 +211,16 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					//TODO: had to do this for widgets in templates to work
 					this.domNode.containerNode = this.domNode;
 					this.domNode.startup();
+					this.domNode.viewId = this.id;
+
+					//ELC try this
+					if(!this.containerNode){
+						if(this.containerSelector){
+							this.containerNode = this.domNode.querySelector(this.containerSelector);
+						}else if(this.domNode.children[0]){
+							this.containerNode = this.domNode.children[0];
+						}
+					}
 
 					this._initViewHidden();
 

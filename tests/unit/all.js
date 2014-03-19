@@ -2,5 +2,9 @@
 define([
 	"./simple1/Test"
 	,
-	"./simple2/Test"
+	"./multinested1/Test"
+	,
+	"./nested1/Test"
+	,
+	 "./simple2/Test"
 ]);

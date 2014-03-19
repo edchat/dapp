@@ -24,6 +24,8 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.attributes.testStringReplace = "yyyyed";
 			this.domNode.currentStatus = this.domNode.currentStatus + "-init called";
 			// I put the on click back in the home.html
+			this.setuponclick = false;
+		/*
 			on(this.domNode.ownerDocument.getElementById("label1"), "click",
 				//on(document.getElementById("label1"), "click",
 				function () {
@@ -35,12 +37,26 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 					deliteApp.displayView('content,detail', params);
 				}
 			);
+		*/
 		},
 		beforeActivate: function (previousView, viewData) {
 			console.log("beforeActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
 				previousView.id : '') + "] with viewData=", viewData);
 			this.beforeActivateCallCount++;
 			this.domNode.beforeActivateStatus = "called " + this.beforeActivateCallCount + " times";
+			if(!this.setuponclick){
+				on(this.domNode.ownerDocument.getElementById("label1"), "click",
+					//on(document.getElementById("label1"), "click",
+					function () {
+						console.log("in on click");
+						//	deliteApp.displayView('detail2');
+						var params = {
+							viewData: "foo"
+						};
+						deliteApp.displayView('content,detail', params);
+					}
+				);
+			}
 		},
 		beforeDeactivate: function (nextView, viewData) {
 			console.log("beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?

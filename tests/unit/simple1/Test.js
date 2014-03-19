@@ -66,7 +66,7 @@ define([
 		},
 
 		// Currently showing simple1App3Home1View test transition to simple1App3Home3NoControllerView
-		".show(simple1App3Home3NoController)": function () {
+		".show(simple1App3Home3NoController) NOTE .show is broken so using testApp.displayView": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
 				if(complete.view.id === "simple1App3Home3NoController") {
@@ -74,23 +74,20 @@ define([
 					var simple1App3Home3NoController = document.getElementById("simple1App3Home3NoController");
 					checkNodeVisibility(simple1Node3, simple1App3Home3NoController);
 
-					// Now simple1App3Home3NoController ActivateCallCounts should be 1
-
 					simple1App3Home3NoControllerView = testApp.getViewFromViewId("simple1App3Home3NoController");
-					assert.deepEqual(simple1App3Home3NoControllerView.beforeActivateCallCount, 1,
-						"simple1App3Home3NoControllerView.beforeActivateCallCount should be 1");
-					assert.deepEqual(simple1App3Home3NoControllerView.afterActivateCallCount, 1,
-						"simple1App3Home3NoControllerView.afterActivateCallCount should be 1");
+
+					// Now simple1App3Home3NoController ActivateCallCounts should be 1
+					checkActivateCallCount(simple1App3Home3NoControllerView, 1);
 
 					// Now simple1App3Home1View DeactivateCallCounts should be 1
-					assert.deepEqual(simple1App3Home1View.beforeDeactivateCallCount, 1,
-						"simple1App3Home1View.beforeDeactivateCallCount should be 1");
-					assert.deepEqual(simple1App3Home1View.afterDeactivateCallCount, 1,
-						"simple1App3Home1View.afterDeactivateCallCount should be 1");
+					checkDeactivateCallCount(simple1App3Home1View, 1);
+
 					d.resolve();
 				}
 			});
 			simple1Node3.show("simple1App3Home3NoController");
+			//testApp.displayView('simple1App3Home3NoController');
+
 		},
 
 		// Currently showing simple1App3Home3NoController test transition back to simple1App3Home1
@@ -104,16 +101,10 @@ define([
 					checkNodeVisibility(simple1Node3, simple1App3Home1);
 
 					// Now simple1App3Home1View ActivateCallCounts should be 2
-					assert.deepEqual(simple1App3Home1View.beforeActivateCallCount, 2,
-						"simple1App3Home1View.beforeActivateCallCount should be 2");
-					assert.deepEqual(simple1App3Home1View.afterActivateCallCount, 2,
-						"simple1App3Home1View.afterActivateCallCount should be 2");
+					checkActivateCallCount(simple1App3Home1View, 2);
 
 					// Now simple1App3Home3NoControllerView DeactivateCallCounts should be 1
-					assert.deepEqual(simple1App3Home3NoControllerView.beforeDeactivateCallCount, 1,
-						"simple1App3Home3NoControllerView.beforeDeactivateCallCount should be 1");
-					assert.deepEqual(simple1App3Home3NoControllerView.afterDeactivateCallCount, 1,
-						"simple1App3Home3NoControllerView.afterDeactivateCallCount should be 1");
+					checkDeactivateCallCount(simple1App3Home3NoControllerView, 1);
 
 					d.resolve();
 				}
@@ -133,23 +124,18 @@ define([
 					var simple1App3Home3NoController = document.getElementById("simple1App3Home3NoController");
 					checkNodeVisibility(simple1Node3, simple1App3Home3NoController);
 
-					// Now simple1App3Home1View ActivateCallCounts should be 2
-					assert.deepEqual(simple1App3Home3NoControllerView.beforeActivateCallCount, 2,
-						"simple1App3Home3NoControllerView.beforeActivateCallCount should be 2");
-					assert.deepEqual(simple1App3Home3NoControllerView.afterActivateCallCount, 2,
-						"simple1App3Home3NoControllerView.afterActivateCallCount should be 2");
+					// Now simple1App3Home3NoControllerView ActivateCallCounts should be 2
+					checkActivateCallCount(simple1App3Home3NoControllerView, 2);
 
-					// Now simple1App3Home3NoControllerView DeactivateCallCounts should be 2
-					assert.deepEqual(simple1App3Home1View.beforeDeactivateCallCount, 2,
-						"simple1App3Home1View.beforeDeactivateCallCount should be 2");
-					assert.deepEqual(simple1App3Home1View.afterDeactivateCallCount, 2,
-						"simple1App3Home1View.afterDeactivateCallCount should be 2");
+					// Now simple1App3Home1View DeactivateCallCounts should be 2
+					checkDeactivateCallCount(simple1App3Home1View, 2);
 
 					d.resolve();
 				}
 			});
 
-			simple1Node3.show('simple1App3Home3NoController');
+			//simple1Node3.show('simple1App3Home3NoController');
+			testApp.displayView('simple1App3Home3NoController');
 		},
 
 		// Currently showing simple1App3Home3NoController test transition back to simple1App3Home2
@@ -165,20 +151,12 @@ define([
 					checkNodeVisibility(simple1Node3, simple1App3Home2);
 
 					// Now simple1App3Home2View ActivateCallCounts should be 1
-					assert.deepEqual(simple1App3Home2View.beforeActivateCallCount, 1,
-						"simple1App3Home2View.beforeActivateCallCount should be 1");
-					assert.deepEqual(simple1App3Home2View.afterActivateCallCount, 1,
-						"simple1App3Home2View.afterActivateCallCount should be 1");
+					checkActivateCallCount(simple1App3Home2View, 1);
 
 					// Now simple1App3Home3NoControllerView DeactivateCallCounts should be 2
-					assert.deepEqual(simple1App3Home1View.beforeDeactivateCallCount, 2,
-						"simple1App3Home1View.beforeDeactivateCallCount should be 2");
-					assert.deepEqual(simple1App3Home1View.afterDeactivateCallCount, 2,
-						"simple1App3Home1View.afterDeactivateCallCount should be 2");
-
-					// And simple1App3Home1View DeactivateCallCounts should still be 2
-					assert.deepEqual(simple1App3Home1View.beforeDeactivateCallCount, 2,
-						"simple1App3Home1View.beforeDeactivateCallCount should be 2");
+					checkDeactivateCallCount(simple1App3Home3NoControllerView, 2);
+					// Now simple1App3Home1View DeactivateCallCounts should be 2
+					checkDeactivateCallCount(simple1App3Home1View, 2);
 
 					d.resolve();
 				}
@@ -201,6 +179,33 @@ define([
 					(vs.children[i] !== target && vs.children[i].style.display === "none")),
 				"checkNodeVisibility FAILED for target.id=" + (target ? target.id : "")
 			);
+		}
+	}
+
+	function checkActivateCallCount(view, count) {
+		if(view) {
+			assert.deepEqual(view.beforeActivateCallCount, count,
+				view.id+ " beforeActivateCallCount should be "+ count);
+			assert.deepEqual(view.afterActivateCallCount, count,
+				view.id+ " afterActivateCallCount should be "+count);
+
+			//also test for selectedChildren being set correctly with constraint main
+			var selectedChildId = testApp.selectedChildren.main.id;
+			assert.deepEqual(view.id, selectedChildId, view.id+ " should be in testApp.selectedChildren.main. ");
+
+			//also test for view._active being set correctly to true
+			assert.isTrue(view._active, "view_active should be true for "+view.id);
+		}
+	}
+	function checkDeactivateCallCount(view, count) {
+		if(view) {
+			assert.deepEqual(view.beforeDeactivateCallCount, count,
+				view.id+ " beforeDeactivateCallCount should be "+ count);
+			assert.deepEqual(view.afterDeactivateCallCount, count,
+				view.id+ " afterDeactivateCallCount should be "+count);
+
+			//also test for view._active being set correctly to false
+			assert.isFalse(view._active, "view_active should be false for "+view.id);
 		}
 	}
 
