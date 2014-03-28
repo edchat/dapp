@@ -1,8 +1,8 @@
 define(
 	["require", "dcl/dcl", "dojo/on", "dojo/_base/lang", "dojo/Deferred", "../../Controller",
-		"../../utils/constraints", "dojo/dom-construct", "dojo/aspect"
+		"../../utils/constraints", "dojo/dom-construct"
 	],
-	function (require, dcl, on, lang, Deferred, Controller, constraints, domConstruct, aspect) {
+	function (require, dcl, on, lang, Deferred, Controller, constraints, domConstruct) {
 		var MODULE = "controllers/delite/Load:";
 		var resolveView = function (event, viewName, newView, parentView) {
 			// in addition to arguments required by delite we pass our own needed arguments
@@ -11,17 +11,19 @@ define(
 			if (newView && newView.app) {
 				newView.app.log(MODULE, F + "called with viewName=[" + viewName + "] nextView.id=[" + newView.id +
 					"] " + "parentView.id=[" + (parentView ? parentView.id : "") + "]");
+				console.log(MODULE, F + "called with viewName=[" + viewName + "] nextView.id=[" + newView.id +
+					"] " + "parentView.id=[" + (parentView ? parentView.id : "") + "] event.dapp.parentView.id=[" +
+					(event.dapp && event.dapp.parentView ? event.dapp.parentView.id : ""));
 			}
 			event.loadDeferred.resolve({
-				child: newView.domNode || newView,
-			//	parent: event.dapp && event.dapp.parentNode ? event.dapp.parentNode : newView.domNode.parentNode,
+				child: newView.domNode,
 				dapp: {
 					nextView: newView,
 					parentView: parentView,
-					parentNode: event.dapp && event.dapp.parentNode ? event.dapp.parentNode : newView.domNode.parentNode,
+					parentNode: event.dapp.parentNode,
 					isParent: event.isParent,
-					lastView: event.dapp ? event.dapp.lastView : true,
-					lastViewId: event.dapp ? event.dapp.lastViewId : newView.id,
+					lastViewPart: event.dapp.lastViewPart,
+					lastViewId: event.dapp.lastViewId,
 					id: newView.id,
 					viewName: newView.viewName
 				}
@@ -37,422 +39,279 @@ define(
 					"app-unload-view": this.unloadView
 				};
 			},
+
 			unloadApp: function () {
 				//TODO: should also destroy this controller too!
 				document.removeEventListener("delite-display-load", this.func, false);
 			},
-			/* jshint maxcomplexity: 13 */
+
+			/* jshint maxcomplexity: 16 */
 			_loadHandler: function (event) {
 				var F = MODULE + "_loadHandler ";
-				this.app.log(MODULE, F + "called for event.dest=[" + event.dest + "]");
-				console.log(MODULE, F + "called for event.dest=[" + event.dest + "] this.app.id="+this.app.id);
+				this.app.log(MODULE, F + "called for event.dest=[" + event.dest + "] this.app.id=" + this.app.id);
 				var self = this;
 				event.preventDefault();
-				// load the actual view
 
-				var viewId = this.app.flatViewDefinitions[event.dest] ?
-					this.app.flatViewDefinitions[event.dest].viewId : event.dest;
+				// load the actual view
+				var dest = event.dest;
+
+				var viewId;
+				// if from dom.show, this could be a view id, if it contains an _ treat it as an id
+				if (dest.indexOf("_") >= 0) { // if dest is already a view id.
+					viewId = dest;
+					dest = this.app.getViewDestFromViewid(dest, event.target);
+					console.log("in .show path after update dest with getViewDestFromViewid dest = " + dest);
+				} else {
+					viewId = this.app.getViewIdFromDest(event.dest, event.target);
+				}
 				this.app.log(MODULE, F + "called for viewId=[" + viewId + "]");
 
-
-				//TODO: this is questionable, how to handle .show calls directly with possible , and + in dest or defaultViews
-				//check to see if this event has event.dapp if not it did not come from transition so try to pass
-				// this one on to transition
-				var dest = event.dest;
-				if(!event.dapp || !event.dapp.parentView){
+				//Need to handle calls directly from node.show that did not come from transition
+				if (!event.dapp || !event.dapp.parentView) {
 					//This must be a direct call from .show, need to setup event.dapp with parentView etc.
 					event.dapp = {};
 					event.dapp.parentNode = event.target;
-					if(dest.indexOf("_") >= 0){ // is the dest really a viewId?
-						var testDest = this.app.getViewDestFromViewid(dest);
-					//	event.dest = testDest;
-						dest = testDest;
-					}
 					event.dapp.parentView = this.app.getParentViewFromViewName(dest, event.target);
+					this.app.log(MODULE, F + "in .show path after update event.dapp.parentView.id = " +
+						event.dapp.parentView.id);
 					event.dapp.lastViewId = viewId;
 					event.dapp.isParent = false;
 
 					// setup dest with the full view path, add in defaultViews if necessary
-					if (this.app.flatViewDefinitions[dest]) { // if dest is a view name we will use the viewPath
-							dest = this.app.flatViewDefinitions[dest].viewPath;
-					}
-					if(!event.parent){
+					dest = viewId.replace(/_/g, ",");
+					if (!event.parent) {
 						dest = this.app.updateDestWithDefaultViews(dest);
-						console.log(MODULE, F + "dest adjusted to have defaults dest=[" + dest + "]");
+						this.app.log(MODULE, F + "dest adjusted to have defaults dest=[" + dest + "]");
 						event.dest = dest;
 					}
-					// it dest has multiple parts or is nested
-					if(!event.parent && (dest.indexOf("+") >= 0 || dest.indexOf("-") >= 0 || dest.indexOf(",") >= 0)){
-					//if(dest.indexOf("+") >= 0 || dest.indexOf("-") >= 0){
-					//TODO: this is questionable, how to handle .show calls directly with possible , and + in dest or defaultViews
-						console.log(MODULE, F + "adjusted dest contains + - or , so need to handle special case dest=[" + dest + "]");
-						console.log(MODULE, F + "handle special case by firing delite-display for now dest=[" + dest + "]");
-						var tempDisplaydeferred = new Deferred();
-						on.emit(document, "delite-display", {
-							// TODO is that really defaultView a good name? Shouldn't it be defaultTarget or defaultView_s_?
-							dest: dest,
-							displayDeferred: tempDisplaydeferred,
-							bubbles: true,
-							cancelable: true
-						});
-						tempDisplaydeferred.then(function (value) {
-							// need to resolve the loadDeferred (too late?)
-							var newView = document.getElementById(viewId);
-							console.log(MODULE, F + "back from handle special case need to resolve deferred for =[" + viewId + "]");
-
-							event.loadDeferred.resolve({
-							//	child: newView.domNode || newView,
-								child: value.child,
-								dapp: {
-									parentView: event.dapp.parentView, // todo: is this needed?
-									parentNode: event.dapp.parentNode, // todo: is this needed?
-									nextView: newView//,
-							//		isParent: event.isParent, // todo: is this needed?
-							//		lastView: event.lastView,
-							//		lastViewId: event.lastViewId,
-							//		id: newView.id,
-							//		viewName: newView.viewName
-								}
-							});
-						});
+					// if dest has multiple parts or is nested we need to send it thru transition
+					if (!event.parent && (dest.indexOf("+") >= 0 || dest.indexOf("-") >= 0 || dest.indexOf(",") >= 0)) {
+						self.app.log(MODULE, F + "adjusted dest contains +- or , need to handle special case dest=[" +
+							dest + "]");
+						this._handleShowFromDispContainer(event, dest);
 						return;
 					}
 				}
-			//	event.parent = event.parent || event.target;
 
-				if(!event.dapp.parentNode){
-					event.dapp.parentNode = event.target;
-				}
-				// TODO: deal with defaultParams?
-				var params = event.params || "";
-
-				var viewDef = this.app.getViewDefFromEvent(event);
-				var constraint = viewDef ? viewDef.constraint : null;
-
-				// TODO: why doing this again, it may not be needed..?
-			/*
-				if (!event.dapp.parentView) {
-					if (!viewDef) { // problem, we dont have this view
-						event.loadDeferred.resolve({
-							child: typeof event.dest === "string" ? document.getElementById(event.dest) : event.dest
-						});
-						return;
-					}
-					event.dapp = {lastViewId : viewId};
-					event.dapp.parentNode = event.target;
-					event.dapp.parentView = this.app.getParentViewFromViewName(dest, event.target);
-					event.dapp.isParent = false;
-					this.app.log(MODULE, F + "called without event.parent for [" + event.dest + "] set it to [" +
-						event.dapp.parentView.id + "]");
-				} else {
-					this.app.log(MODULE, F + "called with event.dapp.parentView [" + event.dapp.parentView.id + "]");
-				}
-			*/
+				// Check to see if this view has already been loaded
 				var view = null;
 				if (event.dapp.parentView && event.dapp.parentView.children) {
 					view = event.dapp.parentView.children[viewId];
+					if (view) {
+						self.app.log(MODULE, F + "view already loaded view.id=" + view.id);
+					}
 				}
 
 
-				console.log(MODULE, F + " before loadDeferred.then event.dest=[" + event.dest + "] self.app.id="+self.app.id);
-			/*
-				var onAddedDclHandle = dcl.around(event.target.performDisplay, function(sup){
-				    return function(child, value){
-						console.log("inside onAddedDclHandle for child.id="+(child?child.id:"no child"));
-				    	sub.call(child, value);
-						onAddedDclHandle.remove();
-				    };
-				  })
-
-				var onbeforeDisplayHandle = on(event.target, "delite-display-beforeDisplay", function (complete) {
-				//var onHandle = aspect.after(event.target, "performDisplay", function (child, complete) {
-					//	on(event.target, "delite-display-complete", function (complete) {
-					if(complete.dest !== event.dest){ // if this delite-display-complete is not for this view return
-						console.log("in on delite-display-beforeDisplay complete.dest NOT EQUAL =["+(complete ? complete.dest: "")+ "] event.dest="+event.dest);
-						return;
-					}
-					console.log("in on delite-display-beforeDisplay complete.dest IS EQUAL =["+(complete ? complete.dest: "")+ "] event.dest="+event.dest);
-					onbeforeDisplayHandle.remove();
-				})
-			 */
-				/* jshint maxcomplexity: 16 */
-				//event.loadDeferred.then(function (value) {
-				//var onAddedHandle = on(event.target, "delite-display-added", function (value) {
-				//var onAddedHandle = aspect.before(event.target, "performDisplay", function (child, value) {
-				//var onAddedHandle = dcl.before(event.target.performDisplay, function (child, value) {
-				//	if(!value || value.dest !== event.dest){ // if this delite-display-complete is not for this view return
-				//		console.log("in aspect.before NOT EQUAL value.dest ="+(value ? value.dest: "")+ " event.dest="+event.dest);
-				//		return;
-				//	}
-				//	onAddedHandle.remove();
+				// After the loadDeferred is resolved, but before the view is displayed this event,
+				// delite-display-beforeDisplay will be fired.
 				var onbeforeDisplayHandle = on(event.target, "delite-display-beforeDisplay", function (value) {
-					//TODO: ELC need to review this and see if fullViewTarget and other params are really needed, and how best to
-					// get the parent
-					if(value.dest !== event.dest){ // if this delite-display-complete is not for this view return
-						console.log("in on delite-display-beforeDisplay complete.dest NOT EQUAL =["+(value ? value.dest: "")+ "] event.dest="+event.dest);
+					// If the value.dest does not match the one we are expecting keep waiting
+					if (value.dest !== event.dest) { // if this delite-display-complete is not for this view return
+						self.app.log(MODULE, F + "in on delite-display-beforeDisplay complete.dest NOT EQUAL =[" +
+							(value ? value.dest : "") + "] event.dest=" + event.dest);
 						return;
 					}
-					console.log("in on delite-display-beforeDisplay complete.dest IS EQUAL =["+(value ? value.dest: "")+ "] event.dest="+event.dest);
-					onbeforeDisplayHandle.remove();
+					//TODO: ELC need to review this and see if fullViewTarget and other params are really needed, and
+					// how best to
+					self.app.log(MODULE, F + "in on delite-display-beforeDisplay value.dest =[" + value.dest + "]");
+					onbeforeDisplayHandle.remove(); // remove the handle when we match value.dest
 
-				//	console.log(MODULE, F + " insied loadDeferred.then event.dest=[" + event.dest + "] self.app.id="+self.app.id);
-					var parts, toId, subIds, next, parent, toId2;
-					if (value.dapp.id) { // need to call the before Activate/Deactivate for the view(s)
-						self.app.log(MODULE, F + "in loadDeferred.then if value.dapp.id for viewId=[" + viewId + "]");
-						toId = value.dapp.id;
+					var retval = {};
+
+					// If this is the lastView, we need to determine the firstChildView, subIds and parentView in order
+					//  to call _getNextSubViewArray, _handleBeforeDeactivateCalls and _handleBeforeActivateCalls
+					if (!value.dapp.isParent && (!value.dapp.lastViewId || value.dapp.lastViewId === value.dapp.id)) {
+						var parts, firstChildId, subIds;
+						retval.dapp = value.dapp;
+
+						firstChildId = value.dapp.id;
 						subIds = null;
-						// TODO: this needs to change, value.dapp.viewName is actually the id, so change it from name
-						// TODO: to id and add a call in app to get the viewPath from the id, and call that instead.
-						var viewDef = self.app.flatViewDefinitions[(value.dapp.viewName || value.dapp.id)];
-						if(!viewDef){
-							console.error("View is not defined in the config for viewId: "+viewId);
-							//throw new Error("View is not defined in the config for viewId: "+viewId);
-						}
-						var viewTarget = viewDef.viewPath;
-					//	parent = value.parent;
-						parent = value.dapp.parentView; //todo: should this be parentNode?
-					//	var parentView = value.dapp.parentView;
 
+						var viewTarget = value.dapp.nextView.id.replace(/_/g, ",");
 						if (viewTarget) {
 							parts = viewTarget.split(",");
-							toId = parts.shift();
+							firstChildId = parts.shift();
 							subIds = parts.join(",");
-						//ELC should not have to check for defaultView here, it is now added to dest up front added back for show case
-
-						} else {
-							// If parent.defaultView is like "main,main", we also need to split it and set the value to
-							// toId and subIds. Or cannot get the next view by "parent.children[parent.id + '_' + toId]"
-							parts = parentView.defaultView.split(",");
-							toId = parts.shift();
-							subIds = parts.join(",");
-
 						}
-						self.app.log(MODULE, F + "in loadDeferred.then if value.dapp.id with subIds =[" + subIds + "]");
+						var appView = self.app;
 
-						var parentView = self.app.getParentViewFromViewId(toId.replace(/,/g,"_"));
-						// next is loaded and ready for transition
-						//	next = parent.children[parent.id + '_' + toId];
+						var firstChildView = appView.children[firstChildId];
+						self.app.log(MODULE, F + "check firstChildView.constraint=[" + (firstChildView ?
+							firstChildView.constraint : "") + "] ");
 
-					//	next = parent.children[toId];
-						next = parentView.domNode.children[toId];
-						var nextView = parentView.children[toId];
-						self.app.log(MODULE, F + "check next.constraint and nextView.constraint next constraint=[",
-							(next ? next.constraint : ""), "], nextView.constraint=[" + (nextView ?
-								nextView.constraint : "") + "] ");
 
-						//	if(!next){
-						//	if(removeView){
-						//		this.app.log(F+
-						// 				"called with removeView true, but that view is not available to remove");
-						//		return;	// trying to remove a view which is not showing
-						//	}
-						//	throw Error("child view must be loaded before transition.");
-						//	}
-						// if no subIds and next has default view,
-						// set the subIds to the default view and transition to default view.
-						//TODO: check on next vs. nextView, maybe parent vs. parentView too in the sections below
-					//ELC should not need to check .defaultView here, added to dest up front added back for show case
-
-						//TODO: question about defaultView here...
-						if (!subIds && (!value.dapp.lastViewId || value.dapp.lastViewId === value.dapp.id)
-							&& nextView.defaultView) {
-							subIds = nextView.defaultView;
-							//TODO: why was I doing this????????
-						//	constraints.setSelectedChild(parentView, (nextView.constraint || "center"), nextView, self.app);
-						//	return; // do not call beforeActivate for the parent with defaultView wait for last child
+						var nextSubViewArray = [firstChildView || appView];
+						if (subIds) {
+							nextSubViewArray = self._getNextSubViewArray(subIds, firstChildView, appView);
 						}
 
-						if (!value.dapp.isParent && (!value.dapp.lastViewId || value.dapp.lastViewId === value.dapp.id)) {
-							var nextSubViewArray = [nextView || parentView];
-							//	var nextSubViewArray = [parentView || self.app];
-							if (subIds) {
-								//nextSubViewArray = self._getNextSubViewArray(subIds, next, parent);
-								nextSubViewArray = self._getNextSubViewArray(subIds, nextView, parentView);
-							}
+						var current = constraints.getSelectedChild(appView, (firstChildView &&
+							firstChildView.constraint ? firstChildView.constraint : "center"));
+						//var testVisibleChild = firstChildView.domNode.parentNode ?
+						//	firstChildView.domNode.parentNode._visibleChild : null;
+						//		self.app.log(MODULE, F + "got current from call to constraints with appView.id=[" +
+						//			appView.id, "], got current.id=[" + (current ? current.id : "") + "]");
+						//TODO: remove temp test
+						//		if (testVisibleChild && current && testVisibleChild !== current.domNode) {
+						//			console.warn("testVisibleChild !== current testVisibleChild.id=" +
+						// 				testVisibleChild.id);
+						//		}
 
-							var current = constraints.getSelectedChild(parentView, (nextView && nextView.constraint ?
-								nextView.constraint : next && next.constraint ? next.constraint : "center"));
-							var testVisibleChild = nextView.domNode.parentNode ? nextView.domNode.parentNode._visibleChild : null;
-							self.app.log(MODULE, F + "got current from call to constraints with parentView.id=["+
-								parentView.id, "], got current.id=[" + (current ? current.id : "") +"]");
-							//TODO: remove temp test
-							if(testVisibleChild && current && testVisibleChild !== current.domNode){
-								console.warn("testVisibleChild !== current testVisibleChild.id="+testVisibleChild.id);
-							}
-							//var current = constraints.getSelectedChild(parent, next.parentSelector || "center");
-							var currentSubViewRet = self._getCurrentSubViewArray(parentView, nextSubViewArray,
-								/*removeView,*/
-								false);
-							var currentSubViewArray = currentSubViewRet.currentSubViewArray;
-							self.currentLastSubChildMatch = currentSubViewRet.currentLastSubChildMatch;
-							self.nextLastSubChildMatch = currentSubViewRet.nextLastSubChildMatch;
-							//var currentSubNames = self._getCurrentSubViewNamesArray(currentSubViewArray);
+						// use the nextSubViewArray to get the currentSubViewArray and current and next last child
+						// matches.
+						var currentSubViewRet = self._getCurrentSubViewArray(appView, nextSubViewArray,
+							/*removeView,*/
+							false);
+						var currentSubViewArray = currentSubViewRet.currentSubViewArray;
+						self.currentLastSubChildMatch = currentSubViewRet.currentLastSubChildMatch;
+						self.nextLastSubChildMatch = currentSubViewRet.nextLastSubChildMatch;
 
-							var data = event.viewData;
+						//call _handleBeforeDeactivateCalls to process calls to beforeDeactivate for this transition
+						if (currentSubViewArray) {
+							//self.app.log(MODULE, F + "calling _handleBeforeDeactivateCalls firstChildView id=[",
+							//	(firstChildView ? firstChildView.id : ""), "], firstChildView.parent.id=[" +
+							//	(firstChildView &&
+							//	firstChildView.parent ? firstChildView.parent.id : "") + "] currentSubViewArray =",
+							//	currentSubViewArray);
+							self._handleBeforeDeactivateCalls(currentSubViewArray, self.nextLastSubChildMatch ||
+								firstChildView, current, value.viewData, subIds);
 						}
-						var retval = {};
-						retval.dapp = value.dapp;
-						if (!value.dapp.isParent && (!value.dapp.lastViewId || value.dapp.lastViewId === value.dapp.id)) {
-						//	if (current && current._active) {
-							if (currentSubViewArray) {
-								self.app.log(MODULE, F + "calling _handleBeforeDeactivateCalls nextView id=[",
-									(nextView ? nextView.id : ""), "], nextView.parent.id=[" + (nextView &&
-										nextView.parent ? nextView.parent.id : "") + "] currentSubViewArray =",
-									currentSubViewArray);
-								self._handleBeforeDeactivateCalls(currentSubViewArray, self.nextLastSubChildMatch ||
-									nextView, current, data, subIds);
-							}else if(current){ // TODO: remove this TEMP
-								self.app.log(MODULE, F + "NOT calling _handleBeforeDeactivateCalls current._active=[",
-									current._active, "], current.id=[" + current.id);
-							}
-							retval.dapp.nextSubViewArray = nextSubViewArray;
-							retval.dapp.currentSubViewArray = currentSubViewArray;
-							retval.dapp.nextLastSubChildMatch = self.nextLastSubChildMatch;
-							retval.dapp.current = current;
-							retval.dapp.next = next;
-							retval.nextView = nextView;
-							retval.subIds = subIds;
-						}
-					//ELC should not have to check for defaultView here, added to dest up front. added back for show case
-					//	if (!value.isParent && nextView && !nextView.defaultView) { // do not call activate if we have a default view to process
-						if (!value.dapp.isParent && nextView && nextSubViewArray) { // do not call activate if we have a default view to process
-							//console.log(F + " calling _handleBeforeActivateCalls next id=[", next.id, "],
-							//        parent.id=[", next.parent.id, "]");
-							self._handleBeforeActivateCalls(nextSubViewArray, self.currentLastSubChildMatch || current,
-								data, subIds);
-						//ELC move this into _handleBeforeActivateCalls
-						//	constraints.setSelectedChild(parentView, (nextView ? nextView.constraint : next ? next.constraint
-						//		: "center"), nextView ? nextView :  next, self.app);
-						}
+						retval.dapp.nextSubViewArray = nextSubViewArray;
+						retval.dapp.currentSubViewArray = currentSubViewArray;
+						retval.dapp.nextLastSubChildMatch = self.nextLastSubChildMatch;
+						retval.dapp.current = current;
+						retval.firstChildView = firstChildView;
+						retval.subIds = subIds;
+						self.app.log(MODULE, F + "retval.firstChildView.id = [" + retval.firstChildView.id +
+							"] retval.dapp.current.id = [" + (retval.dapp.current ? retval.dapp.current.id : "") +
+							"] retval.subIds = [" + retval.subIds + "]");
 
+						//call _handleBeforeActivateCalls to process calls to beforeActivate for this transition
+						self._handleBeforeActivateCalls(nextSubViewArray, self.currentLastSubChildMatch || current,
+							value.viewData, subIds);
 					}
-					/*  TODO: should remove the dapp.previousView code, it did not cut it
-					 if (value.dapp.previousView) {
-					 value.dapp.previousView.beforeDeactivate(value.dapp.nextView);
-					 }
-					 if (value.dapp.nextView) {
-					 //		value.dapp.nextView.beforeActivate(value.dapp.previousView);
-					 }
-					 */
 					return retval;
 				});
-/*
-				console.log("adding onAddedaspectHandle for event.dest="+(event.dest?event.dest:"no dest"));
-				var onAddedaspectHandle = aspect.around(event.target, "performDisplay", function(original){
-				    return function(child, value){
-						console.log("inside onAddedaspectHandle before Original call for child.id="+(child?child.id:"no child"));
-						onAddedaspectHandle.remove();
-				      // doing something before the original call
-				      var deferred = original(child, value);
-				      // doing something after the original call
-			//			console.log("inside onAddedaspectHandle after Original call for child.id="+(child?child.id:"no child"));
-			//			if(!value || value.dest !== event.dest){ // if this delite-display-complete is not for this view return
-			//				console.log("in aspect.around NOT EQUAL value.dest ="+(value ? value.dest: "")+ " event.dest="+event.dest);
-			//				return;
-			//			}
-				      return deferred;
-				    }
-				  });
-*/
-				// once transition we will be ready to call afterActivate
+
+				// on delite-display-complete we will be ready to call afterDeactivate and afterActivate
 				var onHandle = on(event.target, "delite-display-complete", function (complete) {
-				//var onHandle = aspect.after(event.target, "performDisplay", function (child, complete) {
-					//	on(event.target, "delite-display-complete", function (complete) {
-					if(complete.dest !== event.dest){ // if this delite-display-complete is not for this view return
-						console.log("in on delite-display-complete complete.dest NOT EQUAL =["+(complete ? complete.dest: "")+ "] event.dest="+event.dest);
+					if (complete.dest !== event.dest) { // if this delite-display-complete is not for this view return
+						console.log("in on delite-display-complete complete.dest NOT EQUAL =[" + (complete ?
+							complete.dest : "") + "] event.dest=" + event.dest);
 						return;
 					}
-					console.log("in on delite-display-complete complete.dest IS EQUAL =["+(complete ? complete.dest: "")+ "] event.dest="+event.dest);
+					self.app.log(MODULE, F + "in on delite-display-complete complete.dest =[" + complete.dest + "]");
 					onHandle.remove();
-					if (complete.dapp) {
-						//var next = complete.next;
-						var next = complete.dapp.next || complete.dapp.nextView;
-						self.app.log(MODULE, F + "delite-display-complete fired for [" + next.id + "] with parent [" +
-							(complete.dapp.parentView ? complete.dapp.parentView.id : "") + "]");
-						// TODO works for StackView but what about containers with several views visible same time
-						//complete.dapp.parentNode._activeView = complete.dapp.parentView;
-						complete.dapp.parentView._activeView = complete.dapp.parentView;
 
-						// Add call to handleAfterDeactivate and handleAfterActivate here!
-						var data = complete.viewData;
-						if (!next.beforeActivate) { // is next an app view or domNode?
-							next = self.app.getViewFromViewId(next.id);
-						}
-						//TODO: check on isParent, some are in dapp, some are not, check to see if added outside of dapp....
-						if (!complete.dapp.isParent && next) {
-							self.app.log(MODULE, F + "calling _handleAfterDeactivateCalls next id=[" + next.id +
-								"] next.parentView.id=[" + next.parentView.id + "]");
-							self._handleAfterDeactivateCalls(complete.dapp.currentSubViewArray,
-								complete.dapp.nextLastSubChildMatch || next, complete.dapp.current, data,
-								complete.subIds);
-						}
+					var next = complete.dapp.nextView;
+					self.app.log(MODULE, F + "delite-display-complete fired for [" + next.id + "] with parent [" +
+						(complete.dapp.parentView ? complete.dapp.parentView.id : "") + "]");
 
-					//ELC should not have to check defaultView here, it is now added to dest up front added back for show case
-					//	if (complete.nextSubViewArray && next && !next.defaultView) { // do not call activate if we have a default view to process
-						if (complete.dapp.nextSubViewArray && next) {
-							self.app.log(MODULE, F + "calling _handleAfterActivateCalls next id=[" + next.id +
-								"] next.parentView.id=[" + next.parentView.id + "]");
-							self._handleAfterActivateCalls(complete.dapp.nextSubViewArray, /*removeView*/ false,
-								complete.dapp.currentLastSubChildMatch || complete.dapp.current, data, complete.subIds);
-						}
+					// Add call to handleAfterDeactivate and handleAfterActivate here!
 
+					if (!complete.dapp.isParent && (complete.dapp.lastViewId === complete.dapp.id)) {
+						self.app.log(MODULE, F + "calling _handleAfterDeactivateCalls next id=[" + next.id +
+							"] next.parentView.id=[" + next.parentView.id + "]");
+						self._handleAfterDeactivateCalls(complete.dapp.currentSubViewArray,
+							complete.dapp.nextLastSubChildMatch || next, complete.dapp.current, complete.viewData,
+							complete.subIds);
+					}
+
+					if (complete.dapp.nextSubViewArray && next) {
+						self.app.log(MODULE, F + "calling _handleAfterActivateCalls next id=[" + next.id +
+							"] next.parentView.id=[" + next.parentView.id + "]");
+						self._handleAfterActivateCalls(complete.dapp.nextSubViewArray, /*removeView*/ false,
+							complete.dapp.currentLastSubChildMatch || complete.dapp.current, complete.viewData,
+							complete.subIds);
 					}
 				});
+				// TODO: deal with defaultParams?
+				var params = event.params || "";
+
 				if (view) {
 					// set params to new value before returning
 					if (params) {
 						view.params = params;
 					}
-					var parentView = this.app.getParentViewFromViewId(view.id);
-					resolveView(event, event.dest, view, parentView);
+					resolveView(event, event.dest, view, event.dapp.parentView);
 				} else if (event.dest && event.dest.id && this.app.views[event.dest.id]) {
 					viewId = event.dest.id;
-					this._createView(event, viewId, event.dest.viewName, params, event.parentView || this.app,
+					this._createView(event, viewId, event.dest.viewName, params, event.dapp.parentView || this.app,
 						this.app.views[event.dest.id].type);
 				} else {
 					var type = null;
 					if (event.dapp.parentView && event.dapp.parentView.views && event.dapp.parentView.views[viewId]) {
-						type = event.dapp.parentView.views[viewId].type;
+						type = event.dapp.parentView.views[viewId].type; // todo: this code for type seems questionable
 					}
 					this._createView(event, viewId, event.dest, params, event.dapp.parentView, type);
 				}
 			},
 
+			_handleShowFromDispContainer: function (event, dest) {
+				var F = MODULE + "_handleShowFromDispContainer ";
+				console.log(MODULE, F + "adjusted dest contains + - or , so need to handle special case dest=[" + dest +
+					"]");
+				console.log(MODULE, F + "handle special case by firing delite-display for now dest=[" + dest + "]");
+				var tempDisplaydeferred = new Deferred();
+				on.emit(document, "delite-display", {
+					// TODO is that really defaultView a good name? Shouldn't it be defaultTarget or defaultView_s_?
+					dest: dest,
+					displayDeferred: tempDisplaydeferred,
+					bubbles: true,
+					cancelable: true
+				});
+				tempDisplaydeferred.then(function (value) {
+					// need to resolve the loadDeferred
+					console.log(MODULE, F + "back from handle special case need to resolve deferred for =[" +
+						value.dapp.id + "]");
+
+					// resolve the loadDeferred here, do not need dapp stuff since we are not waiting on the
+					// "delite-display-beforeDisplay" or "delite-display-complete" it was handled already by the emit
+					// for "delite-display" above.
+					event.loadDeferred.resolve({
+						child: value.child
+					});
+				});
+				return;
+
+			},
+
 			_createView: function (event, id, viewName, params, parentView, type) {
 				var F = MODULE + "_createView ";
-				this.app.log(MODULE, F + "called for [" + id + "]");
-				console.log(MODULE, F + "called for [" + id + "] with event.dapp.isParent="+
-					(event.dapp ? event.dapp.isParent : ''));
+				this.app.log(MODULE, F + "called for [" + id + "] with event.dapp.isParent=" +
+					(event.dapp ? event.dapp.isParent : ""));
 				var app = this.app;
-				//var id = parent.id + '_' + id;
-				// TODO: in my prototype View names & ids are the same, so view names must be unique
 				require([type ? type : "../../View"], function (View) {
 					var params = {
 						"app": app,
 						"id": id,
 						"viewName": viewName,
 						"parentView": parentView,
-						"parentNode" : event.dapp.parentNode
+						"parentNode": event.dapp.parentNode
 					};
 					dcl.mix(params, {
 						"params": params
 					});
-					console.log("in load calling new View and start for id="+id);
+					console.log("in load calling new View and start for id=" + id);
 					new View(params).start().then(function (newView) {
-						console.log("in load back from new View and start for id="+id);
+						console.log("in load back from new View and start for id=" + id);
 						var p = parentView || app.getParentViewFromViewId(id);
 						var pView = app.getParentViewFromViewId(id);
 						p.children[id] = newView; // todo: is this needed?
 						pView.children[id] = newView; // todo: is this needed?
-						//newView.init(); // todo: this worked with init controller, not without it! Move later and let displayContainer place the node
 						var onAddedHandle = on(event.target, "delite-display-added", function (value) {
-							if(!value.dapp || value.dapp.id !== newView.id){ // if this delite-display-complete is not for this view return
-								console.log("in onAddedHandle NOT EQUAL value.id ="+(value.dapp ? value.dapp.id: "")+ " newView.id="+newView.id);
+							// if this delite-display-complete is not for this view return
+							if (!value.dapp || value.dapp.id !== newView.id) {
+								console.log("in onAddedHandle NOT EQUAL value.id =" +
+									(value.dapp ? value.dapp.id : "") + " newView.id=" + newView.id);
 								return;
 							}
 							onAddedHandle.remove();
 							newView.init();
 						});
+						event.dapp.parentView = pView;
+						event.dapp.parentNode = newView.parentNode;
 						resolveView(event, id, newView, pView);
 					});
 				});
@@ -470,7 +329,8 @@ define(
 				for (var i = subs.length - 1; i >= 0; i--) {
 					var v = subs[i];
 					this.app.log(MODULE, F + "in _handleBeforeDeactivateCalls in subs for v.id=[" + v.id + "]" +
-					" v.beforeDeactivate isFunction?=["+lang.isFunction(v.beforeDeactivate)+"] v._active=["+v._active+"]");
+						" v.beforeDeactivate isFunction?=[" + lang.isFunction(v.beforeDeactivate) + "] v._active=[" +
+						v._active + "]");
 					if (v && v.beforeDeactivate && v._active) {
 						this.app.log(MODULE, F + "beforeDeactivate for v.id=[" + v.id + "]");
 						v.beforeDeactivate(next, data);
@@ -491,19 +351,12 @@ define(
 					}
 					if (v && v.beforeActivate) {
 						this.app.log(MODULE, F + "beforeActivate for v.id=[" + v.id + "]");
-						console.log(MODULE, F + "beforeActivate for v.id=[" + v.id + "]");
 						v.beforeActivate(current, data);
 					}
-					if(p){
+					if (p) {
 						constraints.setSelectedChild(p, (v ? v.constraint : "center"), v, this.app);
 					}
 					p = v;
-					// set this view as the selected child of the parent for this constraint if parent is a view
-					//TODO: ELC this is too late, needs to be done before deactivate is called
-					//	if(this.app.id === v.parent.id || this.app.getViewDefFromViewName(v.parent.id)){
-					//		constraints.setSelectedChild(v.parent, v.constraint || "center", v);
-					//	}
-
 				}
 			},
 
@@ -512,7 +365,6 @@ define(
 				//		Call afterDeactivate for each of the current views which have been deactivated
 				var F = MODULE + "_handleAfterDeactivateCalls ";
 				this.app.log(MODULE, F + "afterDeactivate called for subs=", subs);
-			//	if (current && current._active) {
 				if (subs) {
 					//now we need to loop forwards thru subs calling afterDeactivate
 					for (var i = 0; i < subs.length; i++) {
@@ -524,7 +376,6 @@ define(
 							v.afterDeactivate(next, data);
 						}
 					}
-
 				}
 			},
 
@@ -540,59 +391,52 @@ define(
 				}
 				for (var i = startInt; i < subs.length; i++) {
 					var v = subs[i];
-					this.app.log(MODULE, F + "afterActivate for v.id=[" + v.id + "] and v.afterActivate isFunction="+
+					this.app.log(MODULE, F + "afterActivate for v.id=[" + v.id + "] and v.afterActivate isFunction=" +
 						lang.isFunction(v.afterActivate));
 					if (v.afterActivate) {
 						this.app.log(MODULE, F + "afterActivate for v.id=[" + v.id + "] setting _active true");
-						console.log(MODULE, F + "afterActivate for v.id=[" + v.id + "] setting _active true");
 						v._active = true;
 						v.afterActivate(current, data);
-						//TODO: is this needed????
-						if(v.domNode){
-							v.domNode._active = true;
-						}
 					}
 				}
 			},
 
-			_getNextSubViewArray: function (subIds, next, parentView) {
+			_getNextSubViewArray: function (subIds, firstChildView, parentView) {
 				// summary:
 				//		Get next sub view array, this array will hold the views which are about to be transitioned to
 				//
 				// subIds: String
 				//		the subids, the views are separated with a comma
-				// next: Object
-				//		the next view to be transitioned to.
+				// firstChildView: Object
+				//		the firstChildView view to be transitioned to.
 				// parentView: Object
-				//		the parent view used in place of next if next is not set.
+				//		the parent view used in place of firstChildView if firstChildView is not set.
 				//
 				// returns:
 				//		Array of views which will be transitioned to during this transition
 				var F = MODULE + "_getNextSubViewArray ";
-				console.log(F,"called with subIds with subIds = ["+subIds+"]");
-				console.log(F+"called with subIds with next.id = ["+(next ? next.id: '')+"]");
-				console.log(F+"called with subIds with parentView.id = ["+(parentView ? parentView.id: '')+"]");
+				this.app.log(MODULE, F + "in _getNextSubViewArray with subIds =", subIds);
 				var parts = [];
-				var p = next || parentView;
+				var p = firstChildView || parentView;
 				if (subIds) {
 					parts = subIds.split(",");
 				}
 				var nextSubViewArray = [p];
+				var prevViewId = firstChildView.id;
 				//now we need to loop forwards thru subIds calling beforeActivate
 				for (var i = 0; i < parts.length; i++) {
-					var toId = parts[i];
-					//	var v = p.children[p.id + '_' + toId];
-					toId = this.app.flatViewDefinitions[toId].viewId;
-					var v = p.children[toId];
+					prevViewId = prevViewId + "_" + parts[i];
+					var v = p.children[prevViewId];
 					if (v) {
 						nextSubViewArray.push(v);
 						p = v;
 					}
 				}
 				nextSubViewArray.reverse();
-				for (var i = 0; i <= nextSubViewArray.length - 1; i++) {
-					console.log(F+"returning with nextSubViewArray with nextSubViewArray[i].id = ["+nextSubViewArray[i].id+"]");
-				}
+				//	for (var i = 0; i <= nextSubViewArray.length - 1; i++) {
+				//		console.log(F + "returning with nextSubViewArray with nextSubViewArray[i].id = [" +
+				// 				nextSubViewArray[i].id + "]");
+				//	}
 				return nextSubViewArray;
 			},
 
@@ -608,16 +452,14 @@ define(
 				// returns:
 				//		Array of views which will be deactivated during this transition
 				var F = MODULE + "_getCurrentSubViewArray ";
+				this.app.log(MODULE, F + "in _getNextSubViewArray with parentView.id =", parentView.id);
 				var currentSubViewArray = [];
 				var constraint, type, hash;
 				var p = parentView;
 				var currentLastSubChildMatch = null;
 				var nextLastSubChildMatch = null;
-				console.log(F+"called with parentView.id = ["+parentView.id+"]");
 
 				for (var i = nextSubViewArray.length - 1; i >= 0; i--) {
-					//constraint = nextSubViewArray[i].constraint || "center";
-					console.log(F+"called nextSubViewArray includes  nextSubViewArray[i].id= ["+nextSubViewArray[i].id+"]");
 					if (nextSubViewArray[i].constraint) {
 						constraint = nextSubViewArray[i].constraint;
 					} else {
@@ -660,20 +502,19 @@ define(
 				if (removeView) {
 					currentSubViewArray = currentSubViewArray.concat(constraints.getAllSelectedChildren(p));
 				}
-				console.log(F+"returning  currentLastSubChildMatch.id = ["+(currentLastSubChildMatch ? currentLastSubChildMatch.id : '') +"]");
-				console.log(F+"returning  nextLastSubChildMatch.id = ["+nextLastSubChildMatch.id+"]");
-				for (var i = 0; i <= currentSubViewArray.length - 1; i++) {
-					console.log(F+"returning  currentSubViewArray with currentSubViewArray[i].id = ["+currentSubViewArray[i].id+"]");
-				}
+				//	for (var i = 0; i <= currentSubViewArray.length - 1; i++) {
+				//		console.log(F + "returning  currentSubViewArray with currentSubViewArray[i].id = [" +
+				// 			currentSubViewArray[i].id + "]");
+				//	}
 				var ret = {
 					currentSubViewArray: currentSubViewArray,
 					currentLastSubChildMatch: currentLastSubChildMatch,
 					nextLastSubChildMatch: nextLastSubChildMatch
 				};
-				//	return currentSubViewArray;
 				return ret;
 			},
 
+			/* jshint maxcomplexity: 11 */
 			unloadView: function (event) {
 				// summary:
 				//		Response to dapp "unload-view" event.
@@ -707,13 +548,13 @@ define(
 
 				if (parentView.selectedChildren[viewId]) {
 					console.warn("unload-view event for a view which is still in use so it can not be unloaded for " +
-						"view id = " + viewId + "'.");
+						"view id = " + viewId + ".");
 					return;
 				}
 
 				if (!parentView.children[viewId] && !event.unloadApp) {
-					console.warn("unload-view event for a view which was not found in parentView.children[viewId] for " +
-						"viewId = " + viewId + "'.");
+					console.warn("unload-view event for a view which was not found in parentView.children[viewId] " +
+						"for viewId = " + viewId + ".");
 					return;
 				}
 
@@ -769,24 +610,5 @@ define(
 				}
 				viewToUnload = null;
 			}
-
-			/*
-			_getCurrentSubViewNamesArray: function (currentSubViewArray) {
-				// summary:
-				//		Get current sub view names array, the names of the views which will be transitioned from
-				//
-				// currentSubViewArray: Array
-				//		the array of views which are to be transitioned from.
-				//
-				// returns:
-				//		Array of views which will be deactivated during this transition
-				//var F = MODULE + "_getCurrentSubViewNamesArray ";
-				var currentSubViewNamesArray = [];
-				for (var i = 0; i < currentSubViewArray.length; i++) {
-					currentSubViewNamesArray.push(currentSubViewArray[i].viewName);
-				}
-				return currentSubViewNamesArray;
-			}
-*/
 		});
 	});

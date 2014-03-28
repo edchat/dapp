@@ -11,7 +11,9 @@ define(["dojo/dom", "dojo/on"], function (dom, on) {
 				//	on(document.getElementById(this.viewIdPlusLi), "click",
 				function () {
 					console.log("in on click");
-					deliteApp.displayView("content,home",{reverse: true });
+					deliteApp.displayView("content,home", {
+						reverse: true
+					});
 				}
 			);
 		},

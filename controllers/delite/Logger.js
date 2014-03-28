@@ -17,7 +17,7 @@ define(
 				has.add("app-log-api", app.appLogging.logAll);
 				has.add("app-log-partial", app.appLogging.loggingList.length > 0);
 
-				if (has("app-log-api") || has("app-log-partial")) {
+				if (app.appLogging.logAll || has("app-log-partial")) {
 					app.log = function () {
 						// summary:
 						// If config is set to turn on app logging, then log msg to the console

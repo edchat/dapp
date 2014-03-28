@@ -69,7 +69,7 @@ define([
 		".show(simple1App3Home3NoController) NOTE .show is broken so using testApp.displayView": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "simple1App3Home3NoController") {
+				if (complete.view.id === "simple1App3Home3NoController") {
 					onHandle.remove();
 					var simple1App3Home3NoController = document.getElementById("simple1App3Home3NoController");
 					checkNodeVisibility(simple1Node3, simple1App3Home3NoController);
@@ -91,11 +91,11 @@ define([
 		},
 
 		// Currently showing simple1App3Home3NoController test transition back to simple1App3Home1
-		"testApp.displayView('simple1App3Home1')": function () {
+		"testApp.displayView('simple1App3Home1', params)": function () {
 			var d = this.async(10000);
 
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "simple1App3Home1") {
+				if (complete.view.id === "simple1App3Home1") {
 					onHandle.remove();
 					var simple1App3Home1 = document.getElementById("simple1App3Home1");
 					checkNodeVisibility(simple1Node3, simple1App3Home1);
@@ -106,11 +106,17 @@ define([
 					// Now simple1App3Home3NoControllerView DeactivateCallCounts should be 1
 					checkDeactivateCallCount(simple1App3Home3NoControllerView, 1);
 
+					assert.equal(simple1App3Home1View.viewData, "testData",
+						"simple1App3Home1View.viewData should equal testData");
+
 					d.resolve();
 				}
 			});
-		//	simple1Node3.show("simple1App3Home1");
-			testApp.displayView('simple1App3Home1');
+			//	simple1Node3.show("simple1App3Home1");
+			var params = {
+				viewData: "testData"
+			};
+			testApp.displayView('simple1App3Home1', params);
 
 		},
 
@@ -119,7 +125,7 @@ define([
 			var d = this.async(10000);
 
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "simple1App3Home3NoController") {
+				if (complete.view.id === "simple1App3Home3NoController") {
 					onHandle.remove();
 					var simple1App3Home3NoController = document.getElementById("simple1App3Home3NoController");
 					checkNodeVisibility(simple1Node3, simple1App3Home3NoController);
@@ -144,7 +150,7 @@ define([
 			var displayDeferred = new Deferred();
 
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "simple1App3Home2") {
+				if (complete.view.id === "simple1App3Home2") {
 					onHandle.remove();
 					var simple1App3Home2 = document.getElementById("simple1App3Home2");
 					simple1App3Home2View = testApp.getViewFromViewId("simple1App3Home2");
@@ -183,29 +189,30 @@ define([
 	}
 
 	function checkActivateCallCount(view, count) {
-		if(view) {
+		if (view) {
 			assert.deepEqual(view.beforeActivateCallCount, count,
-				view.id+ " beforeActivateCallCount should be "+ count);
+				view.id + " beforeActivateCallCount should be " + count);
 			assert.deepEqual(view.afterActivateCallCount, count,
-				view.id+ " afterActivateCallCount should be "+count);
+				view.id + " afterActivateCallCount should be " + count);
 
 			//also test for selectedChildren being set correctly with constraint main
 			var selectedChildId = testApp.selectedChildren.main.id;
-			assert.deepEqual(view.id, selectedChildId, view.id+ " should be in testApp.selectedChildren.main. ");
+			assert.deepEqual(view.id, selectedChildId, view.id + " should be in testApp.selectedChildren.main. ");
 
 			//also test for view._active being set correctly to true
-			assert.isTrue(view._active, "view_active should be true for "+view.id);
+			assert.isTrue(view._active, "view_active should be true for " + view.id);
 		}
 	}
+
 	function checkDeactivateCallCount(view, count) {
-		if(view) {
+		if (view) {
 			assert.deepEqual(view.beforeDeactivateCallCount, count,
-				view.id+ " beforeDeactivateCallCount should be "+ count);
+				view.id + " beforeDeactivateCallCount should be " + count);
 			assert.deepEqual(view.afterDeactivateCallCount, count,
-				view.id+ " afterDeactivateCallCount should be "+count);
+				view.id + " afterDeactivateCallCount should be " + count);
 
 			//also test for view._active being set correctly to false
-			assert.isFalse(view._active, "view_active should be false for "+view.id);
+			assert.isFalse(view._active, "view_active should be false for " + view.id);
 		}
 	}
 

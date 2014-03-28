@@ -12,9 +12,6 @@
 		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
 		"dapp/controllers/delite/Transition",
-	//	"dapp/controllers/delite/TestTransition",
-	//	"dapp/controllers/delite/TestLoad",
-		"dapp/controllers/delite/Layout",
 		"dapp/controllers/delite/Logger"
 	],
 
@@ -28,7 +25,7 @@
 
 
 	"appLogging": {
-		"logAll": 0,
+		"logAll": 1,
 		"logTimeStamp": 0,
 		"loggingList": [
 		//	"app-view:" ,"testApp:"
@@ -42,7 +39,7 @@
 	"defaultView": "P1",
 	"views": {
 		"P1": {
-			"constraint": "main",
+		//	"constraint": "main",
 			"parentSelector": "#nested1App1dviewStack",
 			"controller": "dapp/tests/unit/nested1/parentController1.js",
 			"template": "dapp/tests/unit/nested1/parentTemplate.html",
@@ -56,13 +53,13 @@
 					"defaultView": "V1",
 					"views": {
 						"V1": {
-							"constraint": "main3",
+						//	"constraint": "main3",
 						//	"parentSelector": "#nested1App1dviewStack",
 							"controller": "dapp/tests/unit/nested1/viewController1.js",
 							"template": "dapp/tests/unit/nested1/viewTemplate.html"
 						},
 						"V2": {
-							"constraint": "main3",
+						//	"constraint": "main3",
 						//	"parentSelector": "#nested1App1dviewStack",
 							"controller": "dapp/tests/unit/nested1/viewController1.js",
 							"template": "dapp/tests/unit/nested1/viewTemplate.html"
@@ -72,7 +69,7 @@
 			}
 		},
 		"V7": {
-			"constraint": "main",
+		//	"constraint": "main",
 		//	"parentSelector": "#nested1App1dviewStack",
 			"controller": "dapp/tests/unit/nested1/viewController1.js",
 			"template": "dapp/tests/unit/nested1/viewTemplate.html"

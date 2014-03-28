@@ -25,7 +25,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.domNode.currentStatus = this.domNode.currentStatus + "-init called";
 			// I put the on click back in the home.html
 			this.setuponclick = false;
-		/*
+			/*
 			on(this.domNode.ownerDocument.getElementById("label1"), "click",
 				//on(document.getElementById("label1"), "click",
 				function () {
@@ -44,7 +44,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 				previousView.id : '') + "] with viewData=", viewData);
 			this.beforeActivateCallCount++;
 			this.domNode.beforeActivateStatus = "called " + this.beforeActivateCallCount + " times";
-			if(!this.setuponclick){
+			if (!this.setuponclick) {
 				on(this.domNode.ownerDocument.getElementById("label1"), "click",
 					//on(document.getElementById("label1"), "click",
 					function () {

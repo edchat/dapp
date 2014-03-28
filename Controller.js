@@ -84,8 +84,8 @@ define(["dcl/dcl", "dojo/_base/lang", "dojo/on"], function (dcl, lang, on) {
 
 			var len = this._boundEvents.length;
 			for (var i = 0; i < len; i++) {
-					this._boundEvents[i].signal.remove();
-			//		this._boundEvents.splice(i, 1);
+				this._boundEvents[i].signal.remove();
+				//		this._boundEvents.splice(i, 1);
 			}
 			this._boundEvents = [];
 			//console.warn("event '" + event + "' not bind on ", evented);

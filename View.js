@@ -175,9 +175,9 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					// try to setup a widget to build the view here
 					//TODO: why can we not use id here?  it gets an error
 					var tag = "dapp-view-" + this.id.toLowerCase();
-					try{
-					register(tag, [HTMLElement, Widget, Invalidating, Destroyable], params);
-					}catch(e){
+					try {
+						register(tag, [HTMLElement, Widget, Invalidating, Destroyable], params);
+					} catch (e) {
 						//ignore error here if already registered
 					}
 					/*
@@ -214,10 +214,10 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/_base/lang", "dojo/D
 					this.domNode.viewId = this.id;
 
 					//ELC try this
-					if(!this.containerNode){
-						if(this.containerSelector){
+					if (!this.containerNode) {
+						if (this.containerSelector) {
 							this.containerNode = this.domNode.querySelector(this.containerSelector);
-						}else if(this.domNode.children[0]){
+						} else if (this.domNode.children[0]) {
 							this.containerNode = this.domNode.children[0];
 						}
 					}

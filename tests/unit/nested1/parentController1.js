@@ -29,7 +29,9 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.app.log("app-view:", "afterActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
 				previousView.id : '') + "] with viewData=", viewData);
 			this.afterActivateCallCount++;
-			this.app.emit("afterActivateCalled", {view:this}); // do not do this for the parentView
+			this.app.emit("afterActivateCalled", {
+				view: this
+			}); // do not do this for the parentView
 		},
 		afterDeactivate: function (nextView, viewData) {
 			this.app.log("app-view:", "afterDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?

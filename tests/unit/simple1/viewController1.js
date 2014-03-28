@@ -35,6 +35,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.app.log("app-view:", "beforeActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
 				previousView.id : '') + "] with viewData=", viewData);
 			this.beforeActivateCallCount++;
+			this.viewData = viewData;
 		},
 		beforeDeactivate: function (nextView, viewData) {
 			this.app.log("app-view:", "beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
@@ -45,7 +46,9 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.app.log("app-view:", "afterActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
 				previousView.id : '') + "] with viewData=", viewData);
 			this.afterActivateCallCount++;
-			this.app.emit("afterActivateCalled", {view:this});
+			this.app.emit("afterActivateCalled", {
+				view: this
+			});
 		},
 		afterDeactivate: function (nextView, viewData) {
 			this.app.log("app-view:", "afterDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?

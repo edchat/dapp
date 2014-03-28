@@ -21,8 +21,8 @@ define([
 		"<d-linear-layout id='multinested1App1linearlayout' style='height:500px'>" +
 		"</d-linear-layout>";
 
-//		"<d-view-stack id='multinested1App1dviewStack' style='width: 100%; height: 100%; position: absolute !important'>" +
-//		"</d-view-stack>";
+	//		"<d-view-stack id='multinested1App1dviewStack' style='width: 100%; height: 100%; position: absolute !important'>" +
+	//		"</d-view-stack>";
 
 	var multinested1Suite1 = {
 		name: "multinested1Suite1: test app transitions",
@@ -52,29 +52,29 @@ define([
 				testApp = app;
 				console.log("appStartedDef1.then called ");
 
-			//	var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-			//		console.log("afterActivateCalled for complete.view.id="+complete.view.id);
-			//		if(complete.view.id === "P1_S1_V1") {
-			//			onHandle.remove();
-						var multinested1App1P1 = document.getElementById("content_P1");
-						multinested1App1ContentView = testApp.getViewFromViewId("content");
-						multinested1App1Content = multinested1App1ContentView.containerNode;
+				//	var onHandle = on(testApp, "afterActivateCalled", function (complete) {
+				//		console.log("afterActivateCalled for complete.view.id="+complete.view.id);
+				//		if(complete.view.id === "P1_S1_V1") {
+				//			onHandle.remove();
+				var multinested1App1P1 = document.getElementById("content_P1");
+				multinested1App1ContentView = testApp.getViewFromViewId("content");
+				multinested1App1Content = multinested1App1ContentView.containerNode;
 
-						// Here multinested1App1Home1View should be displayed
+				// Here multinested1App1Home1View should be displayed
 
-						multinested1App1P1View = testApp.getViewFromViewId("content_P1");
-						// check the DOM state to see if we are in the expected state
-						assert.isNotNull(multinested1Node1, "root multinested1Node1 must be here");
-						assert.isNotNull(multinested1App1P1, "multinested1App1Home1 view must be here");
-					//	assert.deepEqual(multinested1App1P1View.beforeActivateCallCount, 1,
-					//		"multinested1App1P1View.beforeActivateCallCount should be 1");
+				multinested1App1P1View = testApp.getViewFromViewId("content_P1");
+				// check the DOM state to see if we are in the expected state
+				assert.isNotNull(multinested1Node1, "root multinested1Node1 must be here");
+				assert.isNotNull(multinested1App1P1, "multinested1App1Home1 view must be here");
+				//	assert.deepEqual(multinested1App1P1View.beforeActivateCallCount, 1,
+				//		"multinested1App1P1View.beforeActivateCallCount should be 1");
 
-					//	checkNodeVisibility(multinested1Node1, multinested1App1P1);
-						setTimeout(function () { // try timeout to wait for afterAcivate...
-							d.resolve();
-						}, 300);
-			//		}
-			//	});
+				//	checkNodeVisibility(multinested1Node1, multinested1App1P1);
+				setTimeout(function () { // try timeout to wait for afterAcivate...
+					d.resolve();
+				}, 300);
+				//		}
+				//	});
 			});
 			return d;
 		},
@@ -83,10 +83,10 @@ define([
 		".show(V7)": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "content_V7") {
+				if (complete.view.id === "content_V7") {
 					onHandle.remove();
 					var multinested1App1V7 = document.getElementById("content_V7");
-				//	checkNodeVisibility(multinested1App1Content, multinested1App1V7);
+					//	checkNodeVisibility(multinested1App1Content, multinested1App1V7);
 
 					multinested1App1V7View = testApp.getViewFromViewId("content_V7");
 					multinested1App1S1View = testApp.getViewFromViewId("content_P1_S1");
@@ -104,15 +104,15 @@ define([
 				}
 			});
 			multinested1App1Content.show("V7");
-		//	multinested1App1Content.show("content_V7");
-		//	testApp.displayView('content,V7');
+			//	multinested1App1Content.show("content_V7");
+			//	testApp.displayView('content,V7');
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
 		".show(P1)": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "content_P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				if (complete.view.id === "content_P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
 					onHandle.remove();
 					var multinested1App1V1 = document.getElementById("content_P1_S1_V1");
 					checkNestedNodeVisibility(multinested1App1Content, multinested1App1V1);
@@ -137,7 +137,7 @@ define([
 		"multinested1App1S1View.containerNode.show('V2')": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "content_P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				if (complete.view.id === "content_P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
 					onHandle.remove();
 					var multinested1App1V2 = document.getElementById("content_P1_S1_V2");
 					checkNestedNodeVisibility(multinested1App1Content, multinested1App1V2);
@@ -153,8 +153,8 @@ define([
 					// Now multinested1App1V1View DeactivateCallCounts should be 1
 					checkDeactivateCallCount(multinested1App1V7View, 1);
 					checkDeactivateCallCount(multinested1App1V1View, 2);
-					checkDeactivateCallCount(multinested1App1S1View, 2,true);
-					checkDeactivateCallCount(multinested1App1P1View, 2,true);
+					checkDeactivateCallCount(multinested1App1S1View, 2, true);
+					checkDeactivateCallCount(multinested1App1P1View, 2, true);
 
 					d.resolve();
 				}
@@ -169,10 +169,10 @@ define([
 		"testApp.displayView('V7') actually show 2": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "content_V7") {
+				if (complete.view.id === "content_V7") {
 					onHandle.remove();
 					var multinested1App1V7 = document.getElementById("content_V7");
-//					checkNodeVisibility(multinested1Node1, multinested1App1V7);
+					//					checkNodeVisibility(multinested1Node1, multinested1App1V7);
 
 					// Now multinested1App1V2View ActivateCallCounts should be 1
 					checkActivateCallCount(multinested1App1V7View, 2);
@@ -194,15 +194,15 @@ define([
 				}
 			});
 			multinested1App1ContentView.containerNode.show("V7");
-		//	multinested1App1Content.show("V7");
-		//	testApp.displayView('content,V7');
+			//	multinested1App1Content.show("V7");
+			//	testApp.displayView('content,V7');
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
 		"testApp.displayView('content,P1')": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "content_P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				if (complete.view.id === "content_P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
 					onHandle.remove();
 					var multinested1App1V1 = document.getElementById("content_P1_S1_V1");
 					checkNestedNodeVisibility(multinested1App1Content, multinested1App1V1);
@@ -227,15 +227,17 @@ define([
 			});
 			//multinested1Node1.show("P1,S1,V1");
 			//testApp.displayView('P1,S1,V1');
-		//	multinested1App1Content.show('P1');
-			testApp.displayView('content,P1');
+			multinested1App1ContentView.containerNode.show('content_P1');
+			//	testApp.displayView('content,P1');
+			//todo: this is an error, test for the error case because the container node is not for S1 it is for content...
+			//	multinested1App1ContentView.containerNode.show('content_P1_S1_V1'); // this is an error, test for the error case
 		},
 
 		// Currently showing P1,S1,V1 test transition to P1_S1_V2
 		"multinested1App1Content.show('P2')": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "content_P2_P2S1_P2V1") { // wait on P1 because afterActivate calls go from "P2_S2_V1", "P2_S1", "P2"
+				if (complete.view.id === "content_P2_P2S1_P2V1") { // wait on P1 because afterActivate calls go from "P2_S2_V1", "P2_S1", "P2"
 					onHandle.remove();
 					var multinested1App1P2V1 = document.getElementById("content_P2_P2S1_P2V1");
 					checkNestedNodeVisibility(multinested1App1Content, multinested1App1P2V1);
@@ -266,7 +268,7 @@ define([
 
 		},
 
-/*
+		/*
 		// Currently showing multinested1App1Home1NoController test transition back to multinested1App1Home1
 		"testApp.displayView('multinested1App1Home1')": function () {
 			var d = this.async(10000);
@@ -369,32 +371,33 @@ define([
 	}
 
 	function checkActivateCallCount(view, count, skipActiveCheck) {
-		if(view) {
+		if (view) {
 			assert.deepEqual(view.beforeActivateCallCount, count,
-				view.id+ " beforeActivateCallCount should be "+ count);
+				view.id + " beforeActivateCallCount should be " + count);
 			assert.deepEqual(view.afterActivateCallCount, count,
-				view.id+ " afterActivateCallCount should be "+count);
+				view.id + " afterActivateCallCount should be " + count);
 
 			//also test for selectedChildren being set correctly with constraint main
-		//	var selectedChildId = testApp.selectedChildren.main.id;
-		//	assert.deepEqual(view.id, selectedChildId, view.id+ " should be in testApp.selectedChildren.main. ");
+			//	var selectedChildId = testApp.selectedChildren.main.id;
+			//	assert.deepEqual(view.id, selectedChildId, view.id+ " should be in testApp.selectedChildren.main. ");
 
 			//also test for view._active being set correctly to true
-			if(!skipActiveCheck){
-				assert.isTrue(view._active, "view_active should be true for "+view.id);
+			if (!skipActiveCheck) {
+				assert.isTrue(view._active, "view_active should be true for " + view.id);
 			}
 		}
 	}
+
 	function checkDeactivateCallCount(view, count, skipActiveCheck) {
-		if(view) {
+		if (view) {
 			assert.deepEqual(view.beforeDeactivateCallCount, count,
-				view.id+ " beforeDeactivateCallCount should be "+ count);
+				view.id + " beforeDeactivateCallCount should be " + count);
 			assert.deepEqual(view.afterDeactivateCallCount, count,
-				view.id+ " afterDeactivateCallCount should be "+count);
+				view.id + " afterDeactivateCallCount should be " + count);
 
 			//also test for view._active being set correctly to false
-			if(!skipActiveCheck){
-				assert.isFalse(view._active, "view_active should be false for "+view.id);
+			if (!skipActiveCheck) {
+				assert.isFalse(view._active, "view_active should be false for " + view.id);
 			}
 		}
 	}

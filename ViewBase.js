@@ -36,12 +36,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				// private
 				this._started = false;
 				lang.mixin(this, params);
-				//TODO: this is a hack need better way to get the parent
 				var p = this.parentView;
 				if (!p || !p.views) {
-					//	var constraint = constraints.getConstraintForViewTarget(event.dest, this.app);
-					//	p = document.getElementById(constraint);
-					//	this.parent = p;
 					p = this.app;
 				}
 				// mixin views configuration to current view instance.
@@ -176,34 +172,14 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				constraints.register(this.constraint);
 
 				if (this.parentNode.getIndexOfChild(this.domNode) === -1) {
-			//		this.parentNode.addChild(this.domNode, null);
+					//		this.parentNode.addChild(this.domNode, null);
 				}
-				this.app.log("  > in app/ViewBase calling this.startup and resolve() id=[" + this.id + "], parentView.viewName=[" +
-					(this.parentView ? this.parentView.viewName : "") + "]");
+				this.app.log("  > in app/ViewBase calling this.startup and resolve() id=[" + this.id + "], " +
+					"parentView.viewName=[" + (this.parentView ? this.parentView.viewName : "") + "]");
 				this._started = true;
 				if (this._startDef) {
 					this._startDef.resolve(this);
 				}
-
-/*
-				console.log("in ViewBase _startLayout before call to app.emit(app-initLayout)");
-				this.app.emit("app-initLayout", {
-					"view": this,
-					"callback": lang.hitch(this, function () {
-						console.log("in ViewBase _startLayout inside callback call to app.emit(app-initLayout)");
-						//start widget
-						this.startup();
-						//	this.init(); // moved to Load after startup().then
-						// call view assistant's init() method to initialize view
-						this.app.log("  > in app/ViewBase calling this.startup and resolve() id=[" + this.id + "], parentView.viewName=[" +
-							(this.parentView ? this.parentView.viewName : "") + "]");
-						this._started = true;
-						if (this._startDef) {
-							this._startDef.resolve(this);
-						}
-					})
-				});
-  */
 			},
 
 

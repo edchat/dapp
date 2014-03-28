@@ -12,7 +12,6 @@
 		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
 		"dapp/controllers/delite/Transition",
-		"dapp/controllers/delite/Layout",
 		"dapp/controllers/delite/Logger"
 	],
 

@@ -1,21 +1,42 @@
 define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/config",
 		"dojo/Evented", "dojo/Deferred", "dojo/when", "dojo/has", "dojo/on", "dojo/domReady",
-		"dojo/dom-construct", "dojo/dom-attr", "./utils/nls", "./modules/lifecycle",
-		"./utils/hash", "./utils/constraints", "./utils/config", "./utils/string", "dojo/_base/window" //, "dojo/domReady!"
+		"dojo/dom-construct", "dojo/dom-attr", "./utils/nls", "dojo/topic",
+		"./utils/hash", "./utils/constraints", "./utils/config", "dojo/_base/window" //, "dojo/domReady!"
 	],
 	function (require, kernel, lang, declare, config, Evented, Deferred, when, has, on, domReady, domConstruct, domAttr,
-		nls, lifecycle, hash, constraints, configUtils, iString) {
+		nls, topic, hash, constraints, configUtils) {
 		var MODULE = "Main:";
 
 		has.add("app-log-api", (config.app || {}).debugApp);
 
 		var Application = declare(Evented, {
+			lifecycle: {
+				UNKNOWN: 0, //unknown
+				STARTING: 1, //starting
+				STARTED: 2, //started
+				STOPPING: 3, //stopping
+				STOPPED: 4 //stopped
+			},
+
+			_status: 0, //unknown
+
 			constructor: function (params, node) {
 				lang.mixin(this, params);
 				this.domNode = node;
 				this.children = {};
 				this.loadedStores = {};
 				this.loadedControllers = [];
+			},
+			getStatus: function () {
+				return this._status;
+			},
+
+			setStatus: function (newStatus) {
+				this._status = newStatus;
+
+				// publish /app/status event.
+				// application can subscribe this event to do some status change operation.
+				topic.publish("/app/status", newStatus, this.id);
 			},
 
 			displayView: function (view, params) {
@@ -121,40 +142,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				}));
 			},
 
-			// flattenViewDefinitions will save the viewPath and viewId for each viewName
-			flattenViewDefinitions: function (viewDefs) {
-				var result = {};
-				var resultViews = {};
-
-				function recurse(cur, prop) {
-					for (var p in cur) {
-						result[p] = result[prop] ? result[prop] + "," + p : p; // not used as of now TODO: remove this
-						var vpath = resultViews[prop] && resultViews[prop].viewPath ?
-							resultViews[prop].viewPath + "," + p : p;
-						var vId = resultViews[prop] && resultViews[prop].viewId ?
-							resultViews[prop].viewId + "_" + p : p;
-						//resultViews[p] = {"viewPath": vpath, "viewdef": cur[p]}; // do not need to add the def obj
-						if (resultViews[p]) { // This view name is a duplicate, showing the view by view name may fail
-							console.warn("Duplicate view name [" + p +
-								"] attempts to show this view by name will show [" +
-								resultViews[p].viewPath + "] instead of [" + vpath + "]");
-						} else {
-							resultViews[p] = {
-								"viewPath": vpath,
-								"viewId": vId
-							};
-						}
-						if (cur[p].views) {
-							recurse(cur[p].views, p);
-						}
-					}
-				}
-
-				recurse(viewDefs, "");
-				return resultViews;
-			},
-
-
 			updateDestWithDefaultViews: function (dest) {
 				var F = MODULE + "updateDestWithDefaultViews ";
 				var viewPath = dest;
@@ -166,8 +153,8 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				}
 				viewPath = parts.join("+");
 
-				this.log(MODULE, F + "final set  returning viewPath=[" + viewPath +"]");
-				console.log(MODULE, F + "final set  returning viewPath=[" + viewPath +"]");
+				this.log(MODULE, F + "final set  returning viewPath=[" + viewPath + "]");
+				console.log(MODULE, F + "final set  returning viewPath=[" + viewPath + "]");
 				return viewPath;
 			},
 
@@ -178,13 +165,13 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				this.log(MODULE, F + "called with dest=[" + dest + "]");
 				console.log(MODULE, F + "called with dest=[" + dest + "]");
 				var viewDef = this.getViewDefFromDest(dest);
-				while(viewDef && viewDef.defaultView) {
-					viewPath = viewPath+","+viewDef.defaultView;
-					this.log(MODULE, F + "set viewPath=[" + viewPath +"]");
+				while (viewDef && viewDef.defaultView) {
+					viewPath = viewPath + "," + viewDef.defaultView;
+					this.log(MODULE, F + "set viewPath=[" + viewPath + "]");
 					viewDef = this.getViewDefFromDest(viewPath);
 				}
-				this.log(MODULE, F + "final set  returning viewPath=[" + viewPath +"]");
-				console.log(MODULE, F + "final set  returning viewPath=[" + viewPath +"]");
+				this.log(MODULE, F + "final set  returning viewPath=[" + viewPath + "]");
+				console.log(MODULE, F + "final set  returning viewPath=[" + viewPath + "]");
 				return viewPath;
 			},
 
@@ -192,24 +179,21 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				var F = MODULE + "getViewDefFromEvent ";
 				var viewPath;
 				this.log(MODULE, F + "called with evnt.dest=[" + evnt.dest + "]");
-			//	if(evnt.dapp && evnt.dapp.fullViewTarget){
-			//		viewPath = evnt.dapp.fullViewTarget;
-			//	}else
-			//
-				if(evnt.dest.indexOf("_") >= 0){ // viewId?
+				//	if(evnt.dapp && evnt.dapp.fullViewTarget){
+				//		viewPath = evnt.dapp.fullViewTarget;
+				//	}else
+				//
+				if (evnt.dest.indexOf("_") >= 0) { // viewId?
 					this.getViewDefFromViewId(evnt.dest);
 					return;
 				}
-				if(evnt.dapp && evnt.dapp.parentView){ // parent has to be a view to use the id
-					if(evnt.dapp.parentView === this){
+				if (evnt.dapp && evnt.dapp.parentView) { // parent has to be a view to use the id
+					if (evnt.dapp.parentView === this) {
 						viewPath = evnt.dest;
-					}else{
-						return this.getViewDefFromViewId(evnt.dapp.parentView.id+"_"+evnt.dest);
+					} else {
+						return this.getViewDefFromViewId(evnt.dapp.parentView.id + "_" + evnt.dest);
 						//viewPath = this.getViewDefFromViewId(evnt.dapp.parentView.id);
 					}
-				}else{
-					viewPath = viewPath = this.flatViewDefinitions[evnt.dest] ?
-						this.flatViewDefinitions[evnt.dest].viewPath : null;
 				}
 				var viewName = evnt.dest;
 				if (viewName && viewPath) {
@@ -218,13 +202,13 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 					//	this.log(MODULE, F + "parts=["+parts+"] viewDef.id=["+viewDef.id+"]");
 					for (var item in parts) {
 						viewDef = viewDef.views[parts[item]];
-						if(parts[item] == viewName){
+						if (parts[item] === viewName) {
 							break;
 						}
 						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
 					}
 					this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath + "]" +
-						" returning viewDef.parentSelector=[" + (viewDef?viewDef.parentSelector:'') + "]");
+						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : "") + "]");
 					return viewDef;
 				}
 				this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath +
@@ -235,7 +219,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 
 			getViewDestFromViewid: function (viewId) {
 				var F = MODULE + "getViewDestFromViewid ";
-			//	var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
 				if (viewId) {
 					var parts = viewId.split("_");
 					var viewDef = this;
@@ -247,7 +230,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
 					}
 					this.log(MODULE, F + "called with viewId=[" + viewId +
-						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : '') + "]");
+						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : "") + "]");
 					return viewName;
 				}
 				this.log(MODULE, F + "called with viewId=[" + viewId +
@@ -258,7 +241,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 
 			getViewDefFromViewId: function (viewId) {
 				var F = MODULE + "getViewDefFromViewId ";
-			//	var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
 				if (viewId) {
 					var parts = viewId.split("_");
 					var viewDef = this;
@@ -268,7 +250,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
 					}
 					this.log(MODULE, F + "called with viewId=[" + viewId +
-						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : '') + "]");
+						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : "") + "]");
 					return viewDef;
 				}
 				this.log(MODULE, F + "called with viewId=[" + viewId +
@@ -278,8 +260,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			},
 
 			getViewDefFromDest: function (viewPath) {
-				var F = MODULE + "getViewDefFromViewId ";
-			//	var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
+				var F = MODULE + "getViewDefFromDest ";
 				if (viewPath) {
 					var parts = viewPath.split(",");
 					var viewDef = this;
@@ -289,7 +270,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
 					}
 					this.log(MODULE, F + "called with viewPath=[" + viewPath +
-						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : '') + "]");
+						" returning viewDef.parentSelector=[" + (viewDef ? viewDef.parentSelector : "") + "]");
 					return viewDef;
 				}
 				this.log(MODULE, F + "called with viewPath=[" + viewPath +
@@ -298,67 +279,28 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 				return null;
 			},
 
-			//TODO: this should not be needed anymore...
-			getViewDefFromViewName: function (viewName) {
-				var F = MODULE + "getViewDefFromViewName ";
-				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
-				if (viewName && viewPath) {
-					var parts = viewPath.split(",");
-					var viewDef = this;
-					//	this.log(MODULE, F + "parts=["+parts+"] viewDef.id=["+viewDef.id+"]");
-					for (var item in parts) {
-						viewDef = viewDef.views[parts[item]];
-						//this.log(MODULE, F + "item=["+item+"] viewDef.parentSelector=["+viewDef.parentSelector+"]");
-					}
-					this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath + "]" +
-						" returning viewDef.parentSelector=[" + viewDef.parentSelector + "]");
-					return viewDef;
+			getViewIdFromDest: function (dest, parentNode) {
+				console.log("getViewIdFromDest called with dest = " + dest);
+				var pView = this.getParentViewFromViewName(dest, parentNode);
+				if (this === pView) { // pView is the app
+					return dest;
 				}
-				this.log(MODULE, F + "called with viewName=[" + viewName + "] viewPath=[" + viewPath +
-					"] returning null");
-				this.log(MODULE, F + "returning null");
-				return null;
+				return pView.id + "_" + dest;
 			},
-/*
-			getViewIdFromViewName: function (viewName) {
-				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewId : null;
-				if (viewName && viewPath) {
-					var parts = viewPath.split(",");
-					var viewDef = this;
-					for (var item in parts) {
-						viewDef = viewDef.views[parts[item]];
-					}
-					return viewDef;
-				}
-				return null;
-			},
-*/
+
 			getParentViewFromViewName: function (viewName, parentNode) {
-				if(this.containerNode === parentNode){
+				if (this.containerNode === parentNode) {
 					return this;
 				}
 				var pNode = parentNode;
-				while(!pNode.viewId && pNode.parentNode){
+				while (!pNode.viewId && pNode.parentNode) {
 					pNode = pNode.parentNode;
 				}
-				if(pNode && pNode.viewId){
+				if (pNode && pNode.viewId) {
 					var parentViewId = pNode.viewId;
 					return this.getViewFromViewId(parentViewId);
 				}
-			/*
-				var viewPath = this.flatViewDefinitions[viewName] ? this.flatViewDefinitions[viewName].viewPath : null;
-				if (viewName && viewPath) {
-					var parts = viewPath.split(",");
-					parts.pop();
-					var viewDef = this;
-					for (var item in parts) {
-						viewDef = viewDef.children[parts[item]];
-					}
-					return viewDef;
-				}
-			*/
 				return this;
-
 			},
 
 			getViewFromViewId: function (viewId) {
@@ -370,7 +312,7 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 					for (var item in parts) {
 						var childId = nextChildId + parts[item];
 						view = view.children[childId];
-						nextChildId = childId +"_";
+						nextChildId = childId + "_";
 					}
 					return view;
 				}
@@ -387,101 +329,17 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 					for (var item in parts) {
 						var childId = nextChildId + parts[item];
 						view = view.children[childId];
-						nextChildId = childId +"_";
+						nextChildId = childId + "_";
 					}
 					return view;
 				}
 				return null;
 			},
 
-			/**
-			 * Extracts the views form the specified string
-			 * and returns an array of objects.  Each element
-			 * in the array is a sibling or cousin view and
-			 * in turn contains a lineage.  The returned array
-			 * takes the following form:
-			 * [
-			 *   { id: "encodedViewID",
-			 *     remove: true|false,
-			 *     lineage: [ "encodedViewID", "encodedViewID", ... ]
-			 *   },
-			 *   { id: "encodedViewID",
-			 *     remove: true|false,
-			 *     lineage: [ "encodedViewID", "encodedViewID", ... ]
-			 *   },
-			 *   . . .
-			 * ]
-			 */
-			_decodeViewPaths: function(encodedPaths) {
-				if (!iString.nullTrim(encodedPaths)) return null;
-				var sepIndices = iString.unescapedIndexesOf(encodedPaths, "+-");
-				var siblings = iString.unescapedSplit(encodedPaths, "+-");
-				var result = [];
-				var index = 0;
-				var removes = [];
-				var sepIndex = 0;
-				var sep = "";
-				for (index = 0; index < sepIndices.length; index++) {
-					sepIndex = sepIndices[index];
-					sep = encodedPaths.charAt(sepIndex);
-					removes.push(sep== "-" ? true : false);
-				}
-				if ((sepIndices.length > 0) && (sepIndices[0]==0)) {
-					// we begin with a separator so ignore first sibling
-					// which should be empty-string
-					siblings.shift();
-				} else {
-					// the first character is not a plus or minux, so assume
-					// it is a plus by default so the first sibling is an add
-					removes.unshift(false);
-				}
-				for (index = 0; index < siblings.length; index++) {
-					result.push({
-						id: siblings[index],
-						remove: removes[index],
-						lineage: iString.unescapedSplit(siblings[index], ",")
-					});
-				}
-				return result;
-			},
-
-			/**
-			 * Encodes the view lineage as a string.  This can then
-			 * be decoded as a view path via _decodeViewPaths()
-			 *
-			 * @param {String[]} viewLineage The lineage represented as an array of strings.
-			 * @return The encoded string for the lineage.
-			 */
-			_encodeViewLineage: function(viewLineage) {
-				if (!viewLineage || viewLineage.length == 0) return null;
-				return viewLineage.join(",");
-			},
-
-			/**
-			 * Formats a unique identifier for the child given the
-			 * specified parent and the child view ID.
-			 *
-			 * @param {Object} parent The parent from which to obtain the parent ID.
-			 * @param {String} viewID The view ID of the child.
-			 */
-			_formatChildViewIdentifier: function(parent, viewID) {
-				if(parent.id !== this.id){
-					return parent.id + "_" + viewID.replace(/_/g,"\\_");
-				}else{
-					return viewID.replace(/_/g,"\\_");
-				}
-			},
-
-
 			setupControllers: function () {
 				// create application controller instance
 				// move set _startView operation from history module to application
 				//var F = MODULE + "setupControllers ";
-
-				// TODO: elc try this, need to setup an array of all views to show their viewpaths
-				this.flatViewDefinitions = this.flattenViewDefinitions(this.views);
-				//console.log because the logger controller is not setup yet
-				//console.log(MODULE, F + "this.flattenViewDefinitions = ", this.flatViewDefinitions);
 
 				var currentHash = window.location.hash;
 				this._startView = hash.getTarget(currentHash, this.defaultView);
@@ -577,8 +435,6 @@ define(["require", "dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/declare",
 			if (!config.modules) {
 				config.modules = [];
 			}
-			// add dapp lifecycle module by default
-			config.modules.push("./modules/lifecycle");
 			var modules = config.modules.concat(config.dependencies ? config.dependencies : []);
 
 			if (config.template) {

@@ -3,7 +3,7 @@ require(["dapp/main", "dojo/json", "dojo/text!./app1.json", "dojo/sniff"],
 		has.add("requirejs", window.requirejs);
 		/* jshint nonew: false */
 
-	//	register.parse(document.getElementById("divToParse"));
+		//	register.parse(document.getElementById("divToParse"));
 		var jsonData = config;
 		jsonData = jsonData.replace(/\/\*.*?\*\//g, "");
 		jsonData = jsonData.replace(/\/\/.*/g, "");

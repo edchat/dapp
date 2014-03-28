@@ -11,10 +11,7 @@
 	"controllers": [
 		"dapp/controllers/delite/Init",
 		"dapp/controllers/delite/Load",
-	//	"dapp/controllers/delite/Transition",
-		"dapp/controllers/delite/TestTransition",
-		"dapp/controllers/delite/TestLoad",
-		"dapp/controllers/delite/Layout",
+		"dapp/controllers/delite/Transition",
 		"dapp/controllers/delite/Logger"
 	],
 

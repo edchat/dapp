@@ -35,7 +35,6 @@
 		"dapp/controllers/delite/Load",
 		"dapp/controllers/delite/Logger",
 		"dapp/controllers/delite/Transition"
-	//	,"dapp/controllers/delite/Layout"
 	],
 
 
