@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on"], function (dom, on) {
 	return {
 		init: function () {

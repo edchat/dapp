@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define([
 	"intern!object",
 	"intern/chai!assert",
@@ -40,7 +41,7 @@ define([
 			var handle;
 			// check the app status as it updates when the app is started and stopped
 			handle = topic.subscribe("/app/status", function (status, appId) {
-				if (appId = appName) {
+				if (appId === appName) {
 					assert.deepEqual(status, previousStatus + 1, "app status should progress from Starting to Stopped");
 					previousStatus = status;
 					if (previousStatus === 4) { // STOPPED
@@ -99,7 +100,7 @@ define([
 			testApp = null;
 
 		},
-		"sample2Suite2 dapp simple2 test initial layout": function () {
+		"sample2Suite2 dapp simple2 test domNode sizes": function () {
 			var d = this.async(10000);
 
 			// create the app from the config and wait for the deferred
@@ -108,14 +109,12 @@ define([
 				// we are ready to test
 				testApp = app;
 
-				//TODO: problem with multiple views in defaultView here: where
-				//TODO: default view is set to simple2App2Home1+simple2App2Home2+simple2App2Home3NoController
-				//TODO:  appStartedDef is firing before all default views are shown!!!!!
 				// check the DOM state to see if we are in the expected state
 				assert.isNotNull(document.getElementById("simple2App2dlayout"), "root simple2App2dlayout must be here");
 				assert.isNotNull(document.getElementById("simple2App2Home1"), "simple2App2Home1 view must be here");
 				assert.isNotNull(document.getElementById("simple2App2Home2"), "simple2App2Home2 view must be here");
-				assert.isNotNull(document.getElementById("simple2App2Home3NoController"), "simple2App2Home3NoController view must be here");
+				assert.isNotNull(document.getElementById("simple2App2Home3NoController"),
+					"simple2App2Home3NoController view must be here");
 
 				var children = sample2Node2.getChildren();
 				sample2Node2.style.height = "600px";
@@ -124,9 +123,9 @@ define([
 				var box1 = domGeom.getMarginBox(children[0]);
 				var box2 = domGeom.getMarginBox(children[1]);
 				var box3 = domGeom.getMarginBox(children[2]);
-				//testApp.log("testApp:",'simple2/Simple sample2Suite dapp simple test with deferred simple2App1Home1 height =['+box1.h+']');
-				//testApp.log("testApp:",'simple2/Simple sample2Suite dapp simple test with deferred simple2App1Home2 height =['+box2.h+']');
-				//testApp.log("testApp:",'simple2/Simple sample2Suite dapp simple test with deferred simple2App1Home3NoController height =['+box3.h+']');
+				//testApp.log("testApp:",'simple2/Simple sample2Suite simple2App1Home1 height =['+box1.h+']');
+				//testApp.log("testApp:",'simple2/Simple sample2Suite simple2App1Home2 height =['+box2.h+']');
+				//testApp.log("testApp:",'simple2/Simple sample2Suite simple2App1Home3NoController h =['+box3.h+']');
 				assert.deepEqual(box1.h, 200);
 				assert.deepEqual(box3.h, 200);
 				assert.deepEqual(box1.h, box2.h);
@@ -166,10 +165,8 @@ define([
 		},
 		"sample2Suite3 dapp simple3 test initial layout": function () {
 			var d = this.async(10000);
-			var _self = this;
 
 			var appStartedDef = main(json.parse(stripComments(simple2config3)), sample2Container3);
-			// TODO App construction method should probably return a promise which would make all of this a bit simpler
 			appStartedDef.then(function (app) {
 				// we are ready to test
 				testApp = app;
@@ -209,7 +206,7 @@ define([
 				d.resolve();
 			});
 		},
-		"Show (by widget.show with id) test with sample2Node3.on(delite-display-complete": function () {
+		"Show (by widget.show with id) test with sample2Node3.on(delite-display-complete)": function () {
 			var d = this.async(10000);
 
 			var handle = sample2Node3.on("delite-display-complete", d.callback(function () {
@@ -220,7 +217,7 @@ define([
 
 			var showDeferred = sample2Node3.show("simple2App3Home3NoController");
 		},
-		"Test Show (by App.displayView)": function () {
+		"Test displayView (by view name) ": function () {
 			var d = this.async(10000);
 			var displayDeferred = new Deferred();
 

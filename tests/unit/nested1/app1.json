@@ -34,12 +34,14 @@
 		]
 	},
 
+	"parseOnLoad": true,
+
 	//TODO: There is a problem with using duplicate view names across tests, getting duplicate view error!!!
 	//"defaultView": "P1,S1,V1",
 	"defaultView": "P1",
 	"views": {
 		"P1": {
-		//	"constraint": "main",
+			"constraint": "main",
 			"parentSelector": "#nested1App1dviewStack",
 			"controller": "dapp/tests/unit/nested1/parentController1.js",
 			"template": "dapp/tests/unit/nested1/parentTemplate.html",
@@ -53,13 +55,13 @@
 					"defaultView": "V1",
 					"views": {
 						"V1": {
-						//	"constraint": "main3",
+							"constraint": "main3",
 						//	"parentSelector": "#nested1App1dviewStack",
 							"controller": "dapp/tests/unit/nested1/viewController1.js",
 							"template": "dapp/tests/unit/nested1/viewTemplate.html"
 						},
 						"V2": {
-						//	"constraint": "main3",
+							"constraint": "main3",
 						//	"parentSelector": "#nested1App1dviewStack",
 							"controller": "dapp/tests/unit/nested1/viewController1.js",
 							"template": "dapp/tests/unit/nested1/viewTemplate.html"
@@ -69,8 +71,8 @@
 			}
 		},
 		"V7": {
-		//	"constraint": "main",
-		//	"parentSelector": "#nested1App1dviewStack",
+			"constraint": "main",
+			"parentSelector": "#nested1App1dviewStack",
 			"controller": "dapp/tests/unit/nested1/viewController1.js",
 			"template": "dapp/tests/unit/nested1/viewTemplate.html"
 		}

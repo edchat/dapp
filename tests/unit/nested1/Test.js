@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define([
 	"intern!object",
 	"intern/chai!assert",
@@ -28,7 +29,7 @@ define([
 			nested1Container1 = document.createElement("div");
 			document.body.appendChild(nested1Container1);
 			nested1Container1.innerHTML = nested1HtmlContent1;
-			register.parse(nested1Container1);
+			//	register.parse(nested1Container1); // no need to call parse here since config has "parseOnLoad": true
 			nested1Node1 = document.getElementById("nested1App1dviewStack");
 			testApp = null;
 			nested1App1P1View = null;
@@ -39,7 +40,6 @@ define([
 		},
 		"test initial view": function () {
 			var d = this.async(10000);
-			var _self = this;
 
 			var appStartedDef1 = main(json.parse(stripComments(nested1config1)), nested1Container1);
 			appStartedDef1.then(function (app) {
@@ -56,6 +56,14 @@ define([
 				// Here nested1App1Home1View should be displayed
 
 				nested1App1P1View = testApp.getViewFromViewId("P1");
+				nested1App1S1View = testApp.getViewFromViewId("P1_S1");
+				nested1App1V1View = testApp.getViewFromViewId("P1_S1_V1");
+
+				// check that init has been called on these views
+				assert.isTrue(nested1App1P1View.initialized, "nested1App1P1View.initialized should be true");
+				assert.isTrue(nested1App1S1View.initialized, "nested1App1S1View.initialized should be true");
+				assert.isTrue(nested1App1V1View.initialized, "nested1App1V1View.initialized should be true");
+
 				// check the DOM state to see if we are in the expected state
 				assert.isNotNull(nested1Node1, "root nested1Node1 must be here");
 				assert.isNotNull(nested1App1P1, "nested1App1Home1 view must be here");
@@ -66,14 +74,12 @@ define([
 				setTimeout(function () { // try timeout to wait for afterAcivate...
 					d.resolve();
 				}, 300);
-				//		}
-				//	});
 			});
 			return d;
 		},
 
 		// Currently showing P1_S1_V1 test transition to V7
-		".show(V7)": function () {
+		"nested1Node1.show(V7)": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
 				if (complete.view.id === "V7") {
@@ -96,15 +102,16 @@ define([
 					d.resolve();
 				}
 			});
-			//	nested1Node1.show("V7");
-			testApp.displayView('V7');
+			nested1Node1.show("V7");
+			//testApp.displayView('V7');
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
-		".show(P1)": function () {
+		"nested1Node1.show(P1) will show P1,S1,V1": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if (complete.view.id === "P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				// wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				if (complete.view.id === "P1") {
 					onHandle.remove();
 					var nested1App1V1 = document.getElementById("P1_S1_V1");
 					checkNestedNodeVisibility(nested1Node1, nested1App1V1);
@@ -120,16 +127,17 @@ define([
 					d.resolve();
 				}
 			});
-			//nested1Node1.show("P1");
-			testApp.displayView('P1,S1,V1');
+			nested1Node1.show("P1");
+			//testApp.displayView('P1,S1,V1');
 			//testApp.displayView('P1');
 		},
 
 		// Currently showing P1,S1,V1 test transition to P1_S1_V2
-		"nested1App1S1View.containerNode.show('V2')": function () {
+		"nested1App1S1View.containerNode.show('V2') will show P1,S1,V2": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if (complete.view.id === "P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				// wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				if (complete.view.id === "P1") {
 					onHandle.remove();
 					var nested1App1V2 = document.getElementById("P1_S1_V2");
 					checkNestedNodeVisibility(nested1Node1, nested1App1V2);
@@ -151,9 +159,9 @@ define([
 					d.resolve();
 				}
 			});
+			nested1App1S1View.containerNode.show('V2');
 			//nested1Node1.show("P1.S1,V2");
-			testApp.displayView('P1,S1,V2');
-			//nested1App1S1View.containerNode.show('V2');
+			//testApp.displayView('P1,S1,V2');
 
 		},
 
@@ -190,10 +198,11 @@ define([
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
-		"testApp.displayView('P1')": function () {
+		"testApp.displayView('P1') will show P1,S1,V1": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if (complete.view.id === "P1") { // wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				// wait on P1 because afterActivate calls go from "P1_S1_V1", "P1_S1", "P1"
+				if (complete.view.id === "P1") {
 					onHandle.remove();
 					var nested1App1V1 = document.getElementById("P1_S1_V1");
 					checkNestedNodeVisibility(nested1Node1, nested1App1V1);
@@ -216,85 +225,11 @@ define([
 					d.resolve();
 				}
 			});
+			testApp.displayView('P1');
 			//nested1Node1.show("P1,S1,V1");
 			//testApp.displayView('P1,S1,V1');
-			testApp.displayView('P1');
 		},
 
-		/*
-		// Currently showing nested1App1Home1NoController test transition back to nested1App1Home1
-		"testApp.displayView('nested1App1Home1')": function () {
-			var d = this.async(10000);
-
-			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "nested1App1Home1") {
-					onHandle.remove();
-					var nested1App1Home1 = document.getElementById("nested1App1Home1");
-					checkNodeVisibility(nested1Node1, nested1App1Home1);
-
-					// Now nested1App1Home1View ActivateCallCounts should be 2
-					checkActivateCallCount(nested1App1Home1View, 2);
-
-					// Now nested1App1Home1NoControllerView DeactivateCallCounts should be 1
-					checkDeactivateCallCount(nested1App1Home1NoControllerView, 1);
-
-					d.resolve();
-				}
-			});
-		//	nested1Node1.show("nested1App1Home1");
-			testApp.displayView('nested1App1Home1');
-
-		},
-
-		// Currently showing nested1App1Home1 test transition back to nested1App1Home1NoController
-		".show('nested1App1Home1NoController')": function () {
-			var d = this.async(10000);
-
-			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "nested1App1Home1NoController") {
-					onHandle.remove();
-					var nested1App1Home1NoController = document.getElementById("nested1App1Home1NoController");
-					checkNodeVisibility(nested1Node1, nested1App1Home1NoController);
-
-					// Now nested1App1Home1NoControllerView ActivateCallCounts should be 2
-					checkActivateCallCount(nested1App1Home1NoControllerView, 2);
-
-					// Now nested1App1Home1View DeactivateCallCounts should be 2
-					checkDeactivateCallCount(nested1App1Home1View, 2);
-
-					d.resolve();
-				}
-			});
-
-			nested1Node1.show('nested1App1Home1NoController');
-		},
-
-		// Currently showing nested1App1Home1NoController test transition back to nested1App1Home2
-		"testApp.displayView('nested1App1Home2')": function () {
-			var d = this.async(10000);
-			var displayDeferred = new Deferred();
-
-			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
-				if(complete.view.id === "nested1App1Home2") {
-					onHandle.remove();
-					var nested1App1Home2 = document.getElementById("nested1App1Home2");
-					nested1App1Home2View = testApp.getViewFromViewId("nested1App1Home2");
-					checkNodeVisibility(nested1Node1, nested1App1Home2);
-
-					// Now nested1App1Home2View ActivateCallCounts should be 1
-					checkActivateCallCount(nested1App1Home2View, 1);
-
-					// Now nested1App1Home1NoControllerView DeactivateCallCounts should be 2
-					checkDeactivateCallCount(nested1App1Home1NoControllerView, 2);
-					// Now nested1App1Home1View DeactivateCallCounts should be 2
-					checkDeactivateCallCount(nested1App1Home1View, 2);
-
-					d.resolve();
-				}
-			});
-			testApp.displayView('nested1App1Home2');
-		},
-*/
 		teardown: function () {
 			// call unloadApp to cleanup and end the test
 			nested1Container1.parentNode.removeChild(nested1Container1);
@@ -329,10 +264,6 @@ define([
 				view.id + " beforeActivateCallCount should be " + count);
 			assert.deepEqual(view.afterActivateCallCount, count,
 				view.id + " afterActivateCallCount should be " + count);
-
-			//also test for selectedChildren being set correctly with constraint main
-			//	var selectedChildId = testApp.selectedChildren.main.id;
-			//	assert.deepEqual(view.id, selectedChildId, view.id+ " should be in testApp.selectedChildren.main. ");
 
 			//also test for view._active being set correctly to true
 			if (!skipActiveCheck) {

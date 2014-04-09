@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on"], function (dom, on) {
 	return {
 		attributes: {
@@ -19,22 +20,23 @@ define(["dojo/dom", "dojo/on"], function (dom, on) {
 		},
 		beforeActivate: function (previousView, viewData) {
 			console.log("beforeActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
-				previousView.id : '') + "] with viewData=", viewData);
+				previousView.id : "") + "] with viewData=", viewData);
 			if (previousView && previousView.id) {
-				dom.byId("label").innerHTML = " - from view - " + previousView.id + (viewData ? ("- viewData - " + viewData) : "");
+				dom.byId("label").innerHTML = " - from view - " + previousView.id + (viewData ? ("- viewData - " +
+					viewData) : "");
 			}
 		},
 		beforeDeactivate: function (nextView, viewData) {
 			console.log("beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
-				nextView.id : '') + "]");
+				nextView.id : "") + "]");
 		},
 		afterActivate: function (previousView, viewData) {
 			console.log("afterActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
-				previousView.id : '') + "] with viewData=", viewData);
+				previousView.id : "") + "] with viewData=", viewData);
 		},
 		afterDeactivate: function (nextView, viewData) {
 			console.log("afterDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
-				nextView.id : '') + "]");
+				nextView.id : "") + "]");
 		}
 	};
 });

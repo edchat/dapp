@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) {
 	return {
 		attributes: {
@@ -41,7 +42,7 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 		},
 		beforeActivate: function (previousView, viewData) {
 			console.log("beforeActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
-				previousView.id : '') + "] with viewData=", viewData);
+				previousView.id : "") + "] with viewData=", viewData);
 			this.beforeActivateCallCount++;
 			this.domNode.beforeActivateStatus = "called " + this.beforeActivateCallCount + " times";
 			if (!this.setuponclick) {
@@ -60,19 +61,19 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 		},
 		beforeDeactivate: function (nextView, viewData) {
 			console.log("beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
-				nextView.id : '') + "]");
+				nextView.id : "") + "]");
 			this.beforeDeactivateCallCount++;
 			this.domNode.beforeDeactivateStatus = "called " + this.beforeDeactivateCallCount + " times";
 		},
 		afterActivate: function (previousView, viewData) {
 			console.log("afterActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
-				previousView.id : '') + "] with viewData=", viewData);
+				previousView.id : "") + "] with viewData=", viewData);
 			this.afterActivateCallCount++;
 			this.domNode.afterActivateStatus = "called " + this.afterActivateCallCount + " times";
 		},
 		afterDeactivate: function (nextView, viewData) {
 			console.log("afterDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
-				nextView.id : '') + "]");
+				nextView.id : "") + "]");
 			this.afterDeactivateCallCount++;
 			this.domNode.afterDeactivateStatus = "called " + this.afterDeactivateCallCount + " times";
 		}

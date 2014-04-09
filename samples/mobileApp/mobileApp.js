@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 require(["dapp/main", //"dojo/json",
 		"dojo/text!./config.json",
 		/*"dojo/text!./dapp/samples/mobileApp/config.json",*/
@@ -14,5 +15,5 @@ require(["dapp/main", //"dojo/json",
 		var appDeferred = new Application(JSON.parse(jsonData));
 		appDeferred.then(function (app) {
 			console.log("deferred resolved for new App [" + app.id + "] it should be started and default views shown");
-		})
+		});
 	});

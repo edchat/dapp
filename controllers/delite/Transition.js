@@ -47,48 +47,53 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 					dapp: {}
 				});
 			},
-			_displayViews: function (event, skipParents) {
+			_displayViews: function (event) {
 				var F = MODULE + "_displayViews ";
 				this.app.log(MODULE, F + "called with event.dest=[" + event.dest + "] and event.viewData=[" +
 					event.viewData + "]");
 				//Todo: note when lastViewPart = false, lastViewId will be undefined, so we could remove it but it
 				// might be confusing to.
-				event.dapp.lastViewPart = true;
+				var lastViewPart = true;
 				var views = event.dest && event.dest.split("+");
 				if (views) {
 					for (var i = 0; i < views.length; i++) {
-						if (i === views.length - 1) {
-							event.dapp.lastViewPart = true;
-							event.dapp.lastViewId = views[i].replace(/,/g, "_");
-						} else {
-							event.dapp.lastViewPart = false;
-						}
+						var lastViewId = views[i].replace(/,/g, "_");
+						lastViewPart = (i === views.length - 1); // true for last part of multipart view
 						this.app.log(MODULE, F + "calling _displayView with [" + views[i] +
-							"] event.dapp.lastViewPart = [" + event.dapp.lastViewPart + "]");
-						this._displayView(views[i], event, false, skipParents);
+							"] lastViewPart = [" + lastViewPart + "]");
+						this._displayView(views[i], event, false, lastViewPart, lastViewId);
 					}
 				} else {
 					// this is the root
-					this._displayView(null, event, false, skipParents);
+					this._displayView(null, event, false, lastViewPart, "root");
 				}
 			},
-			_displayView: function (viewTarget, event, isParent, skipParents) {
+			_displayView: function (viewTarget, event, isParent, lastViewPart, lastViewId) {
 				var F = MODULE + "_displayView ";
 				this.app.log(MODULE, F + "called for viewTarget [" + viewTarget + "] with event.dest = [" +
 					event.dest + "] ");
+				//	console.log("in _displayView called with lastViewId = "+lastViewId);
+				//	console.log("in _displayView called with isParent = "+isParent);
+				//	console.log("in _displayView called with lastViewPart = "+lastViewPart);
 				var deferred = new Deferred(),
 					subEvent, loadDeferred;
 				//var parent;
 				event.dapp.isParent = isParent;
+				event.dapp.lastViewPart = lastViewPart;
+				event.dapp.lastViewId = lastViewId;
 				var _self = this;
 				// wait for parents to be displayed first
-				when(skipParents || this._displayParents(viewTarget, event),
+				when(this._displayParents(viewTarget, event, lastViewPart, lastViewId, isParent),
 					function (value) {
 						_self.app.log(MODULE, F + "after _displayParents value.dapp.nextView.id=[" +
 							value.dapp.nextView.id + "]");
+						//	console.log("in _displayView back from this._displayParents lastViewId = "+lastViewId);
+						//	console.log(MODULE, F + " in when this._displayParents  isParent = "+isParent);
 						subEvent = Object.create(event);
 						subEvent.dest = viewTarget.split(",").pop();
-						subEvent.dapp.lastViewPart = value.dapp.lastViewPart;
+						subEvent.dapp.lastViewPart = lastViewPart;
+						subEvent.dapp.lastViewId = lastViewId;
+						subEvent.dapp.isParent = isParent;
 						_self.app.log(MODULE, F + "subEvent.dest = [" + subEvent.dest + "]");
 
 						subEvent.dapp.parentView = value.dapp.nextView;
@@ -110,6 +115,11 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 						//		subEvent.dapp.isParent+"]");
 						//	console.log("in transition before call to .show subEvent.dapp.lastViewId=["+
 						//		subEvent.dapp.lastViewId+"]");
+						//console.log(MODULE, F + " calling p.show with subEvent.dest = "+(subEvent.dest));
+						//console.log(MODULE, F + " calling p.show with subEvent.dapp.isParent = "+(subEvent.dapp?
+						// subEvent.dapp.isParent:""));
+						//console.log("in _displayView calling p.show with subEvent.dapp.lastViewId = "+
+						// subEvent.dapp.lastViewId);
 						loadDeferred = p.show(subEvent.dest, subEvent).then(function (value) {
 							_self.app.log(MODULE, F + "back from parent.containerNode.show for subEvent.dest[" +
 								subEvent.dest + "] subEvent.dapp.parentView.id[" + subEvent.dapp.parentView.id + "]");
@@ -124,7 +134,7 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 					});
 				return deferred.promise;
 			},
-			_displayParents: function (viewTarget, ev) {
+			_displayParents: function (viewTarget, ev, lastViewPart, lastViewId) {
 				var F = MODULE + "_displayParents ";
 				this.app.log(MODULE, F + "called for viewTarget=[" + viewTarget + "]");
 				// for now we consider the parents are listed in the display command (i.e. parent1,parent2,view)
@@ -132,18 +142,14 @@ define(["dcl/dcl", "dojo/on", "dojo/when", "dojo/Deferred", "dojo/promise/all", 
 				var parts = viewTarget ? viewTarget.split(",") : "";
 				if (parts && parts.length > 1) {
 					parts.pop(); // process the parent first
-					ev.dapp.isParent = true;
 					var dest = parts.join(",");
 					this.app.log(MODULE, F + "calling return _displayView with dest=[", dest + "]");
-					return this._displayView(dest, ev, true);
+					return this._displayView(dest, ev, true, lastViewPart, lastViewId);
 				}
-				this.app.log(MODULE, F + " calling return dapp this.app");
 				return {
 					dapp: {
 						nextView: this.app,
-						lastViewPart: ev.dapp.lastViewPart,
-						dest: ev.dest,
-						isParent: ev.dapp.isParent
+						dest: ev.dest
 					}
 				};
 			}

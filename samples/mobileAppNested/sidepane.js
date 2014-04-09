@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) {
 	return {
 		attributes: {
@@ -24,12 +25,12 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			// I put the on click back in the home.html
 			on(this.domNode.ownerDocument.getElementById("spbbb"), "click",
 				function () {
-					mobileAppNested.displayView("bbb");
+					mobileAppNested.displayView("vs,bbb");
 				}
 			);
 			on(this.domNode.ownerDocument.getElementById("spddd"), "click",
 				function () {
-					mobileAppNested.displayView("ddd");
+					mobileAppNested.displayView("vs,ddd");
 				}
 			);
 		},

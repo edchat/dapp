@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 require(["dapp/main", //"dojo/json",
 		"dojo/text!./config.json",
 		/*"dojo/text!./dapp/samples/mobileAppNested/config.json",*/

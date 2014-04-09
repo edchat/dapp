@@ -24,15 +24,20 @@
 
 
 
-	"appLogging": {
-		"logAll": 0,
-		"logTimeStamp": 1,
-		"loggingList": [
-			"app-view:" ,"testApp:"
+	//"appLogging": {
+	//	"logAll": 0,
+	//	"logTimeStamp": 1,
+	//	"loggingList": [
+		//	"app-view:" ,"testApp:"
 		//	,"Main:","ViewBase:","View:"
-			,"controllers/delite/Load:","controllers/delite/Layout:","controllers/delite/Transition:","utils/constraints:"
-		]
-	},
+		//	,"controllers/delite/Load:",
+		//	"controllers/delite/Layout:",
+		//	"controllers/delite/Transition:",
+		//	"utils/constraints:"
+	//	]
+	//},
+
+	"parseOnLoad": true,
 
 	//TODO: There is a problem with using duplicate view names across tests, getting duplicate view error!!!
 	//"defaultView": "P1,S1,V1",

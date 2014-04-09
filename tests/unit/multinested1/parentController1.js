@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) {
 	return {
 		attributes: {
@@ -17,26 +18,26 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 			this.domNode.name = this.id;
 		},
 		beforeActivate: function (previousView, viewData) {
-			this.app.log("app-view:", "beforeActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
-				previousView.id : '') + "] with viewData=", viewData);
+			this.app.log("app-view:", "beforeActivate called for [" + this.viewName + "] with previousView.id =[" +
+				(previousView ? previousView.id : "") + "] with viewData=", viewData);
 			this.beforeActivateCallCount++;
 		},
 		beforeDeactivate: function (nextView, viewData) {
-			this.app.log("app-view:", "beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
-				nextView.id : '') + "]");
+			this.app.log("app-view:", "beforeDeactivate called for [" + this.viewName + "] with previousView.id =[" +
+				(nextView ? nextView.id : "") + "]");
 			this.beforeDeactivateCallCount++;
 		},
 		afterActivate: function (previousView, viewData) {
-			this.app.log("app-view:", "afterActivate called for [" + this.viewName + "] with previousView.id =[" + (previousView ?
-				previousView.id : '') + "] with viewData=", viewData);
+			this.app.log("app-view:", "afterActivate called for [" + this.viewName + "] with previousView.id =[" +
+				(previousView ? previousView.id : "") + "] with viewData=", viewData);
 			this.afterActivateCallCount++;
 			this.app.emit("afterActivateCalled", {
 				view: this
 			}); // do not do this for the parentView
 		},
 		afterDeactivate: function (nextView, viewData) {
-			this.app.log("app-view:", "afterDeactivate called for [" + this.viewName + "] with previousView.id =[" + (nextView ?
-				nextView.id : '') + "]");
+			this.app.log("app-view:", "afterDeactivate called for [" + this.viewName + "] with previousView.id =[" +
+				(nextView ? nextView.id : "") + "]");
 			this.afterDeactivateCallCount++;
 		},
 		destroy: function () {

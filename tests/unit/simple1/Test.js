@@ -1,3 +1,4 @@
+// jshint unused:false, undef:false, quotmark:false
 define([
 	"intern!object",
 	"intern/chai!assert",
@@ -28,7 +29,7 @@ define([
 			simple1Container3 = document.createElement("div");
 			document.body.appendChild(simple1Container3);
 			simple1Container3.innerHTML = simple1HtmlContent3;
-			register.parse(simple1Container3);
+			//	register.parse(simple1Container3);
 			simple1Node3 = document.getElementById("simple1App3dviewStack");
 			testApp = null;
 			simple1App3Home1View = null;
@@ -38,7 +39,6 @@ define([
 		},
 		"test initial view": function () {
 			var d = this.async(10000);
-			var _self = this;
 
 			var appStartedDef3 = main(json.parse(stripComments(simple1config3)), simple1Container3);
 			appStartedDef3.then(function (app) {
@@ -50,6 +50,9 @@ define([
 				// Here simple1App3Home1View should be displayed
 
 				simple1App3Home1View = testApp.getViewFromViewId("simple1App3Home1");
+
+				// check that init has been called on these views
+				assert.isTrue(simple1App3Home1View.initialized, "simple1App3Home1View.initialized should be true");
 				// check the DOM state to see if we are in the expected state
 				assert.isNotNull(simple1Node3, "root simple1Node3 must be here");
 				assert.isNotNull(simple1App3Home1, "simple1App3Home1 view must be here");
@@ -66,7 +69,7 @@ define([
 		},
 
 		// Currently showing simple1App3Home1View test transition to simple1App3Home3NoControllerView
-		".show(simple1App3Home3NoController) NOTE .show is broken so using testApp.displayView": function () {
+		"simple1Node3.show(simple1App3Home3NoController)": function () {
 			var d = this.async(10000);
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
 				if (complete.view.id === "simple1App3Home3NoController") {
@@ -91,7 +94,7 @@ define([
 		},
 
 		// Currently showing simple1App3Home3NoController test transition back to simple1App3Home1
-		"testApp.displayView('simple1App3Home1', params)": function () {
+		"testApp.displayView('simple1App3Home1', params) tests data passed to view": function () {
 			var d = this.async(10000);
 
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
@@ -121,7 +124,7 @@ define([
 		},
 
 		// Currently showing simple1App3Home1 test transition back to simple1App3Home3NoController
-		".show('simple1App3Home3NoController')": function () {
+		"simple1Node3.show('simple1App3Home3NoController')": function () {
 			var d = this.async(10000);
 
 			var onHandle = on(testApp, "afterActivateCalled", function (complete) {
@@ -140,8 +143,8 @@ define([
 				}
 			});
 
-			//simple1Node3.show('simple1App3Home3NoController');
-			testApp.displayView('simple1App3Home3NoController');
+			simple1Node3.show('simple1App3Home3NoController');
+			//testApp.displayView('simple1App3Home3NoController');
 		},
 
 		// Currently showing simple1App3Home3NoController test transition back to simple1App3Home2

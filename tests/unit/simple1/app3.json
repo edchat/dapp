@@ -24,7 +24,7 @@
 
 
 	"appLogging": {
-		"logAll": 0,
+		"logAll": 1,
 		"logTimeStamp": 0,
 		"loggingList": [
 		//	"app-view:"
@@ -38,6 +38,8 @@
 		//	,"utils/constraints:"
 		]
 	},
+
+	"parseOnLoad": true,
 
 	//TODO: There is a problem with using duplicate view names across tests, getting duplicate view error!!!
 	"defaultView": "simple1App3Home1",
