@@ -104,131 +104,136 @@ define(
 					}
 				}
 
-
-				// After the loadDeferred is resolved, but before the view is displayed this event,
-				// delite-display-before will be fired.
-				//var onbeforeDisplayHandle = on(event.target, "delite-display-before", function (value) {
-				var onbeforeDisplayHandle = event.target.on("delite-display-before", function (value) {
-					// If the value.dest does not match the one we are expecting keep waiting
-					if (value.dest !== event.dest) { // if this delite-display-complete is not for this view return
-						return;
-					}
-					onbeforeDisplayHandle.remove(); // remove the handle when we match value.dest
-					self.app.log(MODULE, F + "in on delite-display-before value.dest =[" + value.dest + "]");
-
-					var retval = {};
-
-					// If this is not a parent of a nested view, we need to determine the firstChildView, subIds and
-					//  parentView in order to call _getNextSubViewArray, _handleBeforeDeactivateCalls and
-					// _handleBeforeActivateCalls
-					if (!value.dapp.isParent) {
-						var parts, firstChildId, subIds;
-						retval.dapp = value.dapp;
-
-						firstChildId = value.dapp.id;
-						subIds = null;
-
-						var viewTarget = value.dapp.nextView.id.replace(/_/g, ",");
-						if (viewTarget) {
-							parts = viewTarget.split(",");
-							firstChildId = parts.shift();
-							subIds = parts.join(",");
+				if (!event.preload) { // only need to preload this view, not show or hide it
+					// After the loadDeferred is resolved, but before the view is displayed this event,
+					// delite-before-show will be fired.
+					//var onbeforeDisplayHandle = on(event.target, "delite-display-before", function (value) {
+					var onbeforeDisplayHandle = event.target.on("delite-before-show", function (value) {
+						// If the value.dest does not match the one we are expecting keep waiting
+						if (value.dest !== event.dest) { // if this delite-after-show is not for this view return
+							return;
 						}
-						var appView = self.app;
+						onbeforeDisplayHandle.remove(); // remove the handle when we match value.dest
+						self.app.log(MODULE, F + "in on delite-before-show value.dest =[" + value.dest + "]");
 
-						var firstChildView = appView.children[firstChildId];
-						self.app.log(MODULE, F + "check firstChildView.constraint=[" + (firstChildView ?
-							firstChildView.constraint : "") + "] ");
+						var retval = {};
+
+						// If this is not a parent of a nested view, we need to determine the firstChildView, subIds and
+						//  parentView in order to call _getNextSubViewArray, _handleBeforeDeactivateCalls and
+						// _handleBeforeActivateCalls
+						if (!value.dapp.isParent) {
+							var parts, firstChildId, subIds;
+							retval.dapp = value.dapp;
+
+							firstChildId = value.dapp.id;
+							subIds = null;
+
+							var viewTarget = value.dapp.nextView.id.replace(/_/g, ",");
+							if (viewTarget) {
+								parts = viewTarget.split(",");
+								firstChildId = parts.shift();
+								subIds = parts.join(",");
+							}
+							var appView = self.app;
+
+							var firstChildView = appView.children[firstChildId];
+							self.app.log(MODULE, F + "check firstChildView.constraint=[" + (firstChildView ?
+								firstChildView.constraint : "") + "] ");
 
 
-						var nextSubViewArray = [firstChildView || appView];
-						if (subIds) {
-							nextSubViewArray = self._getNextSubViewArray(subIds, firstChildView, appView);
+							var nextSubViewArray = [firstChildView || appView];
+							if (subIds) {
+								nextSubViewArray = self._getNextSubViewArray(subIds, firstChildView, appView);
+							}
+
+							// Need to use constraints.getSelectedChild instead of event.target._visibleChild
+							// because in a nested case where isParent is true we replace the event.target._visibleChild
+							// before we are ready to use it.  We wait for !isParent and then process the views.
+							var current = constraints.getSelectedChild(appView, (firstChildView &&
+								firstChildView.constraint ? firstChildView.constraint : "center"));
+							//	var testVisibleChild = firstChildView.domNode.parentNode ?
+							//		firstChildView.domNode.parentNode._visibleChild : null;
+							//			self.app.log(MODULE, F +
+							// 				"got current from call to constraints with appView.id=[" +
+							//				appView.id, "], got current.id=[" + (current ? current.id : "") + "]");
+							//	//TODO: remove temp test
+							//			if (testVisibleChild && current && testVisibleChild !== current.domNode) {
+							//				console.warn("testVisibleChild !== current testVisibleChild.id=" +
+							//				testVisibleChild.id);
+							//			}
+
+							// use the nextSubViewArray to get the currentSubViewArray and current and next last child
+							// matches.
+							var currentSubViewRet = self._getCurrentSubViewArray(appView, nextSubViewArray,
+								/*removeView,*/
+								false);
+							var currentSubViewArray = currentSubViewRet.currentSubViewArray;
+							self.currentLastSubChildMatch = currentSubViewRet.currentLastSubChildMatch;
+							self.nextLastSubChildMatch = currentSubViewRet.nextLastSubChildMatch;
+
+							//call _handleBeforeDeactivateCalls to process calls to beforeDeactivate for this transition
+							if (currentSubViewArray) {
+								//self.app.log(MODULE, F + "calling _handleBeforeDeactivateCalls firstChildView id=[",
+								//	(firstChildView ? firstChildView.id : ""), "], firstChildView.parent.id=[" +
+								//	(firstChildView &&
+								//	firstChildView.parent ? firstChildView.parent.id : "") + "] currentSubViewArray =",
+								//	currentSubViewArray);
+								self._handleBeforeDeactivateCalls(currentSubViewArray, self.nextLastSubChildMatch ||
+									firstChildView, current, value.viewData, subIds);
+							}
+							retval.dapp.nextSubViewArray = nextSubViewArray;
+							retval.dapp.currentSubViewArray = currentSubViewArray;
+							retval.dapp.nextLastSubChildMatch = self.nextLastSubChildMatch;
+							retval.dapp.current = current;
+							retval.firstChildView = firstChildView;
+							retval.subIds = subIds;
+							self.app.log(MODULE, F + "retval.firstChildView.id = [" + retval.firstChildView.id +
+								"] retval.dapp.current.id = [" + (retval.dapp.current ? retval.dapp.current.id : "") +
+								"] retval.subIds = [" + retval.subIds + "]");
+
+							//call _handleBeforeActivateCalls to process calls to beforeActivate for this transition
+							self._handleBeforeActivateCalls(nextSubViewArray, self.currentLastSubChildMatch || current,
+								value.viewData, subIds);
+						}
+						return retval;
+					});
+
+					// on delite-after-show we will be ready to call afterDeactivate and afterActivate
+					var onHandle = on(event.target, "delite-after-show", function (complete) {
+						if (complete.dest !== event.dest) { // if this delite-after-show is not for this view return
+							return;
+						}
+						self.app.log(MODULE, F + "in on delite-after-show complete.dest =[" + complete.dest + "]");
+						onHandle.remove();
+
+						var next = complete.dapp.nextView;
+						self.app.log(MODULE, F + "delite-after-show fired for [" + next.id + "] with parent [" +
+							(complete.dapp.parentView ? complete.dapp.parentView.id : "") + "]");
+
+						// Add call to handleAfterDeactivate and handleAfterActivate here!
+
+						// Call _handleAfterDeactivateCalls if !isParent (not parent part of a nested view)
+						if (!complete.dapp.isParent) {
+							self.app.log(MODULE, F + "calling _handleAfterDeactivateCalls next id=[" + next.id +
+								"] next.parentView.id=[" + next.parentView.id + "]");
+							self._handleAfterDeactivateCalls(complete.dapp.currentSubViewArray,
+								complete.dapp.nextLastSubChildMatch || next, complete.dapp.current, complete.viewData,
+								complete.subIds);
 						}
 
-						// Need to use constraints.getSelectedChild instead of event.target._visibleChild
-						// because in a nested case where isParent is true we replace the event.target._visibleChild
-						// before we are ready to use it.  We wait for !isParent and then process the views.
-						var current = constraints.getSelectedChild(appView, (firstChildView &&
-							firstChildView.constraint ? firstChildView.constraint : "center"));
-						//	var testVisibleChild = firstChildView.domNode.parentNode ?
-						//		firstChildView.domNode.parentNode._visibleChild : null;
-						//			self.app.log(MODULE, F +
-						// 				"got current from call to constraints with appView.id=[" +
-						//				appView.id, "], got current.id=[" + (current ? current.id : "") + "]");
-						//	//TODO: remove temp test
-						//			if (testVisibleChild && current && testVisibleChild !== current.domNode) {
-						//				console.warn("testVisibleChild !== current testVisibleChild.id=" +
-						//				testVisibleChild.id);
-						//			}
-
-						// use the nextSubViewArray to get the currentSubViewArray and current and next last child
-						// matches.
-						var currentSubViewRet = self._getCurrentSubViewArray(appView, nextSubViewArray,
-							/*removeView,*/
-							false);
-						var currentSubViewArray = currentSubViewRet.currentSubViewArray;
-						self.currentLastSubChildMatch = currentSubViewRet.currentLastSubChildMatch;
-						self.nextLastSubChildMatch = currentSubViewRet.nextLastSubChildMatch;
-
-						//call _handleBeforeDeactivateCalls to process calls to beforeDeactivate for this transition
-						if (currentSubViewArray) {
-							//self.app.log(MODULE, F + "calling _handleBeforeDeactivateCalls firstChildView id=[",
-							//	(firstChildView ? firstChildView.id : ""), "], firstChildView.parent.id=[" +
-							//	(firstChildView &&
-							//	firstChildView.parent ? firstChildView.parent.id : "") + "] currentSubViewArray =",
-							//	currentSubViewArray);
-							self._handleBeforeDeactivateCalls(currentSubViewArray, self.nextLastSubChildMatch ||
-								firstChildView, current, value.viewData, subIds);
+						if (complete.dapp.nextSubViewArray && next) {
+							self.app.log(MODULE, F + "calling _handleAfterActivateCalls next id=[" + next.id +
+								"] next.parentView.id=[" + next.parentView.id + "]");
+							self._handleAfterActivateCalls(complete.dapp.nextSubViewArray, /*removeView*/ false,
+								complete.dapp.currentLastSubChildMatch || complete.dapp.current, complete.viewData,
+								complete.subIds);
 						}
-						retval.dapp.nextSubViewArray = nextSubViewArray;
-						retval.dapp.currentSubViewArray = currentSubViewArray;
-						retval.dapp.nextLastSubChildMatch = self.nextLastSubChildMatch;
-						retval.dapp.current = current;
-						retval.firstChildView = firstChildView;
-						retval.subIds = subIds;
-						self.app.log(MODULE, F + "retval.firstChildView.id = [" + retval.firstChildView.id +
-							"] retval.dapp.current.id = [" + (retval.dapp.current ? retval.dapp.current.id : "") +
-							"] retval.subIds = [" + retval.subIds + "]");
+					});
 
-						//call _handleBeforeActivateCalls to process calls to beforeActivate for this transition
-						self._handleBeforeActivateCalls(nextSubViewArray, self.currentLastSubChildMatch || current,
-							value.viewData, subIds);
-					}
-					return retval;
-				});
-
-				// on delite-display-complete we will be ready to call afterDeactivate and afterActivate
-				var onHandle = on(event.target, "delite-display-complete", function (complete) {
-					if (complete.dest !== event.dest) { // if this delite-display-complete is not for this view return
-						return;
-					}
-					self.app.log(MODULE, F + "in on delite-display-complete complete.dest =[" + complete.dest + "]");
-					onHandle.remove();
-
-					var next = complete.dapp.nextView;
-					self.app.log(MODULE, F + "delite-display-complete fired for [" + next.id + "] with parent [" +
-						(complete.dapp.parentView ? complete.dapp.parentView.id : "") + "]");
-
-					// Add call to handleAfterDeactivate and handleAfterActivate here!
-
-					// Call _handleAfterDeactivateCalls if !isParent (not parent part of a nested view)
-					if (!complete.dapp.isParent) {
-						self.app.log(MODULE, F + "calling _handleAfterDeactivateCalls next id=[" + next.id +
-							"] next.parentView.id=[" + next.parentView.id + "]");
-						self._handleAfterDeactivateCalls(complete.dapp.currentSubViewArray,
-							complete.dapp.nextLastSubChildMatch || next, complete.dapp.current, complete.viewData,
-							complete.subIds);
-					}
-
-					if (complete.dapp.nextSubViewArray && next) {
-						self.app.log(MODULE, F + "calling _handleAfterActivateCalls next id=[" + next.id +
-							"] next.parentView.id=[" + next.parentView.id + "]");
-						self._handleAfterActivateCalls(complete.dapp.nextSubViewArray, /*removeView*/ false,
-							complete.dapp.currentLastSubChildMatch || complete.dapp.current, complete.viewData,
-							complete.subIds);
-					}
-				});
+				}else{ // preload
+					event.dapp.parentNode = event.parentNode;
+					event.dapp.parentView = this.app.getParentViewFromViewName(event.dest, event.target);
+				}
 				// TODO: deal with defaultParams?
 				var params = event.params || "";
 
@@ -242,14 +247,14 @@ define(
 					viewId = event.dest.id;
 					this._createView(event, viewId, event.dest.viewName, params, event.dapp.parentView || this.app,
 						event.dapp.lastViewPart, event.dapp.isParent,
-						this.app.views[event.dest.id].type);
+						this.app.views[event.dest.id].type, event.preload);
 				} else {
 					var type = null;
 					if (event.dapp.parentView && event.dapp.parentView.views && event.dapp.parentView.views[viewId]) {
 						type = event.dapp.parentView.views[viewId].type; // todo: this code for type seems questionable
 					}
 					this._createView(event, viewId, event.dest, params, event.dapp.parentView,
-						event.dapp.lastViewPart, event.dapp.isParent, type);
+						event.dapp.lastViewPart, event.dapp.isParent, type, event.preload);
 				}
 			},
 
@@ -272,7 +277,7 @@ define(
 					//		value.dapp.id + "]");
 
 					// resolve the loadDeferred here, do not need dapp stuff since we are not waiting on the
-					// "delite-display-before" or "delite-display-complete" it was handled already by the emit
+					// "delite-before-show" or "delite-after-show" it was handled already by the emit
 					// for "delite-display" above.
 					event.loadDeferred.resolve({
 						child: value.child
@@ -282,7 +287,7 @@ define(
 
 			},
 
-			_createView: function (event, id, viewName, params, parentView, lastViewPart, isParent, type) {
+			_createView: function (event, id, viewName, params, parentView, lastViewPart, isParent, type, preload) {
 				var F = MODULE + "_createView ";
 				this.app.log(MODULE, F + "called for [" + id + "] with event.dapp.isParent=" +
 					(event.dapp ? event.dapp.isParent : ""));
@@ -295,7 +300,8 @@ define(
 						"parentView": parentView,
 						"parentNode": event.dapp.parentNode,
 						"lastViewPart": lastViewPart,
-						"isParent": isParent
+						"isParent": isParent,
+						"preload": preload
 					};
 					dcl.mix(params, {
 						"params": params
@@ -309,7 +315,7 @@ define(
 						pView.children[id] = newView; // todo: is this needed?
 						/*
 						var onAddedHandle = on(event.target, "delite-display-added", function (value) {
-							// if this delite-display-complete is not for this view return
+							// if this delite-after-show is not for this view return
 							if (!value.dapp || value.dapp.id !== newView.id) {
 								console.log("in onAddedHandle NOT EQUAL value.id =" +
 									(value.dapp ? value.dapp.id : "") + " newView.id=" + newView.id);

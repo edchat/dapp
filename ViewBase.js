@@ -171,8 +171,8 @@ define(["require", "dojo/when", "dojo/on", "dojo/dom-attr", "dojo/dom-style", "d
 				}
 				constraints.register(this.constraint);
 
-				if (this.parentNode.getIndexOfChild(this.domNode) === -1) {
-					//		this.parentNode.addChild(this.domNode, null);
+				if (this.preload && this.parentNode.getIndexOfChild(this.domNode) === -1) {
+							this.parentNode.addChild(this.domNode, null);
 				}
 				this.app.log("  > in app/ViewBase calling this.startup and resolve() id=[" + this.id + "], " +
 					"parentView.viewName=[" + (this.parentView ? this.parentView.viewName : "") + "]");

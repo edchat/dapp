@@ -186,10 +186,10 @@ define([
 
 		// NOTE: these tests will show transition the views, but call to before/afterDeactivate are not working here
 		// because the next transition fires before the call to afterActivate.
-		"Show (by widget.show with id) test on delite-display-complete": function () {
+		"Show (by widget.show with id) test on delite-after-show": function () {
 			var d = this.async(10000);
 
-			on.once(sample2Node3, "delite-display-complete", function (complete) {
+			on.once(sample2Node3, "delite-after-show", function (complete) {
 				var simple2App3Home3NoController = document.getElementById("simple2App3Home3NoController");
 				checkNodeVisibility(sample2Node3, simple2App3Home3NoController);
 				d.resolve();
@@ -206,10 +206,10 @@ define([
 				d.resolve();
 			});
 		},
-		"Show (by widget.show with id) test with sample2Node3.on(delite-display-complete)": function () {
+		"Show (by widget.show with id) test with sample2Node3.on(delite-after-show)": function () {
 			var d = this.async(10000);
 
-			var handle = sample2Node3.on("delite-display-complete", d.callback(function () {
+			var handle = sample2Node3.on("delite-after-show", d.callback(function () {
 				var simple2App3Home3NoController = document.getElementById("simple2App3Home3NoController");
 				checkNodeVisibility(sample2Node3, simple2App3Home3NoController);
 				handle.remove(); // avoid second calls from other tests

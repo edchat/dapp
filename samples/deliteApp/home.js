@@ -57,6 +57,13 @@ define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) 
 						deliteApp.displayView('content,detail', params);
 					}
 				);
+				self = this;
+				on(this.domNode.ownerDocument.getElementById("label2"), "click",
+					function () {
+						console.log("in on click ");
+						self.domNode.ownerDocument.getElementById("content-view-stack").show('detail', {transition:"slide"});
+					}
+				);
 			}
 		},
 		beforeDeactivate: function (nextView, viewData) {
