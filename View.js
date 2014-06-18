@@ -1,7 +1,7 @@
 define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/Deferred", "delite/Widget", "delite/register",
-		"delite/handlebars", "./ViewBase", "./utils/nls"
+		"delite/handlebars", "delite/Templated", "./ViewBase", "./utils/nls"
 	],
-	function (require, when, on, dcl, Deferred, Widget, register, handlebars, ViewBase, nls) {
+	function (require, when, on, dcl, Deferred, Widget, register, handlebars, Templated, ViewBase, nls) {
 		return dcl([ViewBase, Widget], {
 			// summary:
 			//		View class inheriting from ViewBase adding templating & globalization capabilities.
@@ -121,7 +121,8 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/Deferred", "delite/W
 					//var self = this;
 					var params = {
 						baseClass: "d-" + this.id,
-						buildRendering: handlebars.compile(this.templateString)
+					//	buildRendering: handlebars.compile(this.templateString)
+						template: this.templateString
 						/* leaving this in case it is helpful to debug things later
 						preCreate: function () {
 							console.log("View._startup in view preCreate for [" + self.id + "]");
@@ -137,9 +138,10 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/Deferred", "delite/W
 					dcl.mix(params, this.attributes);
 
 					var tag = "dapp-view-" + this.id.toLowerCase();
-					register(tag, [HTMLElement, Widget], params);
+					var viewClass = register(tag, [HTMLElement, Templated], params);
 
-					this.domNode = register.createElement(tag);
+				//	this.domNode = register.createElement(tag);
+					this.domNode = new(viewClass);
 					this.own(this.domNode);
 					this.domNode.id = this.id;
 
