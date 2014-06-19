@@ -1,9 +1,7 @@
 // jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) {
 	return {
-		attributes: {
-			name: ""
-		},
+		name: "",
 		constructor: function (params) { // jshint unused:false
 			//TODO: why is this not being hit?
 			//console.log("app-view:", " in [" + this.viewName + "] constructor called for [" + this.id + "]");

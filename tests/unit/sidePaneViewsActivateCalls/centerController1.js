@@ -1,8 +1,6 @@
 define([], function () {
 	return {
-		attributes: {
-			name: ""
-		},
+		name: "",
 		beforeActivateCallCount: 0,
 		beforeDeactivateCallCount: 0,
 		afterActivateCallCount: 0,

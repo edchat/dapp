@@ -1,9 +1,7 @@
 // jshint unused:false, undef:false, quotmark:false
 define(["dojo/dom", "dojo/on", "delite/register"], function (dom, on, register) {
 	return {
-		attributes: {
-			name: ""
-		},
+		name: "",
 		beforeActivateCallCount: 0,
 		beforeDeactivateCallCount: 0,
 		afterActivateCallCount: 0,

@@ -117,8 +117,6 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/Deferred", "delite/W
 					//		startup widgets in view template.
 					// tags:
 					//		private
-					this.attributes.nls = this.nls; // add nls strings to attributes
-					//var self = this;
 					var params = {
 						baseClass: "d-" + this.id,
 					//	buildRendering: handlebars.compile(this.templateString)
@@ -135,13 +133,17 @@ define(["require", "dojo/when", "dojo/on", "dcl/dcl", "dojo/Deferred", "delite/W
 						})
 						*/
 					};
-					dcl.mix(params, this.attributes);
+					var viewAttributes = {};
+					for (var i = 0; i < this._viewAttributeNames.length; i++) {
+						viewAttributes[this._viewAttributeNames[i]] = this[this._viewAttributeNames[i]];
+					}
+					viewAttributes.nls = this.nls; // add nls strings to attributes
+					dcl.mix(params, viewAttributes);
 
 					var tag = "dapp-view-" + this.id.toLowerCase();
-					var viewClass = register(tag, [HTMLElement, Templated], params);
+					var viewWidget = register(tag, [HTMLElement, Templated], params);
 
-				//	this.domNode = register.createElement(tag);
-					this.domNode = new(viewClass);
+					this.domNode = new(viewWidget);
 					this.own(this.domNode);
 					this.domNode.id = this.id;
 

@@ -2,10 +2,10 @@
 define(["dojo/dom", "dojo/on", "delite/register", "dstore/Memory", "dstore/Observable"],
 	function (dom, on, register, MemoryStore, Observable) {
 		return {
-			attributes: {
+		//	attributes: {
 				name: "",
-				lastSelection: ""
-			},
+				lastSelection: "",
+		//	},
 			beforeActivateCallCount: 0,
 			beforeDeactivateCallCount: 0,
 			afterActivateCallCount: 0,
