@@ -1,5 +1,5 @@
-define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../../Controller", "../../utils/view"],
-	function (dcl, when, Deferred, all, Controller, viewUtils) {
+define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "dojo/on", "../../Controller", "../../utils/view"],
+	function (dcl, when, Deferred, all, on, Controller, viewUtils) {
 
 		// summary:
 		//		A Transition controller to listen for "dapp-display" events and drive the transitions for those
@@ -54,6 +54,8 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../../Cont
 					reverse: event.reverse,
 					transition: event.transition,
 					displayDeferred: event.displayDeferred,
+					doingPopState: event.doingPopState,
+					params: event.params,
 					dapp: {}
 				});
 			},
@@ -110,6 +112,9 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../../Cont
 					}
 					// check for all defs being complete here, and resolve displayDeferred when all are resolved
 					all(defs).then(function (value) {
+						event.detail = {"dest" : event.dest, "url": event.url, "params":event.params,
+							"transition": event.transition}
+						on.emit(document, "dapp-finishedTransition", event);
 						if (event.displayDeferred) {
 							event.displayDeferred.resolve(value);
 						}

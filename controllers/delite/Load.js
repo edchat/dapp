@@ -250,19 +250,20 @@ define(
 			_createView: function (event, id, viewName, params, parentView, parentNode, isParent, type, viewPath) {
 				var app = this.app;
 				require([type ? type : "../../View"], function (View) {
-					var params = {
+					var viewParams = {
 						"app": app,
 						"id": id,
 						"viewName": viewName,
 						"parentView": parentView,
 						"parentNode": parentNode,
 						"isParent": isParent,
-						"viewPath": viewPath
+						"viewPath": viewPath,
+						"params" : params
 					};
-					dcl.mix(params, {
-						"params": params
+					dcl.mix(viewParams, {
+						"viewParams": viewParams
 					});
-					new View(params).start().then(function (newView) {
+					new View(viewParams).start().then(function (newView) {
 						parentView.children[id] = newView;
 						event.dapp.parentView = parentView;
 						event.dapp.parentNode = newView.parentNode;

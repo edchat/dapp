@@ -160,6 +160,37 @@ define(function () {
 			return paramStr; // String
 		},
 
+		getAllSelectedChildrenHash: function(view, selChildren, subChildFlag){
+			// summary:
+			//		get current all selected children for this view and it's selected subviews
+			//
+			// view: View
+			//		the View to get the child from
+			//
+			// returns:
+			//		string with all of the selChildren added
+			//
+			selChildren = selChildren ? selChildren : "";
+			if(view && view.selectedChildren){
+				for(var hash in view.selectedChildren){
+					if(view.selectedChildren[hash]){
+						var subChild = view.selectedChildren[hash];
+						if(selChildren.length == 0){
+							selChildren = subChild.viewName;
+						}else if(subChildFlag){
+							selChildren = selChildren + "," + subChild.viewName;
+						}else{
+							selChildren = selChildren + "+" + subChild.viewName;
+						}
+						var subChildren2 = hashUtil.getAllSelectedChildrenHash(subChild, selChildren, true);
+						selChildren = subChildren2;
+					}
+				}
+			}
+			return selChildren;
+		},
+
+
 		getTarget: function ( /*String*/ hash, /*String?*/ defaultView) {
 			// summary:
 			//		return the target string

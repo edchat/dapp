@@ -32,6 +32,7 @@
 
 	"parseOnLoad": true,
 
+	"alwaysUseDefaultView" : true, // ignore any url hash when starting the app
 	"defaultView": "header1+center1+footer1",
 	"views": {
 		"header1": {

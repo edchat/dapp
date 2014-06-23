@@ -109,9 +109,13 @@ define(["require", "dcl/dcl", "dojo/on", "dojo/Deferred", "dojo/_base/lang",
 				// fire the event on the container to load the main view
 				var displayDeferred = new Deferred();
 				// let's display default view
+				var initialView = this.app.alwaysUseDefaultView ? this.app.defaultView : this.app._startView;
 				on.emit(document, "dapp-display", {
 					// TODO is that really defaultView a good name? Shouldn't it be defaultTarget or defaultView_s_?
-					dest: this.app.defaultView,
+					//dest: this.app.defaultView,
+					//dest: this.app._startView,
+					dest: initialView,
+					params: this.app._startParams,
 					displayDeferred: displayDeferred,
 					bubbles: true,
 					cancelable: true
