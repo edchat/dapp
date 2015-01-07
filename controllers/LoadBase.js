@@ -10,6 +10,18 @@ define(
 			_loadHandler: function (event) {
 				event.preventDefault(); // to indicate that dapp will load the view
 				// load the actual view
+
+				//ELC for new Promise support
+				event.loadDeferred = new Deferred();
+				if(event.setChild) {
+					event.setChild(new Promise(function (resolve) {
+						// use setTimeout to simulate fetch of data, then create a node
+						event.loadDeferred.then(function (viewData) {
+							resolve(viewData);
+						});
+					}));
+				}
+
 				//Need to handle calls directly from node.show or node.hide that did not come from transition
 				if (!event.dapp || !event.dapp.parentView) {
 					//This must be a direct call from .show or .hide, need to setup event.dapp with parentView etc.
@@ -79,7 +91,10 @@ define(
 			_handleShowFromDispContainer: function (event, dest) {
 				if (!dest) { // this is not a dapp view, so it should be loaded, resolve it
 					var child = document.getElementById(event.dest);
-					event.loadDeferred.resolve({
+				//	event.loadDeferred.resolve({
+				//		child: child
+				//	});
+					event.setChild({
 						child: child
 					});
 					return;

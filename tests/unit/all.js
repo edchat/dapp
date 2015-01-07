@@ -1,6 +1,6 @@
 // Listing of all the infrastructure unit tests
 define([
-	"./responsiveColumnsVisibility/Test",
+/*	"./responsiveColumnsVisibility/Test",
 	"./transitionTypes/Test",
 	"./viewLayout/Test",
 	"./appStatus/Test",
@@ -12,8 +12,8 @@ define([
 	"./multipleAndNestedViewsActivateCalls/TestConstraints",
 	"./nestedViewsActivateCalls/Test",
 	"./sidePaneViewsActivateCalls/Test",
-	"./historyController/Test",
-	"./jqm/hideViewJqm/Test",
-	"./jqm/transitionVisibility/Test",
+*/	"./historyController/Test",
 	"./dstoreMemory/Test"
+//	,"./jqm/hideViewJqm/Test"
+//	,"./jqm/transitionVisibility/Test"
 ]);

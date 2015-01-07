@@ -1,5 +1,6 @@
-require(["jquery"],
-	function ($) {
+define([
+	"jquery"
+], function ($) {
 		// this must be setup after jquery is loaded, but before jquery.mobile is loaded
 		$(document).bind("mobileinit", function () {
 			// if this is set true to see if it helps things

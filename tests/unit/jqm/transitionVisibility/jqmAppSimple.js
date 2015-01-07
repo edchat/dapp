@@ -21,7 +21,7 @@ require(["jquery"],
 		});
 	});
 require(["dapp/Application", "requirejs-text/text!./app.json", "jquery", "jquery.mobile"],
-	function (Application, config, has, $) {
+	function (Application, config, $) {
 		var jsonData = config;
 		jsonData = jsonData.replace(/\/\*.*?\*\//g, "");
 		jsonData = jsonData.replace(/\/\/.*/g, "");
