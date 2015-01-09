@@ -1,6 +1,6 @@
 define(
-	["require", "dcl/dcl", "dojo/Deferred", "../Controller", "../utils/view"],
-	function (require, dcl, Deferred, Controller, viewUtils) {
+	["require", "dcl/dcl", "lie/dist/lie", "dojo/Deferred", "../Controller", "../utils/view"],
+	function (require, dcl, Promise, Deferred, Controller, viewUtils) {
 		var app; // need app in closure for loadMapper
 		return dcl(Controller, {
 			constructor: function (newapp) {
@@ -12,52 +12,54 @@ define(
 				// load the actual view
 
 				//ELC for new Promise support
-				event.loadDeferred = new Deferred();
-				if(event.setChild) {
-					event.setChild(new Promise(function (resolve) {
-						// use setTimeout to simulate fetch of data, then create a node
-						event.loadDeferred.then(function (viewData) {
-							resolve(viewData);
-						});
-					}));
-				}
+				event.loadPromise = new Deferred();
+			//	event.loadPromise = Promise(function (resolve) {
+					if(event.setChild) {
+						event.setChild(new Promise(function (resolve) {
+							// use setTimeout to simulate fetch of data, then create a node
+							event.loadPromise.then(function (viewData) {
+								resolve(viewData);
+							});
+						}));
+					}
 
-				//Need to handle calls directly from node.show or node.hide that did not come from transition
-				if (!event.dapp || !event.dapp.parentView) {
-					//This must be a direct call from .show or .hide, need to setup event.dapp with parentView etc.
-					event.dapp = this._setupEventDapp(event);
-					this._handleShowFromDispContainer(event, event.dapp.dest);
-					return;
-				}
+					//Need to handle calls directly from node.show or node.hide that did not come from transition
+					if (!event.dapp || !event.dapp.parentView) {
+						//This must be a direct call from .show or .hide, need to setup event.dapp with parentView etc.
+						event.dapp = this._setupEventDapp(event);
+						this._handleShowFromDispContainer(event, event.dapp.dest);
+						return;
+					}
 
-				var viewId = event.dapp.parentView !== this.app ?
-					(event.dapp.parentView.id + "_" + event.dest) : event.dest;
+					var viewId = event.dapp.parentView !== this.app ?
+						(event.dapp.parentView.id + "_" + event.dest) : event.dest;
 
-				// Check to see if this view has already been loaded
-				var view = null;
-				if (event.dapp.parentView && event.dapp.parentView.childViews) {
-					view = event.dapp.parentView.childViews[viewId];
-				}
+					// Check to see if this view has already been loaded
+					var view = null;
+					if (event.dapp.parentView && event.dapp.parentView.childViews) {
+						view = event.dapp.parentView.childViews[viewId];
+					}
 
-				// if this is a hide for a view which is not loaded then do not process it
-				if (event.dapp.hide && !view) {
-					//console.log("Load._loadHandler called with hide true, but that view is not available to remove");
-					return; // trying to remove a view which is not showing
-				}
+					// if this is a hide for a view which is not loaded then do not process it
+					if (event.dapp.hide && !view) {
+						//console.log("Load._loadHandler called with hide true, but that view is not available to remove");
+						return; // trying to remove a view which is not showing
+					}
 
-				this._handleOnBeforeAndAfterShowHide(event);
+					this._handleOnBeforeAndAfterShowHide(event);
 
-				var viewParams = viewUtils.getParamsForView(this.app, event);
+					var viewParams = viewUtils.getParamsForView(this.app, event);
 
-				if (view) {
-					// set viewParams to new value before returning
-					view.viewParams = viewParams || null;
-					this._resolveView(event, view, event.dapp.parentView);
-				} else {
-					this._createView(event, viewId, event.dest, viewParams, event.dapp.parentView,
-						event.dapp.parentNode, event.dapp.isParent, event.dapp.parentView.views[event.dest].type,
-						event.dapp.viewPath);
-				}
+					if (view) {
+						// set viewParams to new value before returning
+						view.viewParams = viewParams || null;
+						this._resolveView(event, view, event.dapp.parentView);
+					} else {
+						this._createView(event, viewId, event.dest, viewParams, event.dapp.parentView,
+							event.dapp.parentNode, event.dapp.isParent, event.dapp.parentView.views[event.dest].type,
+							event.dapp.viewPath);
+					}
+			//	}.bind(this));
 			},
 
 			_setupEventDapp: function (event) {
@@ -99,21 +101,23 @@ define(
 					});
 					return;
 				}
-				var tempDisplaydeferred = new Deferred();
-				var savedLoadDeferred = event.loadDeferred;
-				this.app.emit("dapp-display", {
-					dest: dest,
-					transition: event.transition,
-					reverse: event.reverse,
-					displayDeferred: tempDisplaydeferred,
-					bubbles: true,
-					cancelable: true
-				});
-				tempDisplaydeferred.then(function (value) {
+			//	var tempdisplayPromise = new Deferred();
+				var savedLoadDeferred = event.loadPromise;
+				var tempdisplayPromise = Promise(function (resolve) {
+					this.app.emit("dapp-display", {
+						dest: dest,
+						transition: event.transition,
+						reverse: event.reverse,
+						displayPromise: resolve,
+						bubbles: true,
+						cancelable: true
+					});
+				}.bind(this));
+				tempdisplayPromise.then(function (value) {
 					// resolve the loadDeferred here, do not need dapp stuff since we are not waiting on the
 					// "delite-before-show" or "delite-after-show" it was handled already by the emit
 					// for "dapp-display" above.
-					savedLoadDeferred.resolve({
+					savedLoadDeferred.resolve({ //
 						child: value[0].child
 					});
 				});

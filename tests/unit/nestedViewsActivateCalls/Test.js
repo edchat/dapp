@@ -62,11 +62,11 @@ define([
 				return;
 			}
 
-			var appStartedDef1 = new Application(JSON.parse(stripComments(nestedViewsActivateCallsconfig1)),
+			var appStartedPromise1 = new Application(JSON.parse(stripComments(nestedViewsActivateCallsconfig1)),
 				nestedViewsActivateCallsContainer1);
 			console.log("in test initial view step 4");
-			return appStartedDef1.then(function (app) {
-				console.log("in appStartedDef1.then step 5");
+			return appStartedPromise1.then(function (app) {
+				console.log("in appStartedPromise1.then step 5");
 				// we are ready to test
 				testApp = app;
 
@@ -176,11 +176,11 @@ define([
 				// This test is not reliable on Firefox
 				return;
 			}
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			testApp.showOrHideViews('V7', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
 				checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V7);
 
@@ -209,11 +209,11 @@ define([
 				// This test is not reliable on Firefox
 				return;
 			}
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			testApp.showOrHideViews('P1', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var nestedViewsActivateCallsApp1V1 = document.getElementById("P1_S1_V1");
 				checkNestedNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V1);
 
@@ -239,10 +239,10 @@ define([
 				// This test is not reliable on Firefox
 				return;
 			}
-			var displayDeferred = new Deferred();
-			setupOnOnce(testApp, displayDeferred);
+			var displayPromise = new Deferred();
+			setupOnOnce(testApp, displayPromise);
 			history.back();
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
 				checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V7);
 
@@ -282,9 +282,9 @@ define([
 
 	registerSuite(nestedViewsActivateCallsSuite1);
 
-	function setupOnOnce(testApp, displayDeferred) {
+	function setupOnOnce(testApp, displayPromise) {
 		var signal = testApp.on("dapp-finished-transition", function () {
-			displayDeferred.resolve();
+			displayPromise.resolve();
 			signal.unadvise();
 		});
 	}

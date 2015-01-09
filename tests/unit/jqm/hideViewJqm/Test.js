@@ -1,6 +1,5 @@
-define([
-	"jquery"
-], function ($) {
+require(["jquery"],
+	function ($) {
 		// this must be setup after jquery is loaded, but before jquery.mobile is loaded
 		$(document).bind("mobileinit", function () {
 			// if this is set true to see if it helps things
@@ -63,9 +62,9 @@ define([
 		"jqmhideViewJqmSuite dapp jqmhideViewJqm test initial layout": function () {
 			this.timeout = 20000;
 
-			var appStartedDef = new Application(JSON.parse(stripComments(jqmhideViewJqmconfig)),
+			var appStartedPromise = new Application(JSON.parse(stripComments(jqmhideViewJqmconfig)),
 				jqmhideViewJqmContainer3);
-			return appStartedDef.then(function (app) {
+			return appStartedPromise.then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -77,12 +76,12 @@ define([
 		},
 		"Test showOrHideViews('hideViewJqmAppHome2' ": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			testApp.showOrHideViews('hideViewJqmAppHome2', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				hideViewJqmAppHome2View = viewUtils.getViewFromViewId(testApp, "hideViewJqmAppHome2");
 				checkActivateCallCount(hideViewJqmAppHome2View, 1);
 				checkDeactivateCallCount(hideViewJqmAppHome1View, 1);
@@ -90,36 +89,36 @@ define([
 		},
 		"Test showOrHideViews('hideViewJqmAppHome1' ": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			testApp.showOrHideViews('hideViewJqmAppHome1', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				checkActivateCallCount(hideViewJqmAppHome1View, 2);
 				checkDeactivateCallCount(hideViewJqmAppHome2View, 1);
 			});
 		},
 		"Test showOrHideViews('-hideViewJqmAppHome1' ": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			testApp.showOrHideViews('-hideViewJqmAppHome1', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				//checkActivateCallCount(hideViewJqmAppHome1View, 2);
 				checkDeactivateCallCount(hideViewJqmAppHome1View, 2);
 			});
 		},
 		"Test showOrHideViews('hideViewJqmAppHome2') again ": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			testApp.showOrHideViews('hideViewJqmAppHome2', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				checkActivateCallCount(hideViewJqmAppHome2View, 2);
 				checkDeactivateCallCount(hideViewJqmAppHome1View, 2);
 			});

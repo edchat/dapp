@@ -1,7 +1,7 @@
-define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred", "dojo/when",
+define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 		"./utils/nls", "./utils/hash", "./utils/view", "./utils/config", "requirejs-domready/domReady!"
 	],
-	function (require, dcl, Stateful, Evented, Deferred, when, nls, hash, viewUtils, configUtils) {
+	function (require, dcl, Stateful, Evented, Promise, nls, hash, viewUtils, configUtils) {
 
 		var Application = dcl([Evented, Stateful], {
 			UNKNOWN: 0, //unknown
@@ -36,18 +36,35 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 				//		"-" to hide a view, or it can be a nested view with parent,child for example "H1+P1,S1,V1+F1"
 				// viewParams:
 				//		Contains the viewParams for the event which can include transition and direction.
+				// returns:
+				// 		displayPromise which is resolved when the showOrHideViews is complete
 				var opts = {
 					bubbles: true,
 					cancelable: true,
 					dest: viewPath,
 					hash: hash
 				};
-				dcl.mix(opts,
-					viewParams ? viewParams : {
-						transition: "slide",
-						direction: "end"
+				var passedPromise = null;
+				if(viewParams && viewParams.displayPromise) {
+					passedPromise = viewParams.displayPromise;
+				}
+				return Promise(function (resolve) {
+					dcl.mix(opts,
+						viewParams ? viewParams : {
+							transition: "slide",
+							direction: "end"
 					});
-				this.emit("dapp-display", opts);
+					dcl.mix(opts, {displayPromise: resolve});
+					this.emit("dapp-display", opts);
+				}.bind(this)).then(function (resolve) {
+					if(passedPromise) {
+						if(passedPromise.resolve) {  // TODO remove this temp code for deferred
+							passedPromise.resolve(); // TODO remove this temp code for deferred
+						} else {
+							passedPromise();
+						}
+					}
+				}.bind(this))
 			},
 
 			createControllers: function (controllers) {
@@ -57,22 +74,23 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 				// controllers: Array
 				// 		controller configuration array.
 				// returns:
-				// 		controllerDeferred object
+				// 		controllerPromise
 
 				if (controllers) {
 					var requireItems = [];
 					for (var i = 0; i < controllers.length; i++) {
 						requireItems.push(controllers[i]);
 					}
-					var controllerDef = new Deferred();
-					require(requireItems, function () {
-						for (var i = 0; i < arguments.length; i++) {
-							// instantiate controllers, set Application object, and perform auto binding
-							this.loadedControllers.push((new arguments[i](this)).bindAll());
-						}
-						controllerDef.resolve(this);
+					var controllerPromise = Promise(function (resolve) {
+						require(requireItems, function () {
+							for (var i = 0; i < arguments.length; i++) {
+								// instantiate controllers, set Application object, and perform auto binding
+								this.loadedControllers.push((new arguments[i](this)).bindAll());
+							}
+							resolve(this);
+						}.bind(this));
 					}.bind(this));
-					return controllerDef;
+					return controllerPromise;
 				}
 			},
 
@@ -84,7 +102,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 				//create application level controllers
 				this.setupControllers();
 				// if available load root NLS
-				when(nls(this), function (nls) {
+				return Promise.resolve(nls(this)).then(function (nls) {
 					if (nls) {
 						this.nls = {};
 						dcl.mix(this.nls, nls);
@@ -113,7 +131,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 				} else {
 					this.constraint = "center";
 				}
-				when(controllers, function () {
+				return Promise.resolve(controllers).then(function () {
 					// emit "dapp-init" event so that the Init controller can initialize the app and the root view
 					this.emit("dapp-init", {});
 				}.bind(this));
@@ -125,21 +143,22 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 				// 		set the status for STOPPING during the unload and STOPPED when complete
 				// 		emit dapp-unload-view to have controllers stop, and delete the global app reference.
 				//
-				var appStoppedDef = new Deferred();
-				this.setStatus(this.STOPPING);
-				var params = {};
-				params.view = this;
-				params.parentView = this;
-				params.unloadApp = true;
-				params.callback = function () {
-					this.setStatus(this.STOPPED);
-					delete window[this.name]; // remove the global for the app
-					appStoppedDef.resolve();
-				}.bind(this);
-				this.emit("dapp-unload-view", params);
+				var appStoppedPromise = Promise(function (resolve) {
+					this.setStatus(this.STOPPING);
+					var params = {};
+					params.view = this;
+					params.parentView = this;
+					params.unloadApp = true;
+					params.callback = function () {
+						this.setStatus(this.STOPPED);
+						delete window[this.name]; // remove the global for the app
+						resolve();
+					}.bind(this);
+					this.emit("dapp-unload-view", params);
 
-				this.emit("dapp-unload-app", {}); // for controllers to cleanup
-				return appStoppedDef;
+					this.emit("dapp-unload-app", {}); // for controllers to cleanup
+				}.bind(this));
+				return appStoppedPromise;
 			},
 
 			log: function () {} // noop may be replaced by a logger controller
@@ -156,7 +175,6 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 			// node: domNode
 			// 		domNode.
 			var path;
-			var appStartedDef = new Deferred();
 
 			// call configProcessHas to process any has blocks in the config
 			config = configUtils.configProcessHas(config);
@@ -198,38 +216,38 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "dojo/Deferred"
 				}
 				modules.push("requirejs-text/text!" + path);
 			}
-
-			require(modules, function () {
-				var modules = [Application];
-				for (var i = 0; i < config.modules.length; i++) {
-					modules.push(arguments[i]);
-				}
-
-				var ext = {};
-				if (config.template) {
-					ext = {
-						templateString: arguments[arguments.length - 1]
-					};
-				}
-				/*global App:true */
-				App = dcl(modules, ext);
-
-				require(["requirejs-domready/domReady!"], function () {
-					var app = new App(config, node || document.body);
-					// Create global namespace for application.
-					// The global name is application id. For example, modelApp
-					var globalAppName = app.id;
-					if (window[globalAppName]) {
-						dcl.mix(app, window[globalAppName]);
+			return Promise(function (resolve, reject) {
+				require(modules, function () {
+					var modules = [Application];
+					for (var i = 0; i < config.modules.length; i++) {
+						modules.push(arguments[i]);
 					}
-					window[globalAppName] = app;
-					app.appStartedDef = appStartedDef;
-					app.start();
+
+					var ext = {};
+					if (config.template) {
+						ext = {
+							templateString: arguments[arguments.length - 1]
+						};
+					}
+					/*global App:true */
+					App = dcl(modules, ext);
+
+					require(["requirejs-domready/domReady!"], function () {
+						var app = new App(config, node || document.body);
+						// Create global namespace for application.
+						// The global name is application id. For example, modelApp
+						var globalAppName = app.id;
+						if (window[globalAppName]) {
+							dcl.mix(app, window[globalAppName]);
+						}
+						window[globalAppName] = app;
+						app.appStartedPromise = resolve;
+						app.start();
+					});
+				}, function (obj) {
+					reject("Application error back from require for modules message =" + obj.message);
 				});
-			}, function (obj) {
-				throw new Error("Application error back from require for modules message =" + obj.message);
 			});
-			return appStartedDef.promise;
 		}
 
 

@@ -69,17 +69,17 @@ define([
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
 		"testApp.showOrHideViews('viewDataAndParamsAppHome1', params) tests data passed to view": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			//	viewDataNode3.show("viewDataAndParamsAppHome1");
 			var params = {
 				viewData: {
 					"p": "testData"
 				},
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			};
 			testApp.showOrHideViews('viewDataAndParamsAppHome1', params);
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var viewDataAndParamsAppHome1 = document.getElementById("viewDataAndParamsAppHome1");
 				checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome1);
 
@@ -97,7 +97,7 @@ define([
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
 		"testApp.showOrHideViews('parentV1,s1', viewData) tests data passed to subview": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			//	viewDataNode3.show("viewDataAndParamsAppHome1");
 			var params = {
 				viewData: {
@@ -111,10 +111,10 @@ define([
 						}
 					}
 				},
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			};
 			testApp.showOrHideViews('parentV1,s1', params);
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
 				var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
 
@@ -138,7 +138,7 @@ define([
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
 		"testApp.showOrHideViews('parentV1,s1', viewParams) tests params passed to subview": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			//	viewDataNode3.show("viewDataAndParamsAppHome1");
 			var params = {
 				viewParams: {
@@ -152,10 +152,10 @@ define([
 						}
 					}
 				},
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			};
 			testApp.showOrHideViews('parentV1,s1', params);
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
 				var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
 

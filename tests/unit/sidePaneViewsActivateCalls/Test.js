@@ -48,9 +48,9 @@ define([
 		"sidePaneViewsActivateCalls test initial view": function () {
 			this.timeout = 20000;
 
-			var appStartedDef1 = new Application(JSON.parse(stripComments(sidePaneViewsActivateCallsconfig1)),
+			var appStartedPromise1 = new Application(JSON.parse(stripComments(sidePaneViewsActivateCallsconfig1)),
 				sidePaneViewsActivateCallsContainer1);
-			return appStartedDef1.then(function (app) {
+			return appStartedPromise1.then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -82,11 +82,11 @@ define([
 		// showOrHideViews('-sp1right1'
 		"Hide sp1right1 with testApp.showOrHideViews('-sp1right1')": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			testApp.showOrHideViews('-sp1right1', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var sp1rightPane = document.getElementById("sp1rightPane");
 				assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
 				checkActivateCallCount(sp1right1View, 1, true);
@@ -97,11 +97,11 @@ define([
 		// showOrHideViews('leftParent,left1'
 		"show sp1left1 with testApp.showOrHideViews('sp1leftParent,sp1left1')": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			testApp.showOrHideViews('sp1leftParent,sp1left1', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var sp1left1content = document.getElementById("sp1leftParent_sp1left1");
 				var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
 
@@ -114,11 +114,11 @@ define([
 		// got a warning because sp1leftParent was not found as the parent of left1
 		"Hide sp1left1 with testApp.showOrHideViews('-sp1leftParent')": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 			testApp.showOrHideViews('-sp1leftParent,sp1left1-sp1leftParent', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var sp1rightPane = document.getElementById("sp1rightPane");
 				var sp1left1content = document.getElementById("sp1leftPane");
 				var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");

@@ -39,8 +39,8 @@ define([
 		"test initial view and nls labels": function () {
 			this.timeout = 20000;
 
-			var appStartedDef3 = new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3);
-			return appStartedDef3.then(function (app) {
+			var appStartedPromise3 = new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3);
+			return appStartedPromise3.then(function (app) {
 				// we are ready to test
 				testApp = app;
 

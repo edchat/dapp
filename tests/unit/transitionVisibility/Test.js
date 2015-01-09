@@ -32,9 +32,9 @@ define([
 		"transitionVisibilitySuite dapp transitionVisibility test initial layout": function () {
 			this.timeout = 20000;
 
-			var appStartedDef = new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
+			var appStartedPromise = new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
 				transitionVisibilityContainer3);
-			return appStartedDef.then(function (app) {
+			return appStartedPromise.then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -51,15 +51,15 @@ define([
 		// because the next transition fires before the call to afterActivate.
 		"Show (by widget.show with id) test on delite-after-show": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			var sig = transitionVisibilityNode3.on("delite-after-show", function () {
-				displayDeferred.resolve();
+				displayPromise.resolve();
 				sig.remove();
 			});
 			transitionVisibilityNode3.show("transitionVisibilityAppHome3NoController");
 
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var transitionVisibilityAppHome3NoController =
 					document.getElementById("transitionVisibilityAppHome3NoController");
 				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome3NoController);
@@ -89,12 +89,12 @@ define([
 		},
 		"Test showOrHideViews (by view name) ": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+		//	var displayPromise = new Deferred();
 
-			testApp.showOrHideViews('transitionVisibilityAppHome2', {
-				displayDeferred: displayDeferred
-			});
-			return displayDeferred.then(function () {
+			return testApp.showOrHideViews('transitionVisibilityAppHome2', {
+			//	displayPromise: displayPromise
+			}).then(function () {
+		//	return displayPromise.then(function () {
 				var transitionVisibilityAppHome2 = document.getElementById("transitionVisibilityAppHome2");
 				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome2);
 			});

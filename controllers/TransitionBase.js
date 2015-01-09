@@ -1,5 +1,5 @@
-define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../Controller", "../utils/view"],
-	function (dcl, when, Deferred, all, Controller, viewUtils) {
+define(["dcl/dcl", "lie/dist/lie", "dojo/Deferred", "dojo/promise/all", "../Controller", "../utils/view"],
+	function (dcl, Promise, Deferred, all, Controller, viewUtils) {
 
 		// summary:
 		//		A Transition controller to listen for "dapp-display" events and drive the transitions for those
@@ -39,7 +39,7 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../Control
 					viewData: event.viewData,
 					reverse: event.reverse,
 					transition: event.transition,
-					displayDeferred: event.displayDeferred,
+					displayPromise: event.displayPromise,
 					doingPopState: event.doingPopState,
 					viewParams: event.viewParams,
 					dapp: {}
@@ -67,16 +67,20 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../Control
 
 			_handleMultipleViewParts: function (event) {
 				var defs = []; // list of deferreds that need to fire before I am complete
+			//	var defsPromises = []; // list of Promises that need to fire before I am complete
 
 				var syncDeferred;
-				//	var viewPaths = this.app._getViewPaths(event.dest);
+			//	var syncPromise;
 				var viewPaths = viewUtils._getViewPaths(this.app, event.dest);
 				var self = this;
 				if (viewPaths) {
 					if (this.app.loadViewsInOrder || viewPaths[0].loadViewsInOrder) {
 						syncDeferred = new Deferred();
+				//		syncPromise = new Promise();
 						defs.push(syncDeferred);
+				//		defsPromises.push(syncPromise);
 						this._loadViewsInOrder(viewPaths, 0, event, syncDeferred);
+				//		this._loadViewsInOrderPromise(viewPaths, 0, event, syncPromise);
 					} else {
 						var i = 0;
 						while (i < viewPaths.length) {
@@ -96,7 +100,7 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../Control
 							}
 						}
 					}
-					// check for all defs being complete here, and resolve displayDeferred when all are resolved
+					// check for all defs being complete here, and resolve displayPromise when all are resolved
 					all(defs).then(function (value) {
 						//	event.detail = {
 						//		"dest": event.dest,
@@ -106,8 +110,13 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../Control
 						//		"transition": event.transition
 						//	};
 						self.app.emit("dapp-finished-transition", event);
-						if (event.displayDeferred) {
-							event.displayDeferred.resolve(value);
+						if (event.displayPromise) {
+							if(event.displayPromise.resolve){ // TEMP OLD deferred used
+								console.log("TEMP msg using OLD Deferred instead of Promise resolve()");
+								event.displayPromise.resolve(value);
+							}else{ // new Promise used
+								event.displayPromise(value);
+							}
 						}
 					});
 				}
@@ -115,41 +124,42 @@ define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../Control
 
 			// _displayView is called to show a view, it will handle nested views by calling _displayParents
 			_displayView: function (viewTarget, event, isParent, viewPath) {
-				var deferred = new Deferred();
 				var subEvent;
-				event.dapp.isParent = isParent;
-				event.dapp.viewPath = viewPath;
-				var self = this;
-				// wait for parents to be displayed first
-				when(this._displayParents(viewTarget, event, isParent, viewPath),
-					function (value) {
-						subEvent = Object.create(event);
-						subEvent.dest = viewTarget.split(",").pop();
-						subEvent.dapp.viewPath = viewPath;
-						subEvent.dapp.viewPath.dest = subEvent.dest;
-						subEvent.dapp.isParent = isParent;
+				var dispviewPromise = Promise(function (resolve) {
+					event.dapp.isParent = isParent;
+					event.dapp.viewPath = viewPath;
+					var self = this;
+					// wait for parents to be displayed first
+					return Promise.resolve(this._displayParents(viewTarget, event, isParent, viewPath))
+						.then(function (value) {
+							subEvent = Object.create(event);
+							subEvent.dest = viewTarget.split(",").pop();
+							subEvent.dapp.viewPath = viewPath;
+							subEvent.dapp.viewPath.dest = subEvent.dest;
+							subEvent.dapp.isParent = isParent;
 
-						subEvent.dapp.parentView = value.dapp.nextView;
-						var p = self._getParentNode(subEvent) || document.body;
-						if (!self._parentIsValid(p, subEvent.dest, deferred, value)) {
-							return; // p is invalid
-						}
-						subEvent.dapp.parentNode = p;
+							subEvent.dapp.parentView = value.dapp.nextView;
+							var p = self._getParentNode(subEvent) || document.body;
+							if (!self._parentIsValid(p, subEvent.dest, resolve, value)) {
+								return; // p is invalid
+							}
+							subEvent.dapp.parentNode = p;
 
-						subEvent.target = p;
-						var viewId = self.app === subEvent.dapp.parentView ? subEvent.dest :
-							viewUtils.getViewIdFromEvent(self.app, subEvent);
-						var viewdef = viewUtils.getViewDefFromViewId(self.app, viewId);
-						var constraint = viewdef && viewdef.constraint ? viewdef.constraint :
-							viewUtils.getDefaultConstraint(viewId, p);
-						var selView = viewUtils.getSelectedChild(subEvent.dapp.parentView, constraint);
-						// if viewId is already the selected view set transition to none.
-						if (selView && selView.id === viewId) {
-							subEvent.transition = "none";
-						}
-						self._showView(p, subEvent, deferred);
-					});
-				return deferred.promise;
+							subEvent.target = p;
+							var viewId = self.app === subEvent.dapp.parentView ? subEvent.dest :
+								viewUtils.getViewIdFromEvent(self.app, subEvent);
+							var viewdef = viewUtils.getViewDefFromViewId(self.app, viewId);
+							var constraint = viewdef && viewdef.constraint ? viewdef.constraint :
+								viewUtils.getDefaultConstraint(viewId, p);
+							var selView = viewUtils.getSelectedChild(subEvent.dapp.parentView, constraint);
+							// if viewId is already the selected view set transition to none.
+							if (selView && selView.id === viewId) {
+								subEvent.transition = "none";
+							}
+							self._showView(p, subEvent, resolve);
+						});
+				}.bind(this));
+				return dispviewPromise;
 			},
 
 			// _displayParents is called to show parent views before showing the child view for nested views

@@ -1,7 +1,7 @@
-define(["require", "dojo/when", "dcl/dcl", "dojo/Deferred", "delite/Widget", "delite/register",
+define(["require", "dcl/dcl", "lie/dist/lie", "delite/Widget", "delite/register",
 		"delite/handlebars", "./ViewBase", "./utils/nls"
 	],
-	function (require, when, dcl, Deferred, Widget, register, handlebars, ViewBase, nls) {
+	function (require, dcl, Promise, Widget, register, handlebars, ViewBase, nls) {
 		return dcl([ViewBase], {
 			// summary:
 			//		View class inheriting from ViewBase adding templating & globalization capabilities.
@@ -69,40 +69,42 @@ define(["require", "dojo/when", "dcl/dcl", "dojo/Deferred", "delite/Widget", "de
 					if (tpl) {
 						deps = deps.concat(["requirejs-text/text!" + tpl]);
 					}
-					var loadViewDeferred = new Deferred();
-					require(deps, function () {
-						this.templateString = this.template ?
-							arguments[arguments.length - 1] : "<div></div>";
-						loadViewDeferred.resolve(this);
+					var loadViewPromise = Promise(function (resolve) {
+						require(deps, function () {
+							this.templateString = this.template ?
+								arguments[arguments.length - 1] : "<div></div>";
+							resolve(this);
+						}.bind(this));
 					}.bind(this));
-					return loadViewDeferred;
+					return loadViewPromise;
 				}
 			},
 
 			// start view
 			load: dcl.superCall(function (sup) {
 				return function () {
-					var tplDef = new Deferred();
-					var defDef = sup.call(this);
-					var nlsDef = nls(this);
-					// when parentView loading is done (controller), proceed with template
-					defDef.then(function (controller) {
-						when(nlsDef, function (nls) {
-							// we inherit from the parentView NLS
-							this.nls = {};
-							if (this.parentView) {
-								dcl.mix(this.nls, this.parentView.nls);
-							}
-							if (nls) {
-								// make sure template can access nls doing {{nls.myprop}}
-								dcl.mix(this.nls, nls);
-							}
-							when(this._loadTemplate(), function () {
-								tplDef.resolve(controller);
-							});
+					var tplPromise = Promise(function (resolve) {
+						var defDef = sup.call(this);
+						var nlsDef = nls(this);
+						// when parentView loading is done (controller), proceed with template
+						defDef.then(function (controller) {
+							return Promise.resolve(nlsDef).then(function (nls) {
+								// we inherit from the parentView NLS
+								this.nls = {};
+								if (this.parentView) {
+									dcl.mix(this.nls, this.parentView.nls);
+								}
+								if (nls) {
+									// make sure template can access nls doing {{nls.myprop}}
+									dcl.mix(this.nls, nls);
+								}
+								return Promise.resolve(this._loadTemplate()).then(function () {
+									resolve(controller);
+								});
+							}.bind(this));
 						}.bind(this));
 					}.bind(this));
-					return tplDef.promise;
+					return tplPromise;
 				};
 			}),
 

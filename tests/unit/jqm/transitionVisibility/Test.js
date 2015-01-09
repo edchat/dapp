@@ -57,9 +57,9 @@ define([
 		"jqmTransitionVisibilitySuite dapp jqmTransitionVisibility test initial layout": function () {
 			this.timeout = 20000;
 
-			var appStartedDef = new Application(JSON.parse(stripComments(jqmTransitionVisibilityconfig)),
+			var appStartedPromise = new Application(JSON.parse(stripComments(jqmTransitionVisibilityconfig)),
 				jqmTransitionVisibilityContainer3);
-			return appStartedDef.then(function (app) {
+			return appStartedPromise.then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -80,12 +80,12 @@ define([
 		},
 		"Test displayView (by view name) ": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
+			var displayPromise = new Deferred();
 
 			testApp.showOrHideViews('jqmTransitionVisibilityAppHome2', {
-				displayDeferred: displayDeferred
+				displayPromise: displayPromise
 			});
-			return displayDeferred.then(function () {
+			return displayPromise.then(function () {
 				var jqmTransitionVisibilityAppHome2 = $("#jqmTransitionVisibilityAppHome2");
 				var jqmTransitionVisibilityAppHome2ActiveTest =
 					$("#jqmTransitionVisibilityAppHome2").hasClass("ui-page-active");

@@ -31,7 +31,7 @@ define([
 			hideViewNode = document.getElementById("hideViewApp3dviewStack");
 
 		},
-		"test initial view": function () {
+		"test initial view and hide hideViewApp3Home1": function () {
 			this.timeout = 20000;
 
 			return new Application(JSON.parse(stripComments(hideViewconfig)), hideViewContainer)
@@ -55,28 +55,24 @@ define([
 						"hideViewApp3Home1View._beforeActivateCallCount should be 1");
 
 					checkNodeVisibility(hideViewNode, hideViewApp3Home1);
-				});
-		},
-
-		// Currently showing hideViewApp3Home1View test transition to hide it
-		"hideViewNode.hide(hideViewApp3Home1)": function () {
-			this.timeout = 20000;
+				})
+			// Currently showing hideViewApp3Home1View test transition to hide it
+			.then(function () {
 			return hideViewNode.hide("hideViewApp3Home1").then(function () {
 				var hideViewApp3Home1 = document.getElementById("hideViewApp3Home1");
 				hideViewApp3Home1View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home1");
 				assert.isNull(hideViewApp3Home1);
 				assert.isNull(hideViewApp3Home1View.parentNode);
-			});
+			})
+			})
 
 		},
 		// Currently showing hideViewApp3Home1 test transition back to hideViewApp3Home2
-		"testApp.showOrHideViews('hideViewApp3Home2')": function () {
+		"testApp.show and then hide 'hideViewApp3Home2'": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
-			testApp.showOrHideViews('hideViewApp3Home2', {
-				displayDeferred: displayDeferred
-			});
-			return displayDeferred.then(function () {
+			//var displayPromise = new Deferred();
+			return testApp.showOrHideViews('hideViewApp3Home2')
+			.then(function () {
 				var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
 				hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
 				checkNodeVisibility(hideViewNode, hideViewApp3Home2);
@@ -88,17 +84,10 @@ define([
 				checkDeactivateCallCount(hideViewApp3Home3NoControllerView, 1);
 				// Now hideViewApp3Home1View DeactivateCallCounts should be 2
 				checkDeactivateCallCount(hideViewApp3Home1View, 1);
-			});
-		},
-
-		// Currently showing hideViewApp3Home2 test hide hideViewApp3Home2
-		"testApp.showOrHideViews('-hideViewApp3Home2') Hide View": function () {
-			this.timeout = 20000;
-			var displayDeferred = new Deferred();
-			testApp.showOrHideViews('-hideViewApp3Home2', {
-				displayDeferred: displayDeferred
-			});
-			return displayDeferred.then(function () {
+			})
+			.then(function () {
+			return testApp.showOrHideViews('-hideViewApp3Home2')
+			.then(function () {
 				var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
 				hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
 				assert.isNull(hideViewApp3Home2);
@@ -114,7 +103,8 @@ define([
 
 				// Now hideViewApp3Home3NoControllerView DeactivateCallCounts should be 2
 				checkDeactivateCallCount(hideViewApp3Home2View, 1);
-			});
+			})
+			})
 		},
 		// Currently showing nothing test transition to hideViewApp3Home3NoController
 		"hideViewNode.show('hideViewApp3Home3NoController')": function () {

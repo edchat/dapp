@@ -4,13 +4,13 @@ define([
 	"intern/chai!assert",
 	"decor/sniff",
 	"dapp/Application",
-	"dojo/Deferred",
+	"lie/dist/lie",
 	"requirejs-text/text!dapp/tests/unit/dstoreMemory/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack",
 	"deliteful/list/List",
 	"dstore/Memory"
-], function (registerSuite, assert, has, Application, Deferred, dstoreMemoryconfig1) {
+], function (registerSuite, assert, has, Application, Promise, dstoreMemoryconfig1) {
 	// -------------------------------------------------------------------------------------- //
 
 	console.log("has(ie) = " + has("ie"));
@@ -100,15 +100,15 @@ define([
 		// Currently showing dstoreMemoryAppHome1 test transition to dstoreMemoryAppHome2
 		"testApp.showOrHideViews('dstoreMemoryAppHome2')": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
-			var label = dstoreMemorylist1Elements[0].innerHTML || "";
-			testApp.showOrHideViews("dstoreMemoryAppHome2", {
-				viewData: {
-					label: label
-				},
-				displayDeferred: displayDeferred
-			});
-			return displayDeferred.then(function () {
+		//	return Promise(function (resolve) {
+				var label = dstoreMemorylist1Elements[0].innerHTML || "";
+			return testApp.showOrHideViews("dstoreMemoryAppHome2", {
+					viewData: {
+						label: label
+					}//,
+			//		displayPromise: resolve
+			//	});
+			}).then(function () {
 				var dstoreMemoryList2 = document.getElementById("list2");
 				var dstoreMemoryAppHome2 = document.getElementById("dstoreMemoryAppHome2");
 				var header = dstoreMemoryAppHome2.getElementsByTagName("h2");
@@ -142,15 +142,15 @@ define([
 		// Currently showing dstoreMemoryAppHome2 test transition to dstoreMemoryAppHome1
 		"testApp.showOrHideViews('dstoreMemoryAppHome1')": function () {
 			this.timeout = 20000;
-			var displayDeferred = new Deferred();
 			var label = dstoreMemorylist2Elements[4].innerHTML || "";
-			testApp.showOrHideViews("dstoreMemoryAppHome1", {
-				viewData: {
-					label: label
-				},
-				displayDeferred: displayDeferred
-			});
-			return displayDeferred.then(function () {
+			//return Promise(function (resolve) {
+			return testApp.showOrHideViews("dstoreMemoryAppHome1", {
+					viewData: {
+						label: label
+					}//,
+				//	displayPromise: resolve
+			//	});
+			}).then(function () {
 				var dstoreMemoryList1 = document.getElementById("list2");
 				dstoreMemoryList1.deliver();
 				var dstoreMemoryAppHome1 = document.getElementById("dstoreMemoryAppHome1");

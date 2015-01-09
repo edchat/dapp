@@ -1,7 +1,7 @@
-define(["dcl/dcl", "dojo/when", "dojo/Deferred", "dojo/promise/all", "../TransitionBase", "../../utils/view",
+define(["dcl/dcl", "dojo/Deferred", "dojo/promise/all", "../TransitionBase", "../../utils/view",
 		"jquery", "jquery.mobile"
 	],
-	function (dcl, when, Deferred, all, TransitionBase, viewUtils, $) {
+	function (dcl, Deferred, all, TransitionBase, viewUtils, $) {
 
 		// summary:
 		//		A Transition controller to listen for "dapp-display" events and drive the transitions for those

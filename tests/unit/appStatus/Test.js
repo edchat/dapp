@@ -4,12 +4,10 @@ define([
 	"intern/chai!assert",
 	"dapp/Application",
 	"delite/register",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/appStatus/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, register, Deferred,
-	appStatusConfig) {
+], function (registerSuite, assert, Application, register, appStatusConfig) {
 	// for appStatusSuite
 	var appStatusContainer1,
 		testApp,
@@ -36,9 +34,7 @@ define([
 		"appStatusSuite dapp appStatus test app status": function () {
 			this.timeout = 20000;
 
-			// create the app from the config and wait for the deferred
-			//var appStartedDef = new Application(JSON.parse(stripComments(appStatusConfig)), appStatusContainer1);
-			//appStartedDef.then(function (appStatusTest) {
+			// create the app from the config and wait for the promise
 			return new Application(JSON.parse(stripComments(appStatusConfig)),
 				appStatusContainer1).then(function (appStatusTest) {
 				// we are ready to test

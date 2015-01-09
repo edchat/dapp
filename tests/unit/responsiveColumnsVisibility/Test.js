@@ -89,9 +89,9 @@ define([
 		"Desktop layout test initial views": function () {
 			this.timeout = 10000;
 
-			var appStartedDef = new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
+			var appStartedPromise = new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
 				responsiveColumnsVisibilityContainer1);
-			return appStartedDef.then(function (app) {
+			return appStartedPromise.then(function (app) {
 				// we are ready to test
 				console.log("in responsiveColumnsVisibility tests app loaded. " + app.id);
 				rctestApp = app;
@@ -109,11 +109,11 @@ define([
 
 		"Desktop Layout click slide BBB ": function () {
 			this.timeout = 10000;
-			var displayDeferred = new Deferred();
-			setupOnOnce(rctestApp, displayDeferred);
+			var displayPromise = new Deferred();
+			setupOnOnce(rctestApp, displayPromise);
 			var item = document.getElementById("showrcbbb");
 			item.click();
-			return displayDeferred.then(function (evt) {
+			return displayPromise.then(function (evt) {
 				checkTransitionDetails(evt, "rcbbb", "slide", false, rcvsNode);
 				testLayout(leftLayout, '20%');
 				testLayout(centerLayout, 'fill');
@@ -122,13 +122,13 @@ define([
 		},
 		"Tablet layout test rcaaa": function () {
 			this.timeout = 10000;
-			var displayDeferred = new Deferred();
-			setupOnOnce(rctestApp, displayDeferred);
+			var displayPromise = new Deferred();
+			setupOnOnce(rctestApp, displayPromise);
 			var item = document.getElementById("showrcaaa");
 			// force Tablet layout
 			rc.breakpoints = "{'phone': '100px', 'tablet': '99000px', 'desktop': '99999px'}";
 			item.click();
-			return displayDeferred.then(function (evt) {
+			return displayPromise.then(function (evt) {
 				// we are ready to test
 				rcvsNode = document.getElementById("vs");
 				var testId = "rcaaa";
@@ -144,11 +144,11 @@ define([
 
 		"Tablet Layout click slide BBB": function () {
 			this.timeout = 10000;
-			var displayDeferred = new Deferred();
-			setupOnOnce(rctestApp, displayDeferred);
+			var displayPromise = new Deferred();
+			setupOnOnce(rctestApp, displayPromise);
 			var item = document.getElementById("showrcbbb");
 			item.click();
-			return displayDeferred.then(function (evt) {
+			return displayPromise.then(function (evt) {
 				checkTransitionDetails(evt, "rcbbb", "slide", false, rcvsNode);
 				testLayout(leftLayout, '182px');
 				testLayout(centerLayout, 'fill');
@@ -157,13 +157,13 @@ define([
 		},
 		"Phone layout test rcaaa": function () {
 			this.timeout = 10000;
-			var displayDeferred = new Deferred();
-			setupOnOnce(rctestApp, displayDeferred);
+			var displayPromise = new Deferred();
+			setupOnOnce(rctestApp, displayPromise);
 			var item = document.getElementById("showrcaaa");
 			// force Phone layout
 			rc.breakpoints = "{'phone': '98000px', 'tablet': '99000px', 'desktop': '99999px'}";
 			item.click();
-			return displayDeferred.then(function (evt) {
+			return displayPromise.then(function (evt) {
 				// we are ready to test
 				rcvsNode = document.getElementById("vs");
 				var testId = "rcaaa";
@@ -179,11 +179,11 @@ define([
 
 		"Phone Layout click slide CCC": function () {
 			this.timeout = 10000;
-			var displayDeferred = new Deferred();
-			setupOnOnce(rctestApp, displayDeferred);
+			var displayPromise = new Deferred();
+			setupOnOnce(rctestApp, displayPromise);
 			var item = document.getElementById("centershowrcccc");
 			item.click();
-			return displayDeferred.then(function (evt) {
+			return displayPromise.then(function (evt) {
 				checkTransitionDetails(evt, "rcccc", "slide", false, rcvsNode);
 				testLayout(leftLayout, 'hidden');
 				testLayout(centerLayout, 'fill');
@@ -209,9 +209,9 @@ define([
 		assert.isTrue(evt.reverse ? rev : true, "evt.reverse=" + evt.reverse + " it should be " + rev);
 	}
 
-	function setupOnOnce(rctestApp, displayDeferred) {
+	function setupOnOnce(rctestApp, displayPromise) {
 		var signal = rctestApp.on("dapp-finished-transition", function (evt) {
-			displayDeferred.resolve(evt);
+			displayPromise.resolve(evt);
 			signal.unadvise();
 		});
 	}

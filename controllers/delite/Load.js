@@ -1,12 +1,13 @@
 define(
-	["require", "dcl/dcl", "dojo/Deferred", "../LoadBase", "../../utils/view", "../../viewFactory"],
-	function (require, dcl, Deferred, LoadBase, viewUtils, viewFactory) {
+	["require", "dcl/dcl", "../LoadBase", "../../utils/view", "../../viewFactory"],
+	function (require, dcl, LoadBase, viewUtils, viewFactory) {
 		var app; // need app in closure for loadMapper
 		var mapHandler;
 		var resolveView = function (event, newView, parentView) {
 			// in addition to arguments required by delite we pass our own needed arguments
 			// to get them back in the transitionDeferred
-			event.loadDeferred.resolve({
+		//	event.loadDeferred.resolve({
+			event.loadPromise.resolve({ // resolve
 				child: newView,
 				dapp: {
 					nextView: newView,

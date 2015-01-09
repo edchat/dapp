@@ -1,4 +1,4 @@
-define(["require", "dojo/Deferred"], function (require, Deferred) {
+define(["require", "lie/dist/lie"], function (require, Promise) {
 	/* jshint unused: vars */
 	return function ( /*Object*/ config, /*Object*/ parent) {
 		// summary:
@@ -10,13 +10,14 @@ define(["require", "dojo/Deferred"], function (require, Deferred) {
 		//		available to the view.
 		var path = config.nls;
 		if (path) {
-			var nlsDef = new Deferred();
-			require(["requirejs-dplugins/i18n!" + path], function (nls) {
-				nlsDef.resolve(nls);
-			});
-			return nlsDef;
+			var nlsPromise = Promise(function (resolve) {
+				require(["requirejs-dplugins/i18n!" + path], function (nls) {
+					resolve(nls);
+				});
+			}.bind(this));
+			return nlsPromise;
 		} else {
-			return false;
+			return Promise.resolve(true);
 		}
 	};
 });
