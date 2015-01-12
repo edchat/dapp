@@ -6,8 +6,7 @@ define(
 		var resolveView = function (event, newView, parentView) {
 			// in addition to arguments required by delite we pass our own needed arguments
 			// to get them back in the transitionDeferred
-		//	event.loadDeferred.resolve({
-			event.loadPromise.resolve({ // resolve
+			event.loadResolve({ // resolve
 				child: newView,
 				dapp: {
 					nextView: newView,
@@ -53,7 +52,7 @@ define(
 			},
 
 			_handleOnBeforeAndAfterShowHide: function (event) {
-				// After the loadDeferred is resolved, but before the view is displayed this event,
+				// After the loadResolve is resolved, but before the view is displayed this event,
 				// delite-before-show will be fired.
 				var self = this;
 				if (!event.dapp.hide) {

@@ -50,7 +50,7 @@
 			require(["./App1", "requirejs-domready/domReady!"], function(){
 				// Set global variable to signal that the test page is ready
 				console.log("in index.html inside dom ready");
-			//	ready = true; // moved ready = true into App1.js after the appDeferred is resolved.
+			//	ready = true; // moved ready = true into App1.js after the appStartedPromise is resolved.
 			//	console.log("in index.html after ready = true");
 			})
         </script>

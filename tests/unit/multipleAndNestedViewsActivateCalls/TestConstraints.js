@@ -6,11 +6,10 @@ define([
 	"dapp/Application",
 	"dapp/utils/view",
 	"delite/register",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/multipleAndNestedViewsActivateCalls/app1Constraints.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, viewUtils, register, Deferred,
+], function (registerSuite, assert, has, Application, viewUtils, register,
 	multipleAndNestedViewsActivateCallsconfig1) {
 	// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
 	if (has("ie") || has("ff")) {
@@ -79,8 +78,6 @@ define([
 			this.timeout = 20000;
 			return multipleAndNestedViewsActivateCallsApp1Content.show("V7").then(function () {
 				//temp test works on IE but does not help on FF
-				//var displayPromise = new Deferred();
-				//displayPromise.then(function () {
 				// TODO: NOTE this test fails on FF, and IE, the lines above work on IE, but not on FF.
 				// TODO: The failure seems to be caused by ViewStack not being notified with the transitionend for
 				// this case.
@@ -105,9 +102,7 @@ define([
 				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 1);
 			});
 			// temp test works on IE but does not help on FF
-			//testApp.showOrHideViews('content,V7', {
-			//displayPromise: displayPromise
-			//});
+			//testApp.showOrHideViews('content,V7');
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
@@ -156,11 +151,8 @@ define([
 		// Currently showing P1_S1_V2 test transition to V7
 		"testApp.showOrHideViews('contentCons,V7')": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('contentCons,V7', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('contentCons,V7')
+			.then(function () {
 				var multipleAndNestedViewsActivateCallsApp1V7 = document.getElementById("contentCons_V7");
 
 				checkNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
@@ -187,11 +179,8 @@ define([
 		// Currently showing V7 test transition to P1_S1_V1
 		"testApp.showOrHideViews('contentCons,P1') will show P1,S1,V1": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('contentCons,P1', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('contentCons,P1')
+			.then(function () {
 				var multipleAndNestedViewsActivateCallsApp1V1 = document.getElementById("contentCons_P1_S1_V1");
 				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
 					multipleAndNestedViewsActivateCallsApp1V1);
@@ -278,11 +267,8 @@ define([
 		// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V2
 		"testApp.showOrHideViews('contentCons,P2,P2S1,P2V2') will show P2,P2S1,P2V2": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('contentCons,P2,P2S1,P2V2', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('contentCons,P2,P2S1,P2V2')
+			.then(function () {
 				var multipleAndNestedViewsActivateCallsApp1P2V2 = document.getElementById("contentCons_P2_P2S1_P2V2");
 				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
 					multipleAndNestedViewsActivateCallsApp1P2V2);

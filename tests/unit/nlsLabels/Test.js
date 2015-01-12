@@ -5,12 +5,10 @@ define([
 	"decor/sniff",
 	"dapp/Application",
 	"dapp/utils/view",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/nlsLabels/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, viewUtils, Deferred,
-	nlsLabelsconfig3) {
+], function (registerSuite, assert, has, Application, viewUtils, nlsLabelsconfig3) {
 	if (has("ie") === 10) {
 		console.log("Skipping nlsLabelsSuite tests on IE10");
 		return;

@@ -1,5 +1,5 @@
-define(["dcl/dcl", "dojo/promise/all", "../TransitionBase", "../../utils/view"],
-	function (dcl, all, TransitionBase, viewUtils) {
+define(["dcl/dcl", "lie/dist/lie", "../TransitionBase", "../../utils/view"],
+	function (dcl, Promise, TransitionBase, viewUtils) {
 
 		// summary:
 		//		A Transition controller to listen for "dapp-display" events and drive the transitions for those

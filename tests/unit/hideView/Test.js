@@ -4,12 +4,10 @@ define([
 	"intern/chai!assert",
 	"dapp/Application",
 	"dapp/utils/view",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/hideView/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, viewUtils, Deferred,
-	hideViewconfig) {
+], function (registerSuite, assert, Application, viewUtils, hideViewconfig) {
 	// -------------------------------------------------------------------------------------- //
 	// for hideViewSuite transition test
 	var hideViewHtmlContent3 =
@@ -70,7 +68,6 @@ define([
 		// Currently showing hideViewApp3Home1 test transition back to hideViewApp3Home2
 		"testApp.show and then hide 'hideViewApp3Home2'": function () {
 			this.timeout = 20000;
-			//var displayPromise = new Deferred();
 			return testApp.showOrHideViews('hideViewApp3Home2')
 			.then(function () {
 				var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");

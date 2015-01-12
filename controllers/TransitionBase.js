@@ -1,5 +1,5 @@
-define(["dcl/dcl", "lie/dist/lie", "dojo/Deferred", "dojo/promise/all", "../Controller", "../utils/view"],
-	function (dcl, Promise, Deferred, all, Controller, viewUtils) {
+define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
+	function (dcl, Promise, Controller, viewUtils) {
 
 		// summary:
 		//		A Transition controller to listen for "dapp-display" events and drive the transitions for those
@@ -39,14 +39,14 @@ define(["dcl/dcl", "lie/dist/lie", "dojo/Deferred", "dojo/promise/all", "../Cont
 					viewData: event.viewData,
 					reverse: event.reverse,
 					transition: event.transition,
-					displayPromise: event.displayPromise,
+					displayResolve: event.displayResolve,
 					doingPopState: event.doingPopState,
 					viewParams: event.viewParams,
 					dapp: {}
 				});
 			},
 
-			_loadViewsInOrder: function (viewPaths, i, event, syncDef) {
+			_loadViewsInOrder: function (viewPaths, i, event, syncResolve) {
 				var self = this;
 				var dispViewDef = (viewPaths[i].remove) ?
 					this._hideView(viewPaths[i].dest, event, false, viewPaths[i]) :
@@ -54,54 +54,47 @@ define(["dcl/dcl", "lie/dist/lie", "dojo/Deferred", "dojo/promise/all", "../Cont
 				i++;
 				if (i < viewPaths.length) { // need to wait before loading the next views.
 					dispViewDef.then(function () {
-						dispViewDef = self._loadViewsInOrder(viewPaths, i, event, syncDef);
+						dispViewDef = self._loadViewsInOrder(viewPaths, i, event, syncResolve);
 					});
 				} else {
 					dispViewDef.then(function (value) {
-						syncDef.resolve(value);
+						syncResolve();
 					});
 				}
-				return syncDef.promise;
+				return syncResolve;
 
 			},
 
 			_handleMultipleViewParts: function (event) {
-				var defs = []; // list of deferreds that need to fire before I am complete
-			//	var defsPromises = []; // list of Promises that need to fire before I am complete
-
-				var syncDeferred;
-			//	var syncPromise;
+				var promises = []; // list of Promises that need to fire before I am complete
 				var viewPaths = viewUtils._getViewPaths(this.app, event.dest);
 				var self = this;
 				if (viewPaths) {
 					if (this.app.loadViewsInOrder || viewPaths[0].loadViewsInOrder) {
-						syncDeferred = new Deferred();
-				//		syncPromise = new Promise();
-						defs.push(syncDeferred);
-				//		defsPromises.push(syncPromise);
-						this._loadViewsInOrder(viewPaths, 0, event, syncDeferred);
-				//		this._loadViewsInOrderPromise(viewPaths, 0, event, syncPromise);
+						promises.push(Promise(function (syncresolve) {
+							this._loadViewsInOrder(viewPaths, 0, event, syncresolve);
+						}.bind(this)));
 					} else {
 						var i = 0;
 						while (i < viewPaths.length) {
 							var displayViewPromise = (viewPaths[i].remove) ?
 								self._hideView(viewPaths[i].dest, event, false, viewPaths[i]) :
 								self._displayView(viewPaths[i].dest, event, false, viewPaths[i]);
-							defs.push(displayViewPromise);
+							promises.push(displayViewPromise);
 							i++;
 							// need to wait before loading the next views if loadViewsInOrder is set.
 							if (i < viewPaths.length && viewPaths[i].loadViewsInOrder) {
-								syncDeferred = new Deferred();
-								defs.push(syncDeferred);
-								displayViewPromise.then(function () {
-									self._loadViewsInOrder(viewPaths, i, event, syncDeferred);
-								});
+								promises.push(Promise(function (syncresolve2) {
+									displayViewPromise.then(function () {
+										self._loadViewsInOrder(viewPaths, i, event, syncresolve2);
+									});
+								}.bind(this)));
 								break;
 							}
 						}
 					}
-					// check for all defs being complete here, and resolve displayPromise when all are resolved
-					all(defs).then(function (value) {
+					// check for all promises being complete here, and resolve displayResolve when all are resolved
+					Promise.all(promises).then(function (value) {
 						//	event.detail = {
 						//		"dest": event.dest,
 						//		"hash": event.hash,
@@ -110,13 +103,8 @@ define(["dcl/dcl", "lie/dist/lie", "dojo/Deferred", "dojo/promise/all", "../Cont
 						//		"transition": event.transition
 						//	};
 						self.app.emit("dapp-finished-transition", event);
-						if (event.displayPromise) {
-							if(event.displayPromise.resolve){ // TEMP OLD deferred used
-								console.log("TEMP msg using OLD Deferred instead of Promise resolve()");
-								event.displayPromise.resolve(value);
-							}else{ // new Promise used
-								event.displayPromise(value);
-							}
+						if (event.displayResolve) {
+							event.displayResolve(value);
 						}
 					});
 				}

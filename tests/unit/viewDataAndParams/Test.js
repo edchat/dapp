@@ -4,11 +4,11 @@ define([
 	"intern/chai!assert",
 	"dapp/Application",
 	"dapp/utils/view",
-	"dojo/Deferred",
+	"lie/dist/lie",
 	"requirejs-text/text!dapp/tests/unit/viewDataAndParams/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, viewUtils, Deferred, viewDataconfig3) {
+], function (registerSuite, assert, Application, viewUtils, Promise, viewDataconfig3) {
 	// -------------------------------------------------------------------------------------- //
 	// for viewDataSuite transition test
 	var viewDataContainer3,
@@ -69,17 +69,13 @@ define([
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
 		"testApp.showOrHideViews('viewDataAndParamsAppHome1', params) tests data passed to view": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-
 			//	viewDataNode3.show("viewDataAndParamsAppHome1");
 			var params = {
 				viewData: {
 					"p": "testData"
-				},
-				displayPromise: displayPromise
-			};
-			testApp.showOrHideViews('viewDataAndParamsAppHome1', params);
-			return displayPromise.then(function () {
+				}};
+			return testApp.showOrHideViews('viewDataAndParamsAppHome1', params)
+			.then(function () {
 				var viewDataAndParamsAppHome1 = document.getElementById("viewDataAndParamsAppHome1");
 				checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome1);
 
@@ -96,8 +92,6 @@ define([
 
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
 		"testApp.showOrHideViews('parentV1,s1', viewData) tests data passed to subview": function () {
-			this.timeout = 20000;
-			var displayPromise = new Deferred();
 			//	viewDataNode3.show("viewDataAndParamsAppHome1");
 			var params = {
 				viewData: {
@@ -110,11 +104,10 @@ define([
 							"fromChild": "valuefromChild"
 						}
 					}
-				},
-				displayPromise: displayPromise
-			};
-			testApp.showOrHideViews('parentV1,s1', params);
-			return displayPromise.then(function () {
+				}};
+			this.timeout = 20000;
+			return testApp.showOrHideViews('parentV1,s1', params)
+			.then(function () {
 				//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
 				var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
 
@@ -138,8 +131,6 @@ define([
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
 		"testApp.showOrHideViews('parentV1,s1', viewParams) tests params passed to subview": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			//	viewDataNode3.show("viewDataAndParamsAppHome1");
 			var params = {
 				viewParams: {
 					"p": "testData",
@@ -151,11 +142,9 @@ define([
 							"fromParent": "paramValuefromParent"
 						}
 					}
-				},
-				displayPromise: displayPromise
-			};
-			testApp.showOrHideViews('parentV1,s1', params);
-			return displayPromise.then(function () {
+				}};
+			return testApp.showOrHideViews('parentV1,s1', params)
+			.then(function () {
 				//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
 				var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
 

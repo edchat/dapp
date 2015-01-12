@@ -7,11 +7,10 @@ define([
 	"dojo/dom-geometry",
 	"dojo/dom-class",
 	"delite/register",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/viewLayout/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, domGeom, domClass, register, Deferred, viewLayoutconfig) {
+], function (registerSuite, assert, has, Application, domGeom, domClass, register, viewLayoutconfig) {
 	// -------------------------------------------------------------------------------------- //
 
 	if (has("ie") === 10) {
@@ -40,7 +39,7 @@ define([
 		"viewLayoutSuite dapp viewLayout test domNode sizes": function () {
 			this.timeout = 20000;
 
-			// create the app from the config and wait for the deferred
+			// create the app from the config and wait for the promise
 			return new Application(JSON.parse(stripComments(viewLayoutconfig)), viewLayoutContainer2)
 				.then(function (app) {
 					// we are ready to test

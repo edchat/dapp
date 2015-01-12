@@ -13,9 +13,10 @@ define([
 			"jquery.mobile.css": "http://code.jquery.com/mobile/1.4.4/",
 
 			// this works without the JQM tests
-			"jquery": "jquery"
+			//"jquery": "jquery"
 
 			// this works with the JQM tests
+			"jquery": "jquery/dist/jquery.min"
 		//	"jquery": "https://code.jquery.com/jquery-2.1.1.min"
 
 		},

@@ -76,8 +76,6 @@ define([
 			// Currently showing P1_S1_V1 test transition to V7
 			return multipleAndNestedViewsActivateCallsApp1Content.show("V7").then(function () {
 				//temp test works on IE but does not help on FF
-				//var displayPromise = new Deferred();
-				//displayPromise.then(function () {
 				// TODO: NOTE this test fails on FF, and IE, the lines above work on IE, but not on FF.
 				// TODO: The failure seems to be caused by ViewStack not being notified with the transitionend for
 				// this case.
@@ -102,9 +100,7 @@ define([
 			})
 			})
 			// temp test works on IE but does not help on FF
-			//testApp.showOrHideViews('content,V7', {
-			//displayPromise: displayPromise
-			//});
+			//testApp.showOrHideViews('content,V7');
 			// Currently showing V7 test transition to P1_S1_V1
 			.then(function () {
 		 	return multipleAndNestedViewsActivateCallsApp1Content.show("P1").then(function () {

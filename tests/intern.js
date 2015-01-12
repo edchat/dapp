@@ -18,11 +18,11 @@ define({
 		// Desktop.
 		//{ browserName: "internet explorer", version: "11", platform: "Windows 8.1", name : "dapp" },
 		//{ browserName: "internet explorer", version: "10", platform: "Windows 8", name : "dapp" },
-	//	{ browserName: "firefox", version: "31", platform: [ /*"OS X 10.6", "Linux", */ "Windows 7" ],
-	//		name : "dapp"},
+		{ browserName: "firefox", version: "31", platform: [ /*"OS X 10.6", "Linux", */ "Windows 7" ],
+			name : "dapp"},
 		{ browserName: "chrome", version: "32", platform: [ /*"OS X 10.6", "Linux", */ "Windows 7" ],
-			name : "dapp"}//,
-	//	{ browserName: "safari", version: "7", platform: [ "OS X 10.9" ], name : "dapp"}//,
+			name : "dapp"},
+		{ browserName: "safari", version: "7", platform: [ "OS X 10.9" ], name : "dapp"}//,
 
 		// Mobile
 	//	{ platformName: "iOS", platformVersion: "7.1", browserName: "safari", deviceName: "iPhone Simulator",
@@ -54,9 +54,10 @@ define({
 			"jquery.mobile.css": "http://code.jquery.com/mobile/1.4.4/",
 
 			// this works without the JQM tests
-			"jquery": "jquery"
+		//	"jquery": "jquery"
 
 			// this works with the JQM tests
+			"jquery": "jquery/dist/jquery.min"
 		//	"jquery": "https://code.jquery.com/jquery-2.1.1.min"
 		},
 		shim: {

@@ -1,6 +1,6 @@
 define(
-	["require", "dcl/dcl", "lie/dist/lie", "dojo/Deferred", "../Controller", "../utils/view"],
-	function (require, dcl, Promise, Deferred, Controller, viewUtils) {
+	["require", "dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
+	function (require, dcl, Promise, Controller, viewUtils) {
 		var app; // need app in closure for loadMapper
 		return dcl(Controller, {
 			constructor: function (newapp) {
@@ -11,18 +11,8 @@ define(
 				event.preventDefault(); // to indicate that dapp will load the view
 				// load the actual view
 
-				//ELC for new Promise support
-				event.loadPromise = new Deferred();
-			//	event.loadPromise = Promise(function (resolve) {
-					if(event.setChild) {
-						event.setChild(new Promise(function (resolve) {
-							// use setTimeout to simulate fetch of data, then create a node
-							event.loadPromise.then(function (viewData) {
-								resolve(viewData);
-							});
-						}));
-					}
-
+				event.loadPromise = new Promise(function (loadResolve) {
+					event.loadResolve = loadResolve;
 					//Need to handle calls directly from node.show or node.hide that did not come from transition
 					if (!event.dapp || !event.dapp.parentView) {
 						//This must be a direct call from .show or .hide, need to setup event.dapp with parentView etc.
@@ -59,7 +49,16 @@ define(
 							event.dapp.parentNode, event.dapp.isParent, event.dapp.parentView.views[event.dest].type,
 							event.dapp.viewPath);
 					}
-			//	}.bind(this));
+				}.bind(this));
+
+				if(event.setChild) {
+					event.setChild(new Promise(function (resolve) {
+						// use setTimeout to simulate fetch of data, then create a node
+						event.loadPromise.then(function (viewData) {
+							resolve(viewData);
+						});
+					}));
+				}
 			},
 
 			_setupEventDapp: function (event) {
@@ -93,31 +92,27 @@ define(
 			_handleShowFromDispContainer: function (event, dest) {
 				if (!dest) { // this is not a dapp view, so it should be loaded, resolve it
 					var child = document.getElementById(event.dest);
-				//	event.loadDeferred.resolve({
-				//		child: child
-				//	});
-					event.setChild({
+					event.loadResolve({
 						child: child
 					});
 					return;
 				}
-			//	var tempdisplayPromise = new Deferred();
-				var savedLoadDeferred = event.loadPromise;
-				var tempdisplayPromise = Promise(function (resolve) {
+				var savedloadResolve = event.loadResolve;
+				var tempdisplayProm = Promise(function (resolve) {
 					this.app.emit("dapp-display", {
 						dest: dest,
 						transition: event.transition,
 						reverse: event.reverse,
-						displayPromise: resolve,
+						displayResolve: resolve,
 						bubbles: true,
 						cancelable: true
 					});
 				}.bind(this));
-				tempdisplayPromise.then(function (value) {
+				tempdisplayProm.then(function (value) {
 					// resolve the loadDeferred here, do not need dapp stuff since we are not waiting on the
 					// "delite-before-show" or "delite-after-show" it was handled already by the emit
 					// for "dapp-display" above.
-					savedLoadDeferred.resolve({ //
+					savedloadResolve({ //
 						child: value[0].child
 					});
 				});

@@ -105,9 +105,7 @@ define([
 			return testApp.showOrHideViews("dstoreMemoryAppHome2", {
 					viewData: {
 						label: label
-					}//,
-			//		displayPromise: resolve
-			//	});
+					}
 			}).then(function () {
 				var dstoreMemoryList2 = document.getElementById("list2");
 				var dstoreMemoryAppHome2 = document.getElementById("dstoreMemoryAppHome2");
@@ -147,9 +145,7 @@ define([
 			return testApp.showOrHideViews("dstoreMemoryAppHome1", {
 					viewData: {
 						label: label
-					}//,
-				//	displayPromise: resolve
-			//	});
+					}
 			}).then(function () {
 				var dstoreMemoryList1 = document.getElementById("list2");
 				dstoreMemoryList1.deliver();

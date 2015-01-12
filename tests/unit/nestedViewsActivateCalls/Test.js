@@ -5,11 +5,11 @@ define([
 	"decor/sniff",
 	"dapp/Application",
 	"dapp/utils/view",
-	"dojo/Deferred",
+	"lie/dist/lie",
 	"requirejs-text/text!dapp/tests/unit/nestedViewsActivateCalls/app1.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, viewUtils, Deferred,
+], function (registerSuite, assert, has, Application, viewUtils, Promise,
 	nestedViewsActivateCallsconfig1) {
 	// nestedViewsActivateCallsSuite1 is having problems on IE10, IE11 and FF
 	if (has("ie") || has("ff")) {
@@ -176,11 +176,8 @@ define([
 				// This test is not reliable on Firefox
 				return;
 			}
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('V7', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('V7')
+			.then(function () {
 				var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
 				checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V7);
 
@@ -209,11 +206,8 @@ define([
 				// This test is not reliable on Firefox
 				return;
 			}
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('P1', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('P1')
+			.then(function () {
 				var nestedViewsActivateCallsApp1V1 = document.getElementById("P1_S1_V1");
 				checkNestedNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V1);
 
@@ -239,10 +233,10 @@ define([
 				// This test is not reliable on Firefox
 				return;
 			}
-			var displayPromise = new Deferred();
-			setupOnOnce(testApp, displayPromise);
-			history.back();
-			return displayPromise.then(function () {
+			return Promise(function (resolve) {
+				setupOnOncePromise(testApp, resolve)
+				history.back()
+			}).then(function () {
 				var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
 				checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V7);
 
@@ -282,9 +276,9 @@ define([
 
 	registerSuite(nestedViewsActivateCallsSuite1);
 
-	function setupOnOnce(testApp, displayPromise) {
-		var signal = testApp.on("dapp-finished-transition", function () {
-			displayPromise.resolve();
+	function setupOnOncePromise(testApp, resolve) {
+		var signal = testApp.on("dapp-finished-transition", function (evt) {
+			resolve(evt);
 			signal.unadvise();
 		});
 	}

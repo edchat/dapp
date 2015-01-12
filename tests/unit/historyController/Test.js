@@ -65,36 +65,24 @@ define([
 				hc1right1View = viewUtils.getViewFromViewId(testApp, "hc1right1");
 				hc1footer1View = viewUtils.getViewFromViewId(testApp, "hc1footer1");
 				checkActivateCallCount(hc1header1View, 1);
-			}).then(function () {
-				var hc1header1content = hc1header1View.containerNode;
-				assert.isNotNull(hc1header1content, "hc1header1content must be here");
-			}).then(function () {
-				var hc1center1content = hc1header1View.containerNode;
+				assert.isNotNull(hc1header1View.containerNode, "hc1header1View.containerNode must be here");
 				checkActivateCallCount(hc1center1View, 1);
-				assert.isNotNull(hc1center1content, "hc1center1 must be here");
-				checkNodeVisibile(hc1center1content);
-			}).then(function () {
-				var hc1right1content = hc1right1View.containerNode;
+				assert.isNotNull(hc1header1View.containerNode, "hc1header1View.containerNode must be here");
+				checkNodeVisibile(hc1header1View.containerNode);
 				checkActivateCallCount(hc1right1View, 1);
-				assert.isNotNull(hc1right1content, "hc1right1content must be here");
-				checkNodeVisibile(hc1right1content);
+				assert.isNotNull(hc1right1View.containerNode, "hc1right1View.containerNode must be here");
+				checkNodeVisibile(hc1right1View.containerNode);
 
-				var hc1footer1content = hc1footer1View.containerNode;
-				checkActivateCallCount(hc1footer1View, 1);
-				assert.isNotNull(hc1footer1content, "hc1footer1content must be here");
+				assert.isNotNull(hc1footer1View.containerNode, "hc1footer1View.containerNode must be here");
 
-			}).then(function () {
-				var currentHash = window.location.hash;
-				assert.strictEqual(currentHash, "#hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1",
-					" currentHash should be #hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1");
-			}).then(function () {
+				assert.strictEqual(window.location.hash, "#hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1",
+					" window.location.hash should be #hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1");
 			// Currently showing hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1 test
 			// showOrHideViews('hc1center2'
 			return Promise(function (resolve) {
 				testApp.showOrHideViews('hc1center2', {
-					displayPromise: resolve
+					displayResolve: resolve
 				})
-		//	.then(function () {
 			}).then(function () {
 				var hc1center2content = document.getElementById("hc1center2");
 				var hc1center2View = viewUtils.getViewFromViewId(testApp, "hc1center2");
@@ -107,9 +95,8 @@ define([
 			}).then(function () {
 			// Currently showing hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1 test
 			// showOrHideViews('hc1center3' with viewParams for hclcenter3
-		//	return Promise(function (resolve) {
 				var params = {
-//					displayPromise: resolve,
+//					displayResolve: resolve,
 					"viewParams": {
 						"views": {
 							"hc1center3": {
@@ -119,19 +106,14 @@ define([
 					}
 				};
 			return testApp.showOrHideViews('hc1center3', params)
-		//	})
 			.then(function () {
 				var hc1center3content = document.getElementById("hc1center3");
 				var hc1center3View = viewUtils.getViewFromViewId(testApp, "hc1center3");
 				checkNodeVisibile(hc1center3content);
 				checkActivateCallCount(hc1center3View, 1, true);
-			}).then(function () {
-				var currentHash = window.location.hash;
-				assert.strictEqual(currentHash,
+				assert.strictEqual(window.location.hash,
 					"#hc1header1+hc1centerParent+(hc1center3&pTestVal1=value1)+hc1right1+hc1footer1",
-					" currentHash should include (hc1center3&pTestVal1=value1)+hc1right1+hc1footer1");
-			})
-			.then(function () {
+					" window.location.hash should include (hc1center3&pTestVal1=value1)+hc1right1+hc1footer1");
 			// Currently showing hc1header1+hc1centerParent+hc1center3+hc1right1+hc1footer1 test
 			// history.back() to get back to hc1center2
 			return Promise(function (resolve) {
@@ -140,18 +122,18 @@ define([
 			}).then(function () {
 				var hc1center2content = document.getElementById("hc1center2");
 				var hc1center2View = viewUtils.getViewFromViewId(testApp, "hc1center2");
-				checkNodeVisibile(hc1center2content);
+				checkNodeVisibile(document.getElementById("hc1center2"));
 				checkActivateCallCount(hc1center2View, 2, true);
 				var currentHash = window.location.hash;
 				assert.strictEqual(currentHash, "#hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1",
 					" currentHash should be #hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1");
-				});
+				})
 			}).then(function () {
 			// Currently showing hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1 test
 			// history.back() to get back to hc1center1
 			return Promise(function (resolve) {
 				setupOnOncePromise(testApp, resolve);
-				history.back();
+				history.back()
 			}).then(function () {
 				var hc1center1content = document.getElementById("hc1center1");
 				var hc1center1View = viewUtils.getViewFromViewId(testApp, "hc1center1");
@@ -161,24 +143,19 @@ define([
 				var currentHash = window.location.hash;
 				assert.strictEqual(currentHash, "#hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1",
 					" currentHash should be #hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1");
-			});
-			}).then(function () {
 			// Currently showing hc1header1+hc1centerParent+hc1center1+hc1right1+hc1footer1 test
 			// history.forward() to get to hc1center2
-			return Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
-				history.forward();
+				return Promise(function (resolve) {
+					setupOnOncePromise(testApp, resolve);
+					history.forward();
+				})
 			}).then(function () {
 				var hc1center2content = document.getElementById("hc1center2");
 				var hc1center2View = viewUtils.getViewFromViewId(testApp, "hc1center2");
 				checkNodeVisibile(hc1center2content);
 				checkActivateCallCount(hc1center2View, 3, true);
-			}).then(function () {
-				var currentHash = window.location.hash;
-				assert.strictEqual(currentHash, "#hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1",
-					" currentHash should be #hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1");
-			});
-			}).then(function () {
+				assert.strictEqual(window.location.hash, "#hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1",
+					" window.location.hash should be #hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1")
 			// Currently showing hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1 test
 			// history.forward() to get to hc1center3)
 			return Promise(function (resolve) {
@@ -189,18 +166,17 @@ define([
 				var hc1center3View = viewUtils.getViewFromViewId(testApp, "hc1center3");
 				checkNodeVisibile(hc1center3content);
 				checkActivateCallCount(hc1center3View, 2, true);
-			}).then(function () {
-				var currentHash = window.location.hash;
-				assert.strictEqual(currentHash,
+				assert.strictEqual(window.location.hash,
 					"#hc1header1+hc1centerParent+(hc1center3&pTestVal1=value1)+hc1right1+hc1footer1",
-					" currentHash should include (hc1center3&pTestVal1=value1)+hc1right1+hc1footer1");
-			});
+					" window.location.hash should include (hc1center3&pTestVal1=value1)+hc1right1+hc1footer1")
+			})
+			})
 			}).then(function () {
 			// Currently showing hc1header1+hc1centerParent+hc1center3+hc1right1+hc1footer1 test
 			// showOrHideViews('-hc1right1'
 			return Promise(function (resolve) {
 				testApp.showOrHideViews('-hc1right1', {
-					displayPromise: resolve
+					displayResolve: resolve
 				});
 			}).then(function () {
 				var hc1rightPane = document.getElementById("hc1rightPane");
@@ -247,7 +223,7 @@ define([
 			// showOrHideViews('leftParent,left1'
 			return Promise(function (resolve) {
 				var viewParams = {
-					displayPromise: resolve,
+					displayResolve: resolve,
 					"viewParams": {
 						'pTestVal': "value1"
 					}
@@ -274,7 +250,7 @@ define([
 			// got a warning because hc1leftParent was not found as the parent of left1
 			return Promise(function (resolve) {
 				testApp.showOrHideViews('-hc1leftParent', {
-					displayPromise: resolve
+					displayResolve: resolve
 				});
 			}).then(function () {
 				//var hc1rightPane = document.getElementById("hc1rightPane");
@@ -317,7 +293,7 @@ define([
 			// showOrHideViews('leftParent,left2'
 			return Promise(function (resolve) {
 				var params = {
-					displayPromise: resolve,
+					displayResolve: resolve,
 					"viewParams": {
 						"views": {
 							"hc1leftParent": {
@@ -365,7 +341,7 @@ define([
 			// showOrHideViews('leftParent,left1'
 			return Promise(function (resolve) {
 				var params = {
-					displayPromise: resolve,
+					displayResolve: resolve,
 					"viewParams": {
 						"views": {
 							"hc1leftParent": {
@@ -451,7 +427,7 @@ define([
 			// showOrHideViews('leftParent,left2' with viewData
 			return Promise(function (resolve) {
 				var params = {
-					displayPromise: resolve,
+					displayResolve: resolve,
 					"viewData": {
 						"views": {
 							"hc1leftParent": {
@@ -487,7 +463,7 @@ define([
 			// showOrHideViews('leftParent,left1'
 			return Promise(function (resolve) {
 				var params = {
-					displayPromise: resolve,
+					displayResolve: resolve,
 					"viewData": {
 						"views": {
 							"hc1leftParent": {
@@ -567,7 +543,7 @@ define([
 			return Promise(function (resolve) {
 				var params = {
 					hash: "testHash1",
-					displayPromise: resolve
+					displayResolve: resolve
 				};
 				testApp.showOrHideViews('hc1leftParent,hc1left2', params);
 			}).then(function () {
@@ -585,7 +561,7 @@ define([
 			return Promise(function (resolve) {
 				var params = {
 					hash: "testHash2",
-					displayPromise: resolve,
+					displayResolve: resolve,
 					"viewParams": {
 						'pTestVal': "value2"
 					}
@@ -623,7 +599,7 @@ define([
 			// history.forward() to get back to hc1leftParent,hc1left1 with hash set
 			return Promise(function (resolve) {
 				setupOnOncePromise(testApp, resolve);
-				history.forward();
+				history.forward()
 			}).then(function () {
 				var hc1left1content = document.getElementById("hc1leftParent_hc1left1");
 				var hc1left1View = viewUtils.getViewFromViewId(testApp, "hc1leftParent_hc1left1");

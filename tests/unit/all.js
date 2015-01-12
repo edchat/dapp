@@ -13,8 +13,7 @@ define([
 	"./nestedViewsActivateCalls/Test",
 	"./sidePaneViewsActivateCalls/Test",
 	"./historyController/Test",
-
-//	"./jqm/hideViewJqm/Test",
-	"./dstoreMemory/Test"
-//	,"./jqm/transitionVisibility/Test"
+	"./jqm/hideViewJqm/Test",
+	"./dstoreMemory/Test",
+	"./jqm/transitionVisibility/Test"
 ]);

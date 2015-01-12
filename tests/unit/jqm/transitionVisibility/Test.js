@@ -25,13 +25,12 @@ define([
 	"intern!object",
 	"intern/chai!assert",
 	"dapp/Application",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/jqm/transitionVisibility/app.json",
 	"jquery",
 	"jquery.mobile",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, Deferred, jqmTransitionVisibilityconfig, $) {
+], function (registerSuite, assert, Application, jqmTransitionVisibilityconfig, $) {
 	// -------------------------------------------------------------------------------------- //
 	// for jqmTransitionVisibilitySuite
 	var jqmTransitionVisibilityContainer3,
@@ -80,12 +79,8 @@ define([
 		},
 		"Test displayView (by view name) ": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-
-			testApp.showOrHideViews('jqmTransitionVisibilityAppHome2', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('jqmTransitionVisibilityAppHome2')
+			.then(function () {
 				var jqmTransitionVisibilityAppHome2 = $("#jqmTransitionVisibilityAppHome2");
 				var jqmTransitionVisibilityAppHome2ActiveTest =
 					$("#jqmTransitionVisibilityAppHome2").hasClass("ui-page-active");

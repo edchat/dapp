@@ -6,12 +6,10 @@ define([
 	"dapp/Application",
 	"dapp/utils/view",
 	"delite/register",
-	"dojo/Deferred",
 	"requirejs-text/text!dapp/tests/unit/sidePaneViewsActivateCalls/app1.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, viewUtils, register, Deferred,
-	sidePaneViewsActivateCallsconfig1) {
+], function (registerSuite, assert, Application, viewUtils, register, sidePaneViewsActivateCallsconfig1) {
 	// -------------------------------------------------------------------------------------- //
 	// for sidePaneViewsActivateCallsSuite1 transition test
 	var sidePaneViewsActivateCallsContainer1, sidePaneViewsActivateCallsNode1;
@@ -82,11 +80,8 @@ define([
 		// showOrHideViews('-sp1right1'
 		"Hide sp1right1 with testApp.showOrHideViews('-sp1right1')": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('-sp1right1', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('-sp1right1')
+			.then(function () {
 				var sp1rightPane = document.getElementById("sp1rightPane");
 				assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
 				checkActivateCallCount(sp1right1View, 1, true);
@@ -97,11 +92,8 @@ define([
 		// showOrHideViews('leftParent,left1'
 		"show sp1left1 with testApp.showOrHideViews('sp1leftParent,sp1left1')": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('sp1leftParent,sp1left1', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('sp1leftParent,sp1left1')
+			.then(function () {
 				var sp1left1content = document.getElementById("sp1leftParent_sp1left1");
 				var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
 
@@ -114,11 +106,8 @@ define([
 		// got a warning because sp1leftParent was not found as the parent of left1
 		"Hide sp1left1 with testApp.showOrHideViews('-sp1leftParent')": function () {
 			this.timeout = 20000;
-			var displayPromise = new Deferred();
-			testApp.showOrHideViews('-sp1leftParent,sp1left1-sp1leftParent', {
-				displayPromise: displayPromise
-			});
-			return displayPromise.then(function () {
+			return testApp.showOrHideViews('-sp1leftParent,sp1left1-sp1leftParent')
+			.then(function () {
 				var sp1rightPane = document.getElementById("sp1rightPane");
 				var sp1left1content = document.getElementById("sp1leftPane");
 				var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");

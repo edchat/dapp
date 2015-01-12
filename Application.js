@@ -37,7 +37,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 				// viewParams:
 				//		Contains the viewParams for the event which can include transition and direction.
 				// returns:
-				// 		displayPromise which is resolved when the showOrHideViews is complete
+				// 		Promise which is resolved when the showOrHideViews is complete
 				var opts = {
 					bubbles: true,
 					cancelable: true,
@@ -45,8 +45,8 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 					hash: hash
 				};
 				var passedPromise = null;
-				if(viewParams && viewParams.displayPromise) {
-					passedPromise = viewParams.displayPromise;
+				if(viewParams && viewParams.displayResolve) {
+					passedPromise = viewParams.displayResolve;
 				}
 				return Promise(function (resolve) {
 					dcl.mix(opts,
@@ -54,15 +54,11 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 							transition: "slide",
 							direction: "end"
 					});
-					dcl.mix(opts, {displayPromise: resolve});
+					dcl.mix(opts, {displayResolve: resolve});
 					this.emit("dapp-display", opts);
 				}.bind(this)).then(function (resolve) {
 					if(passedPromise) {
-						if(passedPromise.resolve) {  // TODO remove this temp code for deferred
-							passedPromise.resolve(); // TODO remove this temp code for deferred
-						} else {
-							passedPromise();
-						}
+						passedPromise();
 					}
 				}.bind(this))
 			},
@@ -174,6 +170,8 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 			// 		app config
 			// node: domNode
 			// 		domNode.
+			// returns:
+			// 		Promise which is resolved when the application is started
 			var path;
 
 			// call configProcessHas to process any has blocks in the config

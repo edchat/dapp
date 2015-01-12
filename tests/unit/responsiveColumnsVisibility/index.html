@@ -42,9 +42,9 @@
 				var json = JSON.parse(jsonData);
 				json.loaderConfig.paths.responsiveColumnsVisibilityApp = "../responsiveColumnsVisibility"
 				//new Application(JSON.parse(jsonData));
-				var appDeferred = new Application(json);
-				appDeferred.then(function (app) {
-					console.log("deferred resolved for new App [" + app.id + "] it should be started and default views shown");
+				var appStartedPromise = new Application(json);
+				appStartedPromise.then(function (app) {
+					console.log("promise resolved for new App [" + app.id + "] it should be started and default views shown");
 				});
 			});
 
