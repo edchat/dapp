@@ -5,11 +5,12 @@ define([
 	"dapp/Application",
 	"delite/register",
 	"lie/dist/lie",
+	"dojo/when",
 	"requirejs-text/text!dapp/tests/unit/responsiveColumnsVisibility/config.json",
 	"deliteful/LinearLayout",
 	"deliteful/ResponsiveColumns",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, register, Promise, responsiveColumnsVisibilityconfig) {
+], function (registerSuite, assert, Application, register, Promise, when, responsiveColumnsVisibilityconfig) {
 	// -------------------------------------------------------------------------------------- //
 	// for responsiveColumnsVisibilitySuite
 	var responsiveColumnsVisibilityContainer1,
@@ -86,10 +87,17 @@ define([
 			rc.notifyCurrentValue("breakpoints");
 			responsiveColumnsVisibilityNode1 = document.getElementById("responsiveColumnsVisibilityAppdviewStack");
 		},
+		beforeEach: function () {
+			return when(new Promise(function (resolve) {
+				setTimeout(function () {
+					resolve();
+				}, 20);
+			}));
+		},
 		"Desktop layout test initial views": function () {
 			this.timeout = 10000;
 
-			return new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
+			return when(new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
 				responsiveColumnsVisibilityContainer1)
 			.then(function (app) {
 				// we are ready to test
@@ -104,12 +112,12 @@ define([
 				testLayout(leftLayout, '20%');
 				testLayout(centerLayout, 'fill');
 				testLayout(rightLayout, '20%');
-			});
+			}));
 		},
 
 		"Desktop Layout click slide BBB ": function () {
 			this.timeout = 10000;
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcbbb");
 				item.click();
@@ -118,11 +126,11 @@ define([
 				testLayout(leftLayout, '20%');
 				testLayout(centerLayout, 'fill');
 				testLayout(rightLayout, '20%');
-			});
+			}));
 		},
 		"Tablet layout test rcaaa": function () {
 			this.timeout = 10000;
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcaaa");
 				// force Tablet layout
@@ -139,12 +147,12 @@ define([
 				testLayout(leftLayout, '182px');
 				testLayout(centerLayout, 'fill');
 				testLayout(rightLayout, 'hidden');
-			});
+			}));
 		},
 
 		"Tablet Layout click slide BBB": function () {
 			this.timeout = 10000;
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcbbb");
 				item.click();
@@ -153,11 +161,11 @@ define([
 				testLayout(leftLayout, '182px');
 				testLayout(centerLayout, 'fill');
 				testLayout(rightLayout, 'hidden');
-			});
+			}));
 		},
 		"Phone layout test rcaaa": function () {
 			this.timeout = 10000;
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcaaa");
 				// force Phone layout
@@ -174,12 +182,12 @@ define([
 				testLayout(leftLayout, 'hidden');
 				testLayout(centerLayout, 'fill');
 				testLayout(rightLayout, 'hidden');
-			});
+			}));
 		},
 
 		"Phone Layout click slide CCC": function () {
 			this.timeout = 10000;
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("centershowrcccc");
 				item.click();
@@ -188,7 +196,7 @@ define([
 				testLayout(leftLayout, 'hidden');
 				testLayout(centerLayout, 'fill');
 				testLayout(rightLayout, 'hidden');
-			});
+			}));
 		},
 
 		teardown: function () {

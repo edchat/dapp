@@ -5,10 +5,11 @@ define([
 	"dapp/Application",
 	"delite/register",
 	"lie/dist/lie",
+	"dojo/when",
 	"requirejs-text/text!dapp/tests/unit/transitionVisibility/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, register, Promise, transitionVisibilityconfig) {
+], function (registerSuite, assert, Application, register, Promise, when, transitionVisibilityconfig) {
 	// -------------------------------------------------------------------------------------- //
 	// for transitionVisibilitySuite
 	var transitionVisibilityContainer3,
@@ -32,7 +33,7 @@ define([
 		"transitionVisibilitySuite dapp transitionVisibility test initial layout": function () {
 			this.timeout = 20000;
 
-			return new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
+			return when(new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
 				transitionVisibilityContainer3)
 			.then(function (app) {
 				// we are ready to test
@@ -44,14 +45,14 @@ define([
 				assert.isNotNull(transitionVisibilityAppHome1, "transitionVisibilityAppHome1 view must be here");
 
 				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome1);
-			});
+			}));
 		},
 
 		// NOTE: these tests will show transition the views, but call to before/afterDeactivate are not working here
 		// because the next transition fires before the call to afterActivate.
 		"Show (by widget.show with id) test on delite-after-show": function () {
 			this.timeout = 20000;
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				var sig = transitionVisibilityNode3.on("delite-after-show", function () {
 					resolve();
 					sig.remove();
@@ -61,16 +62,16 @@ define([
 				var transitionVisibilityAppHome3NoController =
 					document.getElementById("transitionVisibilityAppHome3NoController");
 				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome3NoController);
-			});
+			}));
 		},
 		"Show (by widget.show with id) test with promise": function () {
 			this.timeout = 20000;
 
-			return transitionVisibilityNode3.show("transitionVisibilityAppHome1")
+			return when(transitionVisibilityNode3.show("transitionVisibilityAppHome1")
 				.then(function () {
 					var transitionVisibilityAppHome1 = document.getElementById("transitionVisibilityAppHome1");
 					checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome1);
-				});
+				}));
 		},
 		"Show (by widget.show with id) test with transitionVisibilityNode3.on(delite-after-show)": function () {
 			var d = this.async(20000);
@@ -88,10 +89,10 @@ define([
 		"Test showOrHideViews (by view name) ": function () {
 			this.timeout = 20000;
 
-			return testApp.showOrHideViews('transitionVisibilityAppHome2', {}).then(function () {
+			return when(testApp.showOrHideViews('transitionVisibilityAppHome2', {}).then(function () {
 				var transitionVisibilityAppHome2 = document.getElementById("transitionVisibilityAppHome2");
 				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome2);
-			});
+			}));
 		},
 		teardown: function () {
 			// call unloadApp to cleanup and end the test

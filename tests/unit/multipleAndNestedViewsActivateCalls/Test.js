@@ -3,13 +3,14 @@ define([
 	"intern!object",
 	"intern/chai!assert",
 	"decor/sniff",
+	"dojo/when",
 	"dapp/Application",
 	"dapp/utils/view",
 	"delite/register",
 	"requirejs-text/text!dapp/tests/unit/multipleAndNestedViewsActivateCalls/app1.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, viewUtils, register,
+], function (registerSuite, assert, has, when, Application, viewUtils, register,
 	multipleAndNestedViewsActivateCallsconfig1) {
 
 	// -------------------------------------------------------------------------------------- //
@@ -49,7 +50,7 @@ define([
 				this.skip();
 			}
 
-			return new Application(JSON.parse(stripComments(multipleAndNestedViewsActivateCallsconfig1)),
+			return when(new Application(JSON.parse(stripComments(multipleAndNestedViewsActivateCallsconfig1)),
 					multipleAndNestedViewsActivateCallsContainer1).then(function (app) {
 					// we are ready to test
 					testApp = app;
@@ -68,10 +69,10 @@ define([
 						"root multipleAndNestedViewsActivateCallsNode1 must be here");
 					assert.isNotNull(multipleAndNestedViewsActivateCallsApp1P1,
 						"multipleAndNestedViewsActivateCallsApp1Home1 view must be here");
-				})
+				}))
 				.then(function () {
 					// Currently showing P1_S1_V1 test transition to V7
-					return multipleAndNestedViewsActivateCallsApp1Content.show("V7").then(function () {
+					return when(multipleAndNestedViewsActivateCallsApp1Content.show("V7").then(function () {
 						//temp test works on IE but does not help on FF
 						// TODO: NOTE this test fails on FF, and IE, the lines above work on IE, but not on FF.
 						// TODO: The failure seems to be caused by ViewStack not being notified with the transitionend
@@ -97,13 +98,13 @@ define([
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 1);
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 1);
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 1);
-					});
+					}));
 				})
 				// temp test works on IE but does not help on FF
 				//testApp.showOrHideViews('content,V7');
 				// Currently showing V7 test transition to P1_S1_V1
 				.then(function () {
-					return multipleAndNestedViewsActivateCallsApp1Content.show("P1").then(function () {
+					return when(multipleAndNestedViewsActivateCallsApp1Content.show("P1").then(function () {
 						var multipleAndNestedViewsActivateCallsApp1V1 = document.getElementById("content_P1_S1_V1");
 						checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
 							multipleAndNestedViewsActivateCallsApp1V1);
@@ -115,11 +116,12 @@ define([
 
 						// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 1);
-					});
+					}));
 				})
 				// Currently showing P1,S1,V1 test transition to P1_S1_V2
 				.then(function () {
-					return multipleAndNestedViewsActivateCallsApp1S1View.containerNode.show('V2').then(function () {
+					return when(multipleAndNestedViewsActivateCallsApp1S1View.containerNode.show('V2')
+						.then(function () {
 						var multipleAndNestedViewsActivateCallsApp1V2 = document.getElementById("content_P1_S1_V2");
 						checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
 							multipleAndNestedViewsActivateCallsApp1V2);
@@ -138,11 +140,11 @@ define([
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2);
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 2, true);
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 2, true);
-					});
+					}));
 				})
 				// Currently showing P1_S1_V2 test transition to V7
 				.then(function () {
-					return testApp.showOrHideViews('content,V7')
+					return when(testApp.showOrHideViews('content,V7')
 						.then(function () {
 							var multipleAndNestedViewsActivateCallsApp1V7 = document.getElementById("content_V7");
 
@@ -164,11 +166,11 @@ define([
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3);
-						});
+						}));
 				})
 				// Currently showing V7 test transition to P1_S1_V1
 				.then(function () {
-					return testApp.showOrHideViews('content,P1')
+					return when(testApp.showOrHideViews('content,P1')
 						.then(function () {
 							var multipleAndNestedViewsActivateCallsApp1V1 = document.getElementById("content_P1_S1_V1");
 							checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
@@ -187,11 +189,11 @@ define([
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3, true);
-						});
+						}));
 				})
 				.then(function () {
 					// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V1
-					return multipleAndNestedViewsActivateCallsApp1Content.show('P2').then(function () {
+					return when(multipleAndNestedViewsActivateCallsApp1Content.show('P2').then(function () {
 						var multipleAndNestedViewsActivateCallsApp1P2V1 =
 							document.getElementById("content_P2_P2S1_P2V1");
 						checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
@@ -214,11 +216,12 @@ define([
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
 						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
-					});
+					}));
 				})
 				.then(function () {
 					// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V1
-					return document.getElementById("content").parentNode.hide(document.getElementById("content").id)
+					return when(
+						document.getElementById("content").parentNode.hide(document.getElementById("content").id)
 						.then(function () {
 							var multipleAndNestedViewsActivateCallsApp1P2V2 =
 								document.getElementById("content_P2_P2S1_P2V2");
@@ -246,11 +249,11 @@ define([
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
-						});
+						}));
 				})
 				.then(function () {
 					// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V2
-					return testApp.showOrHideViews('content,P2,P2S1,P2V2')
+					return when(testApp.showOrHideViews('content,P2,P2S1,P2V2')
 						.then(function () {
 							var multipleAndNestedViewsActivateCallsApp1P2V2 =
 								document.getElementById("content_P2_P2S1_P2V2");
@@ -274,11 +277,11 @@ define([
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
-						});
+						}));
 				})
 				.then(function () {
 					// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V1
-					return document.getElementById("content_P2_P2S1").parentNode
+					return when(document.getElementById("content_P2_P2S1").parentNode
 						.hide(document.getElementById("content_P2_P2S1").id).then(function () {
 							var multipleAndNestedViewsActivateCallsApp1P2V2 =
 								document.getElementById("content_P2_P2S1_P2V2");
@@ -309,7 +312,7 @@ define([
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
 							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
-						});
+						}));
 				});
 		},
 

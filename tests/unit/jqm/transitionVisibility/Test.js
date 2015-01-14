@@ -24,13 +24,14 @@ require(["jquery"],
 define([
 	"intern!object",
 	"intern/chai!assert",
+	"dojo/when",
 	"dapp/Application",
 	"requirejs-text/text!dapp/tests/unit/jqm/transitionVisibility/app.json",
 	"jquery",
 	"jquery.mobile",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, jqmTransitionVisibilityconfig, $) {
+], function (registerSuite, assert, when, Application, jqmTransitionVisibilityconfig, $) {
 	// -------------------------------------------------------------------------------------- //
 	// for jqmTransitionVisibilitySuite
 	var jqmTransitionVisibilityContainer3,
@@ -56,7 +57,7 @@ define([
 		"jqmTransitionVisibilitySuite dapp jqmTransitionVisibility test initial layout": function () {
 			this.timeout = 20000;
 
-			return new Application(JSON.parse(stripComments(jqmTransitionVisibilityconfig)),
+			return when(new Application(JSON.parse(stripComments(jqmTransitionVisibilityconfig)),
 				jqmTransitionVisibilityContainer3).then(function (app) {
 				// we are ready to test
 				testApp = app;
@@ -74,11 +75,11 @@ define([
 				assert.isTrue(jqmTransitionVisibilityAppHome1ActiveTest,
 					"jqmTransitionVisibilityAppHome1 view should be active");
 
-			});
+			}));
 		},
 		"Test displayView (by view name) ": function () {
 			this.timeout = 20000;
-			return testApp.showOrHideViews('jqmTransitionVisibilityAppHome2')
+			return when(testApp.showOrHideViews('jqmTransitionVisibilityAppHome2')
 				.then(function () {
 					var jqmTransitionVisibilityAppHome2 = $("#jqmTransitionVisibilityAppHome2");
 					var jqmTransitionVisibilityAppHome2ActiveTest =
@@ -108,7 +109,7 @@ define([
 					// "jqmTransitionVisibilityAppHome1 view should be hidden");
 					//assert.isNotNull(jqmTransitionVisibilityAppHome1VisTest,
 					// "jqmTransitionVisibilityAppHome1 view should be hidden");
-				});
+				}));
 		},
 		teardown: function () {
 			// call unloadApp to cleanup and end the test

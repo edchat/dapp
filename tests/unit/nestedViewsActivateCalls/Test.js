@@ -6,10 +6,11 @@ define([
 	"dapp/Application",
 	"dapp/utils/view",
 	"lie/dist/lie",
+	"dojo/when",
 	"requirejs-text/text!dapp/tests/unit/nestedViewsActivateCalls/app1.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, viewUtils, Promise,
+], function (registerSuite, assert, has, Application, viewUtils, Promise, when,
 	nestedViewsActivateCallsconfig1) {
 	// nestedViewsActivateCallsSuite1 is having problems on IE10, IE11 and FF and Safari
 	// -------------------------------------------------------------------------------------- //
@@ -43,7 +44,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return new Application(JSON.parse(stripComments(nestedViewsActivateCallsconfig1)),
+			return when(new Application(JSON.parse(stripComments(nestedViewsActivateCallsconfig1)),
 					nestedViewsActivateCallsContainer1)
 				.then(function (app) {
 					// we are ready to test
@@ -73,7 +74,7 @@ define([
 						"nestedViewsActivateCallsApp1P1View.beforeActivateCallCount should be 1");
 
 					checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1P1);
-				});
+				}));
 		},
 
 		// Currently showing P1_S1_V1 test transition to V7
@@ -82,7 +83,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return nestedViewsActivateCallsNode1.show("V7").then(function () {
+			return when(nestedViewsActivateCallsNode1.show("V7").then(function () {
 				var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
 				checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V7);
 
@@ -97,7 +98,7 @@ define([
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1V1View, 1);
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1S1View, 1);
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1P1View, 1);
-			});
+			}));
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
@@ -106,7 +107,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return nestedViewsActivateCallsNode1.show("P1").then(function () {
+			return when(nestedViewsActivateCallsNode1.show("P1").then(function () {
 				var nestedViewsActivateCallsApp1V1 = document.getElementById("P1_S1_V1");
 				checkNestedNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V1);
 
@@ -117,7 +118,7 @@ define([
 
 				// Now nestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1V7View, 1);
-			});
+			}));
 		},
 
 		// Currently showing P1,S1,V1 test transition to P1_S1_V2
@@ -126,7 +127,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return nestedViewsActivateCallsApp1S1View.containerNode.show('V2').then(function () {
+			return when(nestedViewsActivateCallsApp1S1View.containerNode.show('V2').then(function () {
 				var nestedViewsActivateCallsApp1V2 = document.getElementById("P1_S1_V2");
 				checkNestedNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V2);
 
@@ -143,7 +144,7 @@ define([
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1V1View, 2);
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1S1View, 2, true);
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1P1View, 2, true);
-			});
+			}));
 		},
 
 		// Currently showing P1_S1_V2 test transition to V7
@@ -152,7 +153,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return testApp.showOrHideViews('V7')
+			return when(testApp.showOrHideViews('V7')
 				.then(function () {
 					var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
 					checkNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V7);
@@ -172,7 +173,7 @@ define([
 					checkDeactivateCallCount(nestedViewsActivateCallsApp1V2View, 1);
 					checkDeactivateCallCount(nestedViewsActivateCallsApp1S1View, 3);
 					checkDeactivateCallCount(nestedViewsActivateCallsApp1P1View, 3);
-				});
+				}));
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
@@ -181,7 +182,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return testApp.showOrHideViews('P1')
+			return when(testApp.showOrHideViews('P1')
 				.then(function () {
 					var nestedViewsActivateCallsApp1V1 = document.getElementById("P1_S1_V1");
 					checkNestedNodeVisibility(nestedViewsActivateCallsNode1, nestedViewsActivateCallsApp1V1);
@@ -199,7 +200,7 @@ define([
 					checkDeactivateCallCount(nestedViewsActivateCallsApp1V2View, 1, true);
 					checkDeactivateCallCount(nestedViewsActivateCallsApp1S1View, 3, true);
 					checkDeactivateCallCount(nestedViewsActivateCallsApp1P1View, 3, true);
-				});
+				}));
 		},
 		// Currently showing P1_S1_V1 use history.back() to get back to V7
 		"test history.back() to get back to V7)": function () {
@@ -207,7 +208,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return new Promise(function (resolve) {
+			return when(new Promise(function (resolve) {
 				setupOnOncePromise(testApp, resolve);
 				history.back();
 			}).then(function () {
@@ -233,7 +234,7 @@ define([
 				//checkDeactivateCallCount(nestedViewsActivateCallsApp1P1View, 4);
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1S1View, 3, true);
 				checkDeactivateCallCount(nestedViewsActivateCallsApp1P1View, 3, true);
-			});
+			}));
 		},
 
 		teardown: function () {

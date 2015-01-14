@@ -3,12 +3,13 @@ define([
 	"intern!object",
 	"intern/chai!assert",
 	"decor/sniff",
+	"dojo/when",
 	"dapp/Application",
 	"dapp/utils/view",
 	"requirejs-text/text!dapp/tests/unit/nlsLabels/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, viewUtils, nlsLabelsconfig3) {
+], function (registerSuite, assert, has, when, Application, viewUtils, nlsLabelsconfig3) {
 	// -------------------------------------------------------------------------------------- //
 	// TODO: should add a nested nls test with strings at the parent view available to the child view.
 	// for nlsLabelsSuite transition test
@@ -36,7 +37,7 @@ define([
 				this.skip();
 			}
 
-			return new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3)
+			return when(new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3)
 			.then(function (app) {
 				// we are ready to test
 				testApp = app;
@@ -65,7 +66,7 @@ define([
 				assert.strictEqual(testAppNlsLabelDom.innerHTML, "Label Zero", "testAppNlsLabel should be Label Zero");
 				assert.strictEqual(testViewNlsLabelDom.innerHTML, "Label One",
 					"testViewNlsLabelDom should be Label One");
-			});
+			}));
 		},
 
 		// Currently showing nlsLabelsAppHome1View test transition to nlsLabelsAppHome3NoControllerView
@@ -74,7 +75,7 @@ define([
 			if (has("ie") === 10) {
 				this.skip();
 			}
-			return nlsLabelsNode3.show("nlsLabelsAppHome3NoController").then(function () {
+			return when(nlsLabelsNode3.show("nlsLabelsAppHome3NoController").then(function () {
 				var nlsLabelsAppHome3NoController = document.getElementById("nlsLabelsAppHome3NoController");
 				checkNodeVisibility(nlsLabelsNode3, nlsLabelsAppHome3NoController);
 
@@ -93,7 +94,7 @@ define([
 				assert.strictEqual(testAppNlsLabelDom.innerHTML, "Label Zero", "testAppNlsLabel should be Label Zero");
 				assert.strictEqual(testViewNlsLabelDom.innerHTML, "Label One",
 					"testViewNlsLabelDom should be Label One");
-			});
+			}));
 
 		},
 		teardown: function () {

@@ -5,12 +5,13 @@ define([
 	"decor/sniff",
 	"dapp/Application",
 	"lie/dist/lie",
+	"dojo/when",
 	"requirejs-text/text!dapp/tests/unit/dstoreMemory/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack",
 	"deliteful/list/List",
 	"dstore/Memory"
-], function (registerSuite, assert, has, Application, Promise, dstoreMemoryconfig1) {
+], function (registerSuite, assert, has, Application, Promise, when, dstoreMemoryconfig1) {
 	// -------------------------------------------------------------------------------------- //
 
 	// for dstoreMemorySuite1 transition test
@@ -63,7 +64,7 @@ define([
 			if (has("ie") === 10) {
 				this.skip();
 			}
-			return new Application(JSON.parse(stripComments(dstoreMemoryconfig1)), dstoreMemoryContainer1)
+			return when(new Application(JSON.parse(stripComments(dstoreMemoryconfig1)), dstoreMemoryContainer1)
 				.then(function (appx) {
 					// we are ready to test
 					testApp = appx;
@@ -91,7 +92,7 @@ define([
 					assert.strictEqual(dstoreMemorylist1Elements[4].innerHTML, "Selection 5",
 						"element[4].innerHTML should be Selection 5");
 
-				});
+				}));
 		},
 
 		// Currently showing dstoreMemoryAppHome1 test transition to dstoreMemoryAppHome2
@@ -100,9 +101,8 @@ define([
 			if (has("ie") === 10) {
 				this.skip();
 			}
-			//	return Promise(function (resolve) {
 			var label = dstoreMemorylist1Elements[0].innerHTML || "";
-			return testApp.showOrHideViews("dstoreMemoryAppHome2", {
+			return when(testApp.showOrHideViews("dstoreMemoryAppHome2", {
 				viewData: {
 					label: label
 				}
@@ -134,7 +134,7 @@ define([
 				assert.strictEqual(dstoreMemorylist2Elements[4].innerHTML, "Selection 10",
 					"element[4].innerHTML should be Selection 5");
 
-			});
+			}));
 		},
 
 		// Currently showing dstoreMemoryAppHome2 test transition to dstoreMemoryAppHome1
@@ -144,8 +144,7 @@ define([
 				this.skip();
 			}
 			var label = dstoreMemorylist2Elements[4].innerHTML || "";
-			//return Promise(function (resolve) {
-			return testApp.showOrHideViews("dstoreMemoryAppHome1", {
+			return when(testApp.showOrHideViews("dstoreMemoryAppHome1", {
 				viewData: {
 					label: label
 				}
@@ -178,7 +177,7 @@ define([
 				assert.strictEqual(dstoreMemorylist2Elements[4].innerHTML, "Selection 10",
 					"element[4].innerHTML should be Selection 5");
 
-			});
+			}));
 		},
 
 		teardown: function () {

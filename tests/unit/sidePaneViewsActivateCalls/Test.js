@@ -3,13 +3,14 @@
 define([
 	"intern!object",
 	"intern/chai!assert",
+	"dojo/when",
 	"dapp/Application",
 	"dapp/utils/view",
 	"delite/register",
 	"requirejs-text/text!dapp/tests/unit/sidePaneViewsActivateCalls/app1.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, viewUtils, register, sidePaneViewsActivateCallsconfig1) {
+], function (registerSuite, assert, when, Application, viewUtils, register, sidePaneViewsActivateCallsconfig1) {
 	// -------------------------------------------------------------------------------------- //
 	// for sidePaneViewsActivateCallsSuite1 transition test
 	var sidePaneViewsActivateCallsContainer1, sidePaneViewsActivateCallsNode1;
@@ -46,7 +47,7 @@ define([
 		"sidePaneViewsActivateCalls test initial view": function () {
 			this.timeout = 20000;
 
-			return new Application(JSON.parse(stripComments(sidePaneViewsActivateCallsconfig1)),
+			return when(new Application(JSON.parse(stripComments(sidePaneViewsActivateCallsconfig1)),
 				sidePaneViewsActivateCallsContainer1).then(function (app) {
 				// we are ready to test
 				testApp = app;
@@ -73,39 +74,39 @@ define([
 				checkActivateCallCount(sp1footer1View, 1);
 				var sp1footer1content = sp1footer1View.containerNode;
 				assert.isNotNull(sp1footer1content, "sp1footer1content must be here");
-			});
+			}));
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1right1+sp1footer1 test
 		// showOrHideViews('-sp1right1'
 		"Hide sp1right1 with testApp.showOrHideViews('-sp1right1')": function () {
 			this.timeout = 20000;
-			return testApp.showOrHideViews('-sp1right1')
+			return when(testApp.showOrHideViews('-sp1right1')
 				.then(function () {
 					var sp1rightPane = document.getElementById("sp1rightPane");
 					assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
 					checkActivateCallCount(sp1right1View, 1, true);
 					checkDeactivateCallCount(sp1right1View, 1, true);
-				});
+				}));
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1 test
 		// showOrHideViews('leftParent,left1'
 		"show sp1left1 with testApp.showOrHideViews('sp1leftParent,sp1left1')": function () {
 			this.timeout = 20000;
-			return testApp.showOrHideViews('sp1leftParent,sp1left1')
+			return when(testApp.showOrHideViews('sp1leftParent,sp1left1')
 				.then(function () {
 					var sp1left1content = document.getElementById("sp1leftParent_sp1left1");
 					var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
 
 					checkNodeVisibile(sp1left1content);
 					checkActivateCallCount(sp1left1View, 1, true);
-				});
+				}));
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1+sp1leftParent,sp1left1 test
 		// showOrHideViews('-sp1leftParent') when I used showOrHideViews('-sp1leftParent-sp1leftParent,left1') it
 		// got a warning because sp1leftParent was not found as the parent of left1
 		"Hide sp1left1 with testApp.showOrHideViews('-sp1leftParent')": function () {
 			this.timeout = 20000;
-			return testApp.showOrHideViews('-sp1leftParent,sp1left1-sp1leftParent')
+			return when(testApp.showOrHideViews('-sp1leftParent,sp1left1-sp1leftParent')
 				.then(function () {
 					var sp1rightPane = document.getElementById("sp1rightPane");
 					var sp1left1content = document.getElementById("sp1leftPane");
@@ -116,27 +117,27 @@ define([
 
 					checkActivateCallCount(sp1left1View, 1, true);
 					checkDeactivateCallCount(sp1left1View, 1, true); // note not deactivated, only parent is hidden
-				});
+				}));
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1 test
 		// sp1rightPaneElem.show('sp1right2')
 		"show sp1right2 with sp1rightPaneElem.show('sp1right2')": function () {
 			this.timeout = 20000;
 			var sp1rightPaneElem = document.getElementById("sp1rightPane");
-			return sp1rightPaneElem.show('sp1right2').then(function () {
+			return when(sp1rightPaneElem.show('sp1right2').then(function () {
 				var sp1right2View = viewUtils.getViewFromViewId(testApp, "sp1right2");
 				checkActivateCallCount(sp1right2View, 1);
 				var sp1right2content = sp1right2View.containerNode;
 				assert.isNotNull(sp1right2content, "sp1right2content must be here");
 				checkNodeVisibile(sp1right2content);
-			});
+			}));
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1 test
 		// sp1rightPaneElem.hide('sp1right2')
 		"hide sp1right2 with sp1rightPaneElem.hide('sp1right2')": function () {
 			this.timeout = 20000;
 			var sp1rightPaneElem = document.getElementById("sp1rightPane");
-			return sp1rightPaneElem.hide('sp1right2').then(function () {
+			return when(sp1rightPaneElem.hide('sp1right2').then(function () {
 				var sp1right2View = viewUtils.getViewFromViewId(testApp, "sp1right2");
 				checkDeactivateCallCount(sp1right2View, 1);
 				var sp1right2content = sp1right2View.containerNode;
@@ -145,7 +146,7 @@ define([
 				assert.strictEqual(sp1right2View.style.display, "none", "sp1right2View.style.display should be none");
 				assert.strictEqual(sp1rightPaneElem.style.display, "none",
 					"sp1rightPaneElem.style.display should be none");
-			});
+			}));
 		},
 
 		teardown: function () {

@@ -3,6 +3,7 @@ define([
 	"intern!object",
 	"intern/chai!assert",
 	"decor/sniff",
+	"dojo/when",
 	"dapp/Application",
 	"dojo/dom-geometry",
 	"dojo/dom-class",
@@ -10,7 +11,7 @@ define([
 	"requirejs-text/text!dapp/tests/unit/viewLayout/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, Application, domGeom, domClass, register, viewLayoutconfig) {
+], function (registerSuite, assert, has, when, Application, domGeom, domClass, register, viewLayoutconfig) {
 	// -------------------------------------------------------------------------------------- //
 
 	// for viewLayoutSuite
@@ -38,7 +39,7 @@ define([
 			}
 
 			// create the app from the config and wait for the promise
-			return new Application(JSON.parse(stripComments(viewLayoutconfig)), viewLayoutContainer2)
+			return when(new Application(JSON.parse(stripComments(viewLayoutconfig)), viewLayoutContainer2)
 				.then(function (app) {
 					// we are ready to test
 					testApp = app;
@@ -63,7 +64,7 @@ define([
 					assert.strictEqual(box1.h, 200);
 					assert.strictEqual(box3.h, 200);
 					assert.strictEqual(box1.h, box2.h);
-				});
+				}));
 		},
 		// hide one view and verify sizes
 		"viewLayoutSuite dapp viewLayout hide viiew and test domNode sizes": function () {
@@ -72,7 +73,7 @@ define([
 				this.skip();
 			}
 
-			return document.getElementById("viewLayoutAppdlayout").hide("viewLayoutAppHome2")
+			return when(document.getElementById("viewLayoutAppdlayout").hide("viewLayoutAppHome2")
 				.then(function () {
 					assert.isNotNull(document.getElementById("viewLayoutAppdlayout"),
 						"root viewLayoutAppdlayout must be here");
@@ -91,7 +92,7 @@ define([
 					assert.strictEqual(box1.h, 300);
 					assert.strictEqual(box2.h, 300);
 					assert.strictEqual(box1.h, box2.h);
-				});
+				}));
 		},
 		teardown: function () {
 			// call unloadApp to cleanup and end the test

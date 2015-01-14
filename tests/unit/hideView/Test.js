@@ -2,12 +2,13 @@
 define([
 	"intern!object",
 	"intern/chai!assert",
+	"dojo/when",
 	"dapp/Application",
 	"dapp/utils/view",
 	"requirejs-text/text!dapp/tests/unit/hideView/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, viewUtils, hideViewconfig) {
+], function (registerSuite, assert, when, Application, viewUtils, hideViewconfig) {
 	// -------------------------------------------------------------------------------------- //
 	// for hideViewSuite transition test
 	var hideViewHtmlContent3 =
@@ -32,7 +33,7 @@ define([
 		"test initial view and hide hideViewApp3Home1": function () {
 			this.timeout = 20000;
 
-			return new Application(JSON.parse(stripComments(hideViewconfig)), hideViewContainer)
+			return when(new Application(JSON.parse(stripComments(hideViewconfig)), hideViewContainer)
 				.then(function (app) {
 					// we are ready to test
 					testApp = app;
@@ -54,19 +55,19 @@ define([
 
 					checkNodeVisibility(hideViewNode, hideViewApp3Home1);
 					// Currently showing hideViewApp3Home1View test transition to hide it
-					return hideViewNode.hide("hideViewApp3Home1").then(function () {
+					return when(hideViewNode.hide("hideViewApp3Home1").then(function () {
 						var hideViewApp3Home1 = document.getElementById("hideViewApp3Home1");
 						hideViewApp3Home1View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home1");
 						assert.isNull(hideViewApp3Home1);
 						assert.isNull(hideViewApp3Home1View.parentNode);
-					});
-				});
+					}));
+				}));
 
 		},
 		// Currently showing hideViewApp3Home1 test transition back to hideViewApp3Home2
 		"testApp.show and then hide 'hideViewApp3Home2'": function () {
 			this.timeout = 20000;
-			return testApp.showOrHideViews('hideViewApp3Home2')
+			return when(testApp.showOrHideViews('hideViewApp3Home2')
 				.then(function () {
 					var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
 					hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
@@ -79,7 +80,7 @@ define([
 					checkDeactivateCallCount(hideViewApp3Home3NoControllerView, 1);
 					// Now hideViewApp3Home1View DeactivateCallCounts should be 2
 					checkDeactivateCallCount(hideViewApp3Home1View, 1);
-					return testApp.showOrHideViews('-hideViewApp3Home2')
+					return when(testApp.showOrHideViews('-hideViewApp3Home2')
 						.then(function () {
 							var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
 							hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
@@ -96,13 +97,13 @@ define([
 
 							// Now hideViewApp3Home3NoControllerView DeactivateCallCounts should be 2
 							checkDeactivateCallCount(hideViewApp3Home2View, 1);
-						});
-				});
+						}));
+				}));
 		},
 		// Currently showing nothing test transition to hideViewApp3Home3NoController
 		"hideViewNode.show('hideViewApp3Home3NoController')": function () {
 			this.timeout = 20000;
-			return hideViewNode.show('hideViewApp3Home3NoController').then(function () {
+			return when(hideViewNode.show('hideViewApp3Home3NoController').then(function () {
 				var hideViewApp3Home3NoController = document.getElementById("hideViewApp3Home3NoController");
 				checkNodeVisibility(hideViewNode, hideViewApp3Home3NoController);
 
@@ -111,7 +112,7 @@ define([
 
 				// Now hideViewApp3Home1View DeactivateCallCounts should be 2
 				checkDeactivateCallCount(hideViewApp3Home1View, 1);
-			});
+			}));
 
 		},
 		teardown: function () {

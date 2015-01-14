@@ -5,10 +5,11 @@ define([
 	"dapp/Application",
 	"dapp/utils/view",
 	"lie/dist/lie",
+	"dojo/when",
 	"requirejs-text/text!dapp/tests/unit/viewDataAndParams/app.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, Application, viewUtils, Promise, viewDataconfig3) {
+], function (registerSuite, assert, Application, viewUtils, Promise, when, viewDataconfig3) {
 	// -------------------------------------------------------------------------------------- //
 	// for viewDataSuite transition test
 	var viewDataContainer3,
@@ -32,7 +33,7 @@ define([
 		"test initial view": function () {
 			this.timeout = 20000;
 
-			return new Application(JSON.parse(stripComments(viewDataconfig3)), viewDataContainer3)
+			return when(new Application(JSON.parse(stripComments(viewDataconfig3)), viewDataContainer3)
 				.then(function (app) {
 					// we are ready to test
 					testApp = app;
@@ -48,13 +49,13 @@ define([
 						"viewDataAndParamsAppHome1View._beforeActivateCallCount should be 1");
 					assert.isNotNull(viewDataNode3, "root viewDataNode3 must be here");
 					checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome1);
-				});
+				}));
 		},
 
 		// Currently showing viewDataAndParamsAppHome1View test transition to viewDataAndParamsAppHome3View
 		"viewDataNode3.show(viewDataAndParamsAppHome3)": function () {
 			this.timeout = 20000;
-			return viewDataNode3.show("viewDataAndParamsAppHome3").then(function () {
+			return when(viewDataNode3.show("viewDataAndParamsAppHome3").then(function () {
 				var viewDataAndParamsAppHome3 = document.getElementById("viewDataAndParamsAppHome3");
 				checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome3);
 				viewDataAndParamsAppHome3View = viewUtils.getViewFromViewId(testApp, "viewDataAndParamsAppHome3");
@@ -62,7 +63,7 @@ define([
 				checkActivateCallCount(viewDataAndParamsAppHome3View, 1);
 				// Now viewDataAndParamsAppHome1View DeactivateCallCounts should be 1
 				checkDeactivateCallCount(viewDataAndParamsAppHome1View, 1);
-			});
+			}));
 
 		},
 
@@ -75,7 +76,7 @@ define([
 					"p": "testData"
 				}
 			};
-			return testApp.showOrHideViews('viewDataAndParamsAppHome1', params)
+			return when(testApp.showOrHideViews('viewDataAndParamsAppHome1', params)
 				.then(function () {
 					var viewDataAndParamsAppHome1 = document.getElementById("viewDataAndParamsAppHome1");
 					checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome1);
@@ -88,7 +89,7 @@ define([
 
 					assert.strictEqual(viewDataAndParamsAppHome1View.viewData.p, "testData",
 						"viewDataAndParamsAppHome1View.viewData should equal testData");
-				});
+				}));
 		},
 
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
@@ -108,7 +109,7 @@ define([
 				}
 			};
 			this.timeout = 20000;
-			return testApp.showOrHideViews('parentV1,s1', params)
+			return when(testApp.showOrHideViews('parentV1,s1', params)
 				.then(function () {
 					//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
 					var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
@@ -127,7 +128,7 @@ define([
 						"viewDataparentV1View.viewData.fromParent should equal valuefromParent");
 					assert.isUndefined(viewDataparentV1View.viewData.fromChild,
 						"viewDataparentV1View.viewData.fromChild should not be set");
-				});
+				}));
 		},
 
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
@@ -146,7 +147,7 @@ define([
 					}
 				}
 			};
-			return testApp.showOrHideViews('parentV1,s1', params)
+			return when(testApp.showOrHideViews('parentV1,s1', params)
 				.then(function () {
 					//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
 					var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
@@ -165,7 +166,7 @@ define([
 						"viewDataparentV1View.viewParams.fromParent should equal paramValuefromParent");
 					assert.isUndefined(viewDataparentV1View.viewParams.fromChild,
 						"viewDataparentV1View.viewParams.fromChild should not be set");
-				});
+				}));
 		},
 
 		teardown: function () {
