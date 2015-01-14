@@ -32,7 +32,7 @@ define(
 
 					// if this is a hide for a view which is not loaded then do not process it
 					if (event.dapp.hide && !view) {
-						//console.log("Load._loadHandler called with hide true, but that view is not available to remove");
+						//console.log("Load._loadHandler called with hide true, but view is not available to remove");
 						return; // trying to remove a view which is not showing
 					}
 
@@ -51,7 +51,7 @@ define(
 					}
 				}.bind(this));
 
-				if(event.setChild) {
+				if (event.setChild) {
 					event.setChild(new Promise(function (resolve) {
 						// use setTimeout to simulate fetch of data, then create a node
 						event.loadPromise.then(function (viewData) {
@@ -98,7 +98,7 @@ define(
 					return;
 				}
 				var savedloadResolve = event.loadResolve;
-				var tempdisplayProm = Promise(function (resolve) {
+				var tempdisplayProm = new Promise(function (resolve) {
 					this.app.emit("dapp-display", {
 						dest: dest,
 						transition: event.transition,

@@ -46,9 +46,8 @@ define([
 		"sidePaneViewsActivateCalls test initial view": function () {
 			this.timeout = 20000;
 
-			var appStartedPromise1 = new Application(JSON.parse(stripComments(sidePaneViewsActivateCallsconfig1)),
-				sidePaneViewsActivateCallsContainer1);
-			return appStartedPromise1.then(function (app) {
+			return new Application(JSON.parse(stripComments(sidePaneViewsActivateCallsconfig1)),
+				sidePaneViewsActivateCallsContainer1).then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -81,25 +80,25 @@ define([
 		"Hide sp1right1 with testApp.showOrHideViews('-sp1right1')": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('-sp1right1')
-			.then(function () {
-				var sp1rightPane = document.getElementById("sp1rightPane");
-				assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
-				checkActivateCallCount(sp1right1View, 1, true);
-				checkDeactivateCallCount(sp1right1View, 1, true);
-			});
+				.then(function () {
+					var sp1rightPane = document.getElementById("sp1rightPane");
+					assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
+					checkActivateCallCount(sp1right1View, 1, true);
+					checkDeactivateCallCount(sp1right1View, 1, true);
+				});
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1 test
 		// showOrHideViews('leftParent,left1'
 		"show sp1left1 with testApp.showOrHideViews('sp1leftParent,sp1left1')": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('sp1leftParent,sp1left1')
-			.then(function () {
-				var sp1left1content = document.getElementById("sp1leftParent_sp1left1");
-				var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
+				.then(function () {
+					var sp1left1content = document.getElementById("sp1leftParent_sp1left1");
+					var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
 
-				checkNodeVisibile(sp1left1content);
-				checkActivateCallCount(sp1left1View, 1, true);
-			});
+					checkNodeVisibile(sp1left1content);
+					checkActivateCallCount(sp1left1View, 1, true);
+				});
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1+sp1leftParent,sp1left1 test
 		// showOrHideViews('-sp1leftParent') when I used showOrHideViews('-sp1leftParent-sp1leftParent,left1') it
@@ -107,17 +106,17 @@ define([
 		"Hide sp1left1 with testApp.showOrHideViews('-sp1leftParent')": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('-sp1leftParent,sp1left1-sp1leftParent')
-			.then(function () {
-				var sp1rightPane = document.getElementById("sp1rightPane");
-				var sp1left1content = document.getElementById("sp1leftPane");
-				var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
-				assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
-				assert.strictEqual(sp1left1content.style.display, "none",
-					"sp1left1content.style.display should be none");
+				.then(function () {
+					var sp1rightPane = document.getElementById("sp1rightPane");
+					var sp1left1content = document.getElementById("sp1leftPane");
+					var sp1left1View = viewUtils.getViewFromViewId(testApp, "sp1leftParent_sp1left1");
+					assert.strictEqual(sp1rightPane.style.display, "none", "sp1rightPane.style.display should be none");
+					assert.strictEqual(sp1left1content.style.display, "none",
+						"sp1left1content.style.display should be none");
 
-				checkActivateCallCount(sp1left1View, 1, true);
-				checkDeactivateCallCount(sp1left1View, 1, true); // note not deactivated because only parent is hidden
-			});
+					checkActivateCallCount(sp1left1View, 1, true);
+					checkDeactivateCallCount(sp1left1View, 1, true); // note not deactivated, only parent is hidden
+				});
 		},
 		// Currently showing sp1header1+sp1centerParent+sp1center1+sp1footer1 test
 		// sp1rightPaneElem.show('sp1right2')
@@ -153,7 +152,9 @@ define([
 			// call unloadApp to cleanup and end the test
 			sidePaneViewsActivateCallsContainer1.parentNode.removeChild(
 				sidePaneViewsActivateCallsContainer1);
-			testApp.unloadApp();
+			if (testApp) {
+				testApp.unloadApp();
+			}
 		}
 	};
 

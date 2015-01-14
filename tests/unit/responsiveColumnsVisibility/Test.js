@@ -89,9 +89,9 @@ define([
 		"Desktop layout test initial views": function () {
 			this.timeout = 10000;
 
-			var appStartedPromise = new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
-				responsiveColumnsVisibilityContainer1);
-			return appStartedPromise.then(function (app) {
+			return new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
+				responsiveColumnsVisibilityContainer1)
+			.then(function (app) {
 				// we are ready to test
 				console.log("in responsiveColumnsVisibility tests app loaded. " + app.id);
 				rctestApp = app;
@@ -109,8 +109,8 @@ define([
 
 		"Desktop Layout click slide BBB ": function () {
 			this.timeout = 10000;
-			return Promise(function (resolve) {
-				setupOnOncePromise(rctestApp, resolve)
+			return new Promise(function (resolve) {
+				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcbbb");
 				item.click();
 			}).then(function (evt) {
@@ -122,7 +122,7 @@ define([
 		},
 		"Tablet layout test rcaaa": function () {
 			this.timeout = 10000;
-			return Promise(function (resolve) {
+			return new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcaaa");
 				// force Tablet layout
@@ -144,7 +144,7 @@ define([
 
 		"Tablet Layout click slide BBB": function () {
 			this.timeout = 10000;
-			return Promise(function (resolve) {
+			return new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcbbb");
 				item.click();
@@ -157,7 +157,7 @@ define([
 		},
 		"Phone layout test rcaaa": function () {
 			this.timeout = 10000;
-			return Promise(function (resolve) {
+			return new Promise(function (resolve) {
 				setupOnOncePromise(rctestApp, resolve);
 				var item = document.getElementById("showrcaaa");
 				// force Phone layout
@@ -179,10 +179,10 @@ define([
 
 		"Phone Layout click slide CCC": function () {
 			this.timeout = 10000;
-			return Promise(function (resolve) {
-					setupOnOncePromise(rctestApp, resolve);
-					var item = document.getElementById("centershowrcccc");
-					item.click();
+			return new Promise(function (resolve) {
+				setupOnOncePromise(rctestApp, resolve);
+				var item = document.getElementById("centershowrcccc");
+				item.click();
 			}).then(function (evt) {
 				checkTransitionDetails(evt, "rcccc", "slide", false, rcvsNode);
 				testLayout(leftLayout, 'hidden');

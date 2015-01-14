@@ -13,12 +13,6 @@ define([
 ], function (registerSuite, assert, has, Application, Promise, dstoreMemoryconfig1) {
 	// -------------------------------------------------------------------------------------- //
 
-	console.log("has(ie) = " + has("ie"));
-	if (has("ie") === 10) {
-		console.log("Skipping dstoreMemorySuite tests on IE10");
-		return;
-	}
-
 	// for dstoreMemorySuite1 transition test
 	var dstoreMemoryContainer1,
 		testApp,
@@ -66,6 +60,9 @@ define([
 		},
 		"test initial view": function () {
 			this.timeout = 20000;
+			if (has("ie") === 10) {
+				this.skip();
+			}
 			return new Application(JSON.parse(stripComments(dstoreMemoryconfig1)), dstoreMemoryContainer1)
 				.then(function (appx) {
 					// we are ready to test
@@ -100,12 +97,15 @@ define([
 		// Currently showing dstoreMemoryAppHome1 test transition to dstoreMemoryAppHome2
 		"testApp.showOrHideViews('dstoreMemoryAppHome2')": function () {
 			this.timeout = 20000;
-		//	return Promise(function (resolve) {
-				var label = dstoreMemorylist1Elements[0].innerHTML || "";
+			if (has("ie") === 10) {
+				this.skip();
+			}
+			//	return Promise(function (resolve) {
+			var label = dstoreMemorylist1Elements[0].innerHTML || "";
 			return testApp.showOrHideViews("dstoreMemoryAppHome2", {
-					viewData: {
-						label: label
-					}
+				viewData: {
+					label: label
+				}
 			}).then(function () {
 				var dstoreMemoryList2 = document.getElementById("list2");
 				var dstoreMemoryAppHome2 = document.getElementById("dstoreMemoryAppHome2");
@@ -140,12 +140,15 @@ define([
 		// Currently showing dstoreMemoryAppHome2 test transition to dstoreMemoryAppHome1
 		"testApp.showOrHideViews('dstoreMemoryAppHome1')": function () {
 			this.timeout = 20000;
+			if (has("ie") === 10) {
+				this.skip();
+			}
 			var label = dstoreMemorylist2Elements[4].innerHTML || "";
 			//return Promise(function (resolve) {
 			return testApp.showOrHideViews("dstoreMemoryAppHome1", {
-					viewData: {
-						label: label
-					}
+				viewData: {
+					label: label
+				}
 			}).then(function () {
 				var dstoreMemoryList1 = document.getElementById("list2");
 				dstoreMemoryList1.deliver();

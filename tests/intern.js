@@ -15,18 +15,18 @@ define({
 		// It seems that specifying version="" or leaving version unspecified
 		// does not default to the latest version of the browser.
 
+		// Mobile
+	//	{ platformName: "iOS", platformVersion: "7.1", browserName: "safari", deviceName: "iPhone Simulator",
+	//		"appium-version": "1.2.2", name: "dapp" },
+
 		// Desktop.
 		//{ browserName: "internet explorer", version: "11", platform: "Windows 8.1", name : "dapp" },
 		//{ browserName: "internet explorer", version: "10", platform: "Windows 8", name : "dapp" },
-		{ browserName: "firefox", version: "31", platform: [ /*"OS X 10.6", "Linux", */ "Windows 7" ],
-			name : "dapp"},
+//		{ browserName: "firefox", version: "31", platform: [ /*"OS X 10.6", "Linux", */ "Windows 7" ],
+//			name : "dapp"},
 		{ browserName: "chrome", version: "32", platform: [ /*"OS X 10.6", "Linux", */ "Windows 7" ],
-			name : "dapp"},
-		{ browserName: "safari", version: "7", platform: [ "OS X 10.9" ], name : "dapp"}//,
-
-		// Mobile
-	//	{ platformName: "iOS", platformVersion: "7.1", browserName: "safari", deviceName: "iPhone Simulator",
-	//		"appium-version": "1.2.2", name: "dapp" }
+			name : "dapp"}/*,
+		{ browserName: "safari", version: "7", platform: [ "OS X 10.9" ], name : "dapp"}*/
 
 	],
 

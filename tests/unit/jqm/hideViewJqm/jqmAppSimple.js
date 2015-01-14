@@ -29,8 +29,7 @@ require(["dapp/Application", "requirejs-text/text!./app.json", "jquery", "jquery
 		jsonData = jsonData.replace(/\/\*.*?\*\//g, "");
 		jsonData = jsonData.replace(/\/\/.*/g, "");
 		//new Application(JSON.parse(jsonData));
-		var appStartedPromise = new Application(JSON.parse(jsonData));
-		appStartedPromise.then(function (app) {
+		new Application(JSON.parse(jsonData)).then(function (app) {
 			console.log("promise resolved for new App [" + app.id + "] it should be started and default views shown");
 		});
 

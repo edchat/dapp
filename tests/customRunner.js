@@ -19,7 +19,9 @@ define([
 	 * *FAILED Test main - Checkbox - functional - Checkbox behavior on firefox 31.0 on XP:
 	 */
 	// empty session is for the test runner itself
-	var sessions = { "": {} },
+	var sessions = {
+			"": {}
+		},
 		reporter = new Reporter(),
 		detailedReporter = new DetailedReporter(),
 		hasErrors = false;
@@ -40,7 +42,9 @@ define([
 		},
 
 		"/session/start": function (remote) {
-			sessions[remote.sessionId] = { remote: remote };
+			sessions[remote.sessionId] = {
+				remote: remote
+			};
 			console.log("Initialised " + remote.environmentType);
 		},
 
@@ -60,8 +64,7 @@ define([
 				suite = session.suite;
 			if (session.coverage) {
 				reporter.writeReport(session.coverage);
-			}
-			else {
+			} else {
 				console.log("No unit test coverage for " + remote.environmentType);
 			}
 

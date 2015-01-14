@@ -73,21 +73,22 @@ define([
 			var params = {
 				viewData: {
 					"p": "testData"
-				}};
+				}
+			};
 			return testApp.showOrHideViews('viewDataAndParamsAppHome1', params)
-			.then(function () {
-				var viewDataAndParamsAppHome1 = document.getElementById("viewDataAndParamsAppHome1");
-				checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome1);
+				.then(function () {
+					var viewDataAndParamsAppHome1 = document.getElementById("viewDataAndParamsAppHome1");
+					checkNodeVisibility(viewDataNode3, viewDataAndParamsAppHome1);
 
-				// Now viewDataAndParamsAppHome1View ActivateCallCounts should be 2
-				checkActivateCallCount(viewDataAndParamsAppHome1View, 2);
+					// Now viewDataAndParamsAppHome1View ActivateCallCounts should be 2
+					checkActivateCallCount(viewDataAndParamsAppHome1View, 2);
 
-				// Now viewDataAndParamsAppHome3View DeactivateCallCounts should be 1
-				checkDeactivateCallCount(viewDataAndParamsAppHome3View, 1);
+					// Now viewDataAndParamsAppHome3View DeactivateCallCounts should be 1
+					checkDeactivateCallCount(viewDataAndParamsAppHome3View, 1);
 
-				assert.strictEqual(viewDataAndParamsAppHome1View.viewData.p, "testData",
-					"viewDataAndParamsAppHome1View.viewData should equal testData");
-			});
+					assert.strictEqual(viewDataAndParamsAppHome1View.viewData.p, "testData",
+						"viewDataAndParamsAppHome1View.viewData should equal testData");
+				});
 		},
 
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
@@ -104,28 +105,29 @@ define([
 							"fromChild": "valuefromChild"
 						}
 					}
-				}};
+				}
+			};
 			this.timeout = 20000;
 			return testApp.showOrHideViews('parentV1,s1', params)
-			.then(function () {
-				//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
-				var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
+				.then(function () {
+					//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
+					var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
 
-				assert.strictEqual(viewDataparentV1s1View.viewData.p, "testData",
-					"viewDataparentV1s1View.viewData.p should equal testData");
-				assert.strictEqual(viewDataparentV1s1View.viewData.fromChild, "valuefromChild",
-					"viewDataparentV1s1View.viewData.fromChild should equal valuefromChild");
-				//NOTE: viewData is not inherited from parentView, so viewData.parentV1 is not set
-				assert.isUndefined(viewDataparentV1s1View.viewData.fromParent,
-					"viewDataparentV1s1View.viewData.fromParent should not be set");
+					assert.strictEqual(viewDataparentV1s1View.viewData.p, "testData",
+						"viewDataparentV1s1View.viewData.p should equal testData");
+					assert.strictEqual(viewDataparentV1s1View.viewData.fromChild, "valuefromChild",
+						"viewDataparentV1s1View.viewData.fromChild should equal valuefromChild");
+					//NOTE: viewData is not inherited from parentView, so viewData.parentV1 is not set
+					assert.isUndefined(viewDataparentV1s1View.viewData.fromParent,
+						"viewDataparentV1s1View.viewData.fromParent should not be set");
 
-				var viewDataparentV1View = viewUtils.getViewFromViewId(testApp, "parentV1");
-				//NOTE: viewData with fromParent on viewDataparentV1View should be set
-				assert.strictEqual(viewDataparentV1View.viewData.fromParent, "valuefromParent",
-					"viewDataparentV1View.viewData.fromParent should equal valuefromParent");
-				assert.isUndefined(viewDataparentV1View.viewData.fromChild,
-					"viewDataparentV1View.viewData.fromChild should not be set");
-			});
+					var viewDataparentV1View = viewUtils.getViewFromViewId(testApp, "parentV1");
+					//NOTE: viewData with fromParent on viewDataparentV1View should be set
+					assert.strictEqual(viewDataparentV1View.viewData.fromParent, "valuefromParent",
+						"viewDataparentV1View.viewData.fromParent should equal valuefromParent");
+					assert.isUndefined(viewDataparentV1View.viewData.fromChild,
+						"viewDataparentV1View.viewData.fromChild should not be set");
+				});
 		},
 
 		// Currently showing viewDataAndParamsAppHome3 test transition back to viewDataAndParamsAppHome1
@@ -142,27 +144,28 @@ define([
 							"fromParent": "paramValuefromParent"
 						}
 					}
-				}};
+				}
+			};
 			return testApp.showOrHideViews('parentV1,s1', params)
-			.then(function () {
-				//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
-				var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
+				.then(function () {
+					//	var viewDataparentV1s1 = document.getElementById("parentV1_s1");
+					var viewDataparentV1s1View = viewUtils.getViewFromViewId(testApp, "parentV1_s1");
 
-				assert.strictEqual(viewDataparentV1s1View.viewParams.p, "testData",
-					"viewDataparentV1s1View.viewParams should equal testData");
-				assert.strictEqual(viewDataparentV1s1View.viewParams.fromParent, "paramValuefromParent",
-					"viewDataparentV1s1View.viewParams.fromParent should equal paramValuefromParent");
-				assert.strictEqual(viewDataparentV1s1View.viewParams.fromChild, "paramValuefromChild",
-					"viewDataparentV1s1View.viewParams.fromChild should equal paramValuefromChild");
+					assert.strictEqual(viewDataparentV1s1View.viewParams.p, "testData",
+						"viewDataparentV1s1View.viewParams should equal testData");
+					assert.strictEqual(viewDataparentV1s1View.viewParams.fromParent, "paramValuefromParent",
+						"viewDataparentV1s1View.viewParams.fromParent should equal paramValuefromParent");
+					assert.strictEqual(viewDataparentV1s1View.viewParams.fromChild, "paramValuefromChild",
+						"viewDataparentV1s1View.viewParams.fromChild should equal paramValuefromChild");
 
-				var viewDataparentV1View = viewUtils.getViewFromViewId(testApp, "parentV1");
-				assert.strictEqual(viewDataparentV1View.viewParams.p, "testData",
-					"viewDataparentV1View.viewParams should equal testData");
-				assert.strictEqual(viewDataparentV1View.viewParams.fromParent, "paramValuefromParent",
-					"viewDataparentV1View.viewParams.fromParent should equal paramValuefromParent");
-				assert.isUndefined(viewDataparentV1View.viewParams.fromChild,
-					"viewDataparentV1View.viewParams.fromChild should not be set");
-			});
+					var viewDataparentV1View = viewUtils.getViewFromViewId(testApp, "parentV1");
+					assert.strictEqual(viewDataparentV1View.viewParams.p, "testData",
+						"viewDataparentV1View.viewParams should equal testData");
+					assert.strictEqual(viewDataparentV1View.viewParams.fromParent, "paramValuefromParent",
+						"viewDataparentV1View.viewParams.fromParent should equal paramValuefromParent");
+					assert.isUndefined(viewDataparentV1View.viewParams.fromChild,
+						"viewDataparentV1View.viewParams.fromChild should not be set");
+				});
 		},
 
 		teardown: function () {

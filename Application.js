@@ -44,23 +44,25 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 					dest: viewPath,
 					hash: hash
 				};
-				var passedPromise = null;
-				if(viewParams && viewParams.displayResolve) {
-					passedPromise = viewParams.displayResolve;
+				var passedResolve = null;
+				if (viewParams && viewParams.displayResolve) {
+					passedResolve = viewParams.displayResolve;
 				}
-				return Promise(function (resolve) {
+				return new Promise(function (resolve) {
 					dcl.mix(opts,
 						viewParams ? viewParams : {
 							transition: "slide",
 							direction: "end"
+						});
+					dcl.mix(opts, {
+						displayResolve: resolve
 					});
-					dcl.mix(opts, {displayResolve: resolve});
 					this.emit("dapp-display", opts);
-				}.bind(this)).then(function (resolve) {
-					if(passedPromise) {
-						passedPromise();
+				}.bind(this)).then(function () {
+					if (passedResolve) {
+						passedResolve();
 					}
-				}.bind(this))
+				}.bind(this));
 			},
 
 			createControllers: function (controllers) {
@@ -77,7 +79,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 					for (var i = 0; i < controllers.length; i++) {
 						requireItems.push(controllers[i]);
 					}
-					var controllerPromise = Promise(function (resolve) {
+					var controllerPromise = new Promise(function (resolve) {
 						require(requireItems, function () {
 							for (var i = 0; i < arguments.length; i++) {
 								// instantiate controllers, set Application object, and perform auto binding
@@ -139,7 +141,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 				// 		set the status for STOPPING during the unload and STOPPED when complete
 				// 		emit dapp-unload-view to have controllers stop, and delete the global app reference.
 				//
-				var appStoppedPromise = Promise(function (resolve) {
+				var appStoppedPromise = new Promise(function (resolve) {
 					this.setStatus(this.STOPPING);
 					var params = {};
 					params.view = this;
@@ -214,7 +216,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 				}
 				modules.push("requirejs-text/text!" + path);
 			}
-			return Promise(function (resolve, reject) {
+			return new Promise(function (resolve, reject) {
 				require(modules, function () {
 					var modules = [Application];
 					for (var i = 0; i < config.modules.length; i++) {
@@ -239,7 +241,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 							dcl.mix(app, window[globalAppName]);
 						}
 						window[globalAppName] = app;
-						app.appStartedPromise = resolve;
+						app.appStartedResolve = resolve;
 						app.start();
 					});
 				}, function (obj) {

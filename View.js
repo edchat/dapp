@@ -69,7 +69,7 @@ define(["require", "dcl/dcl", "lie/dist/lie", "delite/Widget", "delite/register"
 					if (tpl) {
 						deps = deps.concat(["requirejs-text/text!" + tpl]);
 					}
-					var loadViewPromise = Promise(function (resolve) {
+					var loadViewPromise = new Promise(function (resolve) {
 						require(deps, function () {
 							this.templateString = this.template ?
 								arguments[arguments.length - 1] : "<div></div>";
@@ -83,7 +83,7 @@ define(["require", "dcl/dcl", "lie/dist/lie", "delite/Widget", "delite/register"
 			// start view
 			load: dcl.superCall(function (sup) {
 				return function () {
-					var tplPromise = Promise(function (resolve) {
+					var tplPromise = new Promise(function (resolve) {
 						var defDef = sup.call(this);
 						var nlsDef = nls(this);
 						// when parentView loading is done (controller), proceed with template

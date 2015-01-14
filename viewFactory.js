@@ -2,7 +2,7 @@ define(["require", "dcl/dcl", "lie/dist/lie"],
 	function (require, dcl, Promise) {
 		return function (viewParams) {
 			var viewType = viewParams.viewType;
-			var createPromise = Promise(function (resolve) {
+			var createPromise = new Promise(function (resolve) {
 				require([viewType ? viewType : "./View"], function (View) {
 					var v = new View(viewParams);
 					if (v.start) {

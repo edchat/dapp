@@ -13,11 +13,6 @@ define([
 ], function (registerSuite, assert, has, Application, domGeom, domClass, register, viewLayoutconfig) {
 	// -------------------------------------------------------------------------------------- //
 
-	if (has("ie") === 10) {
-		console.log("Skipping multipleAndNestedViewsActivateCalls tests on IE10");
-		return;
-	}
-
 	// for viewLayoutSuite
 	var viewLayoutContainer2,
 		testApp,
@@ -38,6 +33,9 @@ define([
 		},
 		"viewLayoutSuite dapp viewLayout test domNode sizes": function () {
 			this.timeout = 20000;
+			if (has("ie") === 10) {
+				this.skip();
+			}
 
 			// create the app from the config and wait for the promise
 			return new Application(JSON.parse(stripComments(viewLayoutconfig)), viewLayoutContainer2)
@@ -70,6 +68,9 @@ define([
 		// hide one view and verify sizes
 		"viewLayoutSuite dapp viewLayout hide viiew and test domNode sizes": function () {
 			this.timeout = 20000;
+			if (has("ie") === 10) {
+				this.skip();
+			}
 
 			return document.getElementById("viewLayoutAppdlayout").hide("viewLayoutAppHome2")
 				.then(function () {
@@ -95,7 +96,9 @@ define([
 		teardown: function () {
 			// call unloadApp to cleanup and end the test
 			viewLayoutContainer2.parentNode.removeChild(viewLayoutContainer2);
-			testApp.unloadApp();
+			if (testApp) {
+				testApp.unloadApp();
+			}
 		}
 	};
 	registerSuite(viewLayoutSuite);

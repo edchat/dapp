@@ -32,9 +32,9 @@ define([
 		"transitionVisibilitySuite dapp transitionVisibility test initial layout": function () {
 			this.timeout = 20000;
 
-			var appStartedPromise = new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
-				transitionVisibilityContainer3);
-			return appStartedPromise.then(function (app) {
+			return new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
+				transitionVisibilityContainer3)
+			.then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -51,12 +51,12 @@ define([
 		// because the next transition fires before the call to afterActivate.
 		"Show (by widget.show with id) test on delite-after-show": function () {
 			this.timeout = 20000;
-			return Promise(function (resolve) {
+			return new Promise(function (resolve) {
 				var sig = transitionVisibilityNode3.on("delite-after-show", function () {
 					resolve();
 					sig.remove();
 				});
-				transitionVisibilityNode3.show("transitionVisibilityAppHome3NoController")
+				transitionVisibilityNode3.show("transitionVisibilityAppHome3NoController");
 			}).then(function () {
 				var transitionVisibilityAppHome3NoController =
 					document.getElementById("transitionVisibilityAppHome3NoController");
@@ -88,8 +88,7 @@ define([
 		"Test showOrHideViews (by view name) ": function () {
 			this.timeout = 20000;
 
-			return testApp.showOrHideViews('transitionVisibilityAppHome2', {
-			}).then(function () {
+			return testApp.showOrHideViews('transitionVisibilityAppHome2', {}).then(function () {
 				var transitionVisibilityAppHome2 = document.getElementById("transitionVisibilityAppHome2");
 				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome2);
 			});

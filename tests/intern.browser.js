@@ -17,7 +17,7 @@ define([
 
 			// this works with the JQM tests
 			"jquery": "jquery/dist/jquery.min"
-		//	"jquery": "https://code.jquery.com/jquery-2.1.1.min"
+				//	"jquery": "https://code.jquery.com/jquery-2.1.1.min"
 
 		},
 		shim: {

@@ -21,6 +21,8 @@
 				"decor": "../../../../decor",
 				"delite": "../../../../delite",
 				"deliteful": "../../../../deliteful",
+				"lie": "../../../../lie",
+				"jquery": "../../../../jquery",
 				"requirejs": "../../../../requirejs",
 				"requirejs-text": "../../../../requirejs-text",
 				"requirejs-dplugins": "../../../../requirejs-dplugins",
@@ -41,8 +43,7 @@
 				var json = JSON.parse(jsonData);
 				json.loaderConfig.paths.transitionTypesApp = "../transitionTypes"
 				//new Application(JSON.parse(jsonData));
-				var appStartedPromise = new Application(json);
-				appStartedPromise.then(function (app) {
+				new Application(json).then(function (app) {
 					console.log("promise resolved for new App [" + app.id + "] it should be started and default views shown");
 				});
 			});

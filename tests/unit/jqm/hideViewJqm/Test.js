@@ -61,9 +61,8 @@ define([
 		"jqmhideViewJqmSuite dapp jqmhideViewJqm test initial layout": function () {
 			this.timeout = 20000;
 
-			var appStartedPromise = new Application(JSON.parse(stripComments(jqmhideViewJqmconfig)),
-				jqmhideViewJqmContainer3);
-			return appStartedPromise.then(function (app) {
+			return new Application(JSON.parse(stripComments(jqmhideViewJqmconfig)),
+				jqmhideViewJqmContainer3).then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -76,35 +75,35 @@ define([
 		"Test showOrHideViews('hideViewJqmAppHome2' ": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('hideViewJqmAppHome2')
-			.then(function () {
-				hideViewJqmAppHome2View = viewUtils.getViewFromViewId(testApp, "hideViewJqmAppHome2");
-				checkActivateCallCount(hideViewJqmAppHome2View, 1);
-				checkDeactivateCallCount(hideViewJqmAppHome1View, 1);
-			});
+				.then(function () {
+					hideViewJqmAppHome2View = viewUtils.getViewFromViewId(testApp, "hideViewJqmAppHome2");
+					checkActivateCallCount(hideViewJqmAppHome2View, 1);
+					checkDeactivateCallCount(hideViewJqmAppHome1View, 1);
+				});
 		},
 		"Test showOrHideViews('hideViewJqmAppHome1' ": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('hideViewJqmAppHome1')
-			.then(function () {
-				checkActivateCallCount(hideViewJqmAppHome1View, 2);
-				checkDeactivateCallCount(hideViewJqmAppHome2View, 1);
-			});
+				.then(function () {
+					checkActivateCallCount(hideViewJqmAppHome1View, 2);
+					checkDeactivateCallCount(hideViewJqmAppHome2View, 1);
+				});
 		},
 		"Test showOrHideViews('-hideViewJqmAppHome1' ": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('-hideViewJqmAppHome1')
-			.then(function () {
-				//checkActivateCallCount(hideViewJqmAppHome1View, 2);
-				checkDeactivateCallCount(hideViewJqmAppHome1View, 2);
-			});
+				.then(function () {
+					//checkActivateCallCount(hideViewJqmAppHome1View, 2);
+					checkDeactivateCallCount(hideViewJqmAppHome1View, 2);
+				});
 		},
 		"Test showOrHideViews('hideViewJqmAppHome2') again ": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('hideViewJqmAppHome2')
-			.then(function () {
-				checkActivateCallCount(hideViewJqmAppHome2View, 2);
-				checkDeactivateCallCount(hideViewJqmAppHome1View, 2);
-			});
+				.then(function () {
+					checkActivateCallCount(hideViewJqmAppHome2View, 2);
+					checkDeactivateCallCount(hideViewJqmAppHome1View, 2);
+				});
 		},
 		teardown: function () {
 			// call unloadApp to cleanup and end the test

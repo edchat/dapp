@@ -53,55 +53,51 @@ define([
 						"hideViewApp3Home1View._beforeActivateCallCount should be 1");
 
 					checkNodeVisibility(hideViewNode, hideViewApp3Home1);
-				})
-			// Currently showing hideViewApp3Home1View test transition to hide it
-			.then(function () {
-			return hideViewNode.hide("hideViewApp3Home1").then(function () {
-				var hideViewApp3Home1 = document.getElementById("hideViewApp3Home1");
-				hideViewApp3Home1View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home1");
-				assert.isNull(hideViewApp3Home1);
-				assert.isNull(hideViewApp3Home1View.parentNode);
-			})
-			})
+					// Currently showing hideViewApp3Home1View test transition to hide it
+					return hideViewNode.hide("hideViewApp3Home1").then(function () {
+						var hideViewApp3Home1 = document.getElementById("hideViewApp3Home1");
+						hideViewApp3Home1View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home1");
+						assert.isNull(hideViewApp3Home1);
+						assert.isNull(hideViewApp3Home1View.parentNode);
+					});
+				});
 
 		},
 		// Currently showing hideViewApp3Home1 test transition back to hideViewApp3Home2
 		"testApp.show and then hide 'hideViewApp3Home2'": function () {
 			this.timeout = 20000;
 			return testApp.showOrHideViews('hideViewApp3Home2')
-			.then(function () {
-				var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
-				hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
-				checkNodeVisibility(hideViewNode, hideViewApp3Home2);
+				.then(function () {
+					var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
+					hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
+					checkNodeVisibility(hideViewNode, hideViewApp3Home2);
 
-				// Now hideViewApp3Home2View ActivateCallCounts should be 1
-				checkActivateCallCount(hideViewApp3Home2View, 1);
+					// Now hideViewApp3Home2View ActivateCallCounts should be 1
+					checkActivateCallCount(hideViewApp3Home2View, 1);
 
-				// Now hideViewApp3Home3NoControllerView DeactivateCallCounts should be 2
-				checkDeactivateCallCount(hideViewApp3Home3NoControllerView, 1);
-				// Now hideViewApp3Home1View DeactivateCallCounts should be 2
-				checkDeactivateCallCount(hideViewApp3Home1View, 1);
-			})
-			.then(function () {
-			return testApp.showOrHideViews('-hideViewApp3Home2')
-			.then(function () {
-				var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
-				hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
-				assert.isNull(hideViewApp3Home2);
-				assert.isNull(hideViewApp3Home2View.parentNode);
+					// Now hideViewApp3Home3NoControllerView DeactivateCallCounts should be 2
+					checkDeactivateCallCount(hideViewApp3Home3NoControllerView, 1);
+					// Now hideViewApp3Home1View DeactivateCallCounts should be 2
+					checkDeactivateCallCount(hideViewApp3Home1View, 1);
+					return testApp.showOrHideViews('-hideViewApp3Home2')
+						.then(function () {
+							var hideViewApp3Home2 = document.getElementById("hideViewApp3Home2");
+							hideViewApp3Home2View = viewUtils.getViewFromViewId(testApp, "hideViewApp3Home2");
+							assert.isNull(hideViewApp3Home2);
+							assert.isNull(hideViewApp3Home2View.parentNode);
 
-				// Now hideViewApp3Home2View ActivateCallCounts should be 1
-				var view = hideViewApp3Home2View;
-				var count = 1;
-				assert.strictEqual(view._beforeActivateCallCount, count,
-					view.id + " _beforeActivateCallCount should be " + count);
-				assert.strictEqual(view._afterActivateCallCount, count,
-					view.id + " _afterActivateCallCount should be " + count);
+							// Now hideViewApp3Home2View ActivateCallCounts should be 1
+							var view = hideViewApp3Home2View;
+							var count = 1;
+							assert.strictEqual(view._beforeActivateCallCount, count,
+								view.id + " _beforeActivateCallCount should be " + count);
+							assert.strictEqual(view._afterActivateCallCount, count,
+								view.id + " _afterActivateCallCount should be " + count);
 
-				// Now hideViewApp3Home3NoControllerView DeactivateCallCounts should be 2
-				checkDeactivateCallCount(hideViewApp3Home2View, 1);
-			})
-			})
+							// Now hideViewApp3Home3NoControllerView DeactivateCallCounts should be 2
+							checkDeactivateCallCount(hideViewApp3Home2View, 1);
+						});
+				});
 		},
 		// Currently showing nothing test transition to hideViewApp3Home3NoController
 		"hideViewNode.show('hideViewApp3Home3NoController')": function () {

@@ -58,7 +58,7 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 					});
 				} else {
 					dispViewDef.then(function (value) {
-						syncResolve();
+						syncResolve(value);
 					});
 				}
 				return syncResolve;
@@ -71,7 +71,7 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 				var self = this;
 				if (viewPaths) {
 					if (this.app.loadViewsInOrder || viewPaths[0].loadViewsInOrder) {
-						promises.push(Promise(function (syncresolve) {
+						promises.push(new Promise(function (syncresolve) {
 							this._loadViewsInOrder(viewPaths, 0, event, syncresolve);
 						}.bind(this)));
 					} else {
@@ -84,7 +84,7 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 							i++;
 							// need to wait before loading the next views if loadViewsInOrder is set.
 							if (i < viewPaths.length && viewPaths[i].loadViewsInOrder) {
-								promises.push(Promise(function (syncresolve2) {
+								promises.push(new Promise(function (syncresolve2) {
 									displayViewPromise.then(function () {
 										self._loadViewsInOrder(viewPaths, i, event, syncresolve2);
 									});
@@ -113,7 +113,7 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 			// _displayView is called to show a view, it will handle nested views by calling _displayParents
 			_displayView: function (viewTarget, event, isParent, viewPath) {
 				var subEvent;
-				var dispviewPromise = Promise(function (resolve) {
+				var dispviewPromise = new Promise(function (resolve) {
 					event.dapp.isParent = isParent;
 					event.dapp.viewPath = viewPath;
 					var self = this;

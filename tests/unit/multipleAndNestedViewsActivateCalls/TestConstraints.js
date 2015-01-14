@@ -11,11 +11,6 @@ define([
 	"deliteful/ViewStack"
 ], function (registerSuite, assert, has, Application, viewUtils, register,
 	multipleAndNestedViewsActivateCallsconfig1) {
-	// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
-	if (has("ie") || has("ff")) {
-		console.log("Skipping multipleAndNestedViewsActivateCallsConstraintsSuite1 tests on IE and FF");
-		return;
-	}
 
 	// -------------------------------------------------------------------------------------- //
 	// for multipleAndNestedViewsActivateCallsConstraintsSuite1 transition test
@@ -49,10 +44,13 @@ define([
 		},
 		"test initial view": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 
-			var appStartedPromise1 = new Application(JSON.parse(stripComments(multipleAndNestedViewsActivateCallsconfig1)),
-				multipleAndNestedViewsActivateCallsContainer1);
-			return appStartedPromise1.then(function (app) {
+			return new Application(JSON.parse(stripComments(multipleAndNestedViewsActivateCallsconfig1)),
+					multipleAndNestedViewsActivateCallsContainer1).then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -76,6 +74,10 @@ define([
 		// Currently showing P1_S1_V1 test transition to V7
 		"multipleAndNestedViewsActivateCallsApp1Content.show(V7)": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return multipleAndNestedViewsActivateCallsApp1Content.show("V7").then(function () {
 				//temp test works on IE but does not help on FF
 				// TODO: NOTE this test fails on FF, and IE, the lines above work on IE, but not on FF.
@@ -108,6 +110,10 @@ define([
 		// Currently showing V7 test transition to P1_S1_V1
 		"multipleAndNestedViewsActivateCallsApp1Content.show(P1) will show P1,S1,V": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return multipleAndNestedViewsActivateCallsApp1Content.show("P1").then(function () {
 				var multipleAndNestedViewsActivateCallsApp1V1 = document.getElementById("contentCons_P1_S1_V1");
 				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
@@ -126,6 +132,10 @@ define([
 		// Currently showing P1,S1,V1 test transition to P1_S1_V2
 		"multipleAndNestedViewsActivateCallsApp1S1View.containerNode.show('V2') will show P1,S1,V2": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return multipleAndNestedViewsActivateCallsApp1S1View.containerNode.show('V2').then(function () {
 				var multipleAndNestedViewsActivateCallsApp1V2 = document.getElementById("contentCons_P1_S1_V2");
 				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
@@ -151,59 +161,71 @@ define([
 		// Currently showing P1_S1_V2 test transition to V7
 		"testApp.showOrHideViews('contentCons,V7')": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return testApp.showOrHideViews('contentCons,V7')
-			.then(function () {
-				var multipleAndNestedViewsActivateCallsApp1V7 = document.getElementById("contentCons_V7");
+				.then(function () {
+					var multipleAndNestedViewsActivateCallsApp1V7 = document.getElementById("contentCons_V7");
 
-				checkNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
-					multipleAndNestedViewsActivateCallsApp1V7);
+					checkNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
+						multipleAndNestedViewsActivateCallsApp1V7);
 
-				// Now multipleAndNestedViewsActivateCallsApp1V2View ActivateCallCounts should be 1
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2);
+					// Now multipleAndNestedViewsActivateCallsApp1V2View ActivateCallCounts should be 1
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2);
 
-				// Now multipleAndNestedViewsActivateCallsApp1V1View ActivateCallCounts should be 1
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3, true);
+					// Now multipleAndNestedViewsActivateCallsApp1V1View ActivateCallCounts should be 1
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3, true);
 
-				// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 1, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3);
-			});
+					// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 1, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3);
+				});
 		},
 
 		// Currently showing V7 test transition to P1_S1_V1
 		"testApp.showOrHideViews('contentCons,P1') will show P1,S1,V1": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return testApp.showOrHideViews('contentCons,P1')
-			.then(function () {
-				var multipleAndNestedViewsActivateCallsApp1V1 = document.getElementById("contentCons_P1_S1_V1");
-				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
-					multipleAndNestedViewsActivateCallsApp1V1);
+				.then(function () {
+					var multipleAndNestedViewsActivateCallsApp1V1 = document.getElementById("contentCons_P1_S1_V1");
+					checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
+						multipleAndNestedViewsActivateCallsApp1V1);
 
-				// Now multipleAndNestedViewsActivateCallsApp1V2View ActivateCallCounts as follows
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 3);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4);
+					// Now multipleAndNestedViewsActivateCallsApp1V2View ActivateCallCounts as follows
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 3);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4);
 
-				// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3, true);
-			});
+					// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3, true);
+				});
 		},
 
 		// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V1
 		"multipleAndNestedViewsActivateCallsApp1Content.show('P2') will show P2,P2S1,P2V1": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return multipleAndNestedViewsActivateCallsApp1Content.show('P2').then(function () {
 				var multipleAndNestedViewsActivateCallsApp1P2V1 = document.getElementById("contentCons_P2_P2S1_P2V1");
 				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
@@ -232,6 +254,10 @@ define([
 		// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V1
 		"testApp.showOrHideViews('-contentCons') will hide P2,P2S1,P2V1": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return document.getElementById("contentCons").parentNode.hide(document.getElementById("contentCons").id)
 				.then(function () {
 					var multipleAndNestedViewsActivateCallsApp1P2V2 =
@@ -267,36 +293,45 @@ define([
 		// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V2
 		"testApp.showOrHideViews('contentCons,P2,P2S1,P2V2') will show P2,P2S1,P2V2": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return testApp.showOrHideViews('contentCons,P2,P2S1,P2V2')
-			.then(function () {
-				var multipleAndNestedViewsActivateCallsApp1P2V2 = document.getElementById("contentCons_P2_P2S1_P2V2");
-				checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
-					multipleAndNestedViewsActivateCallsApp1P2V2);
+				.then(function () {
+					var multipleAndNestedViewsActivateCallsApp1P2V2 =
+						document.getElementById("contentCons_P2_P2S1_P2V2");
+					checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
+						multipleAndNestedViewsActivateCallsApp1P2V2);
 
-				multipleAndNestedViewsActivateCallsApp1P2V2View = viewUtils.getViewFromViewId(testApp,
-					"contentCons_P2_P2S1_P2V2");
+					multipleAndNestedViewsActivateCallsApp1P2V2View = viewUtils.getViewFromViewId(testApp,
+						"contentCons_P2_P2S1_P2V2");
 
-				// Now multipleAndNestedViewsActivateCallsApp1V1View ActivateCallCounts should be 1
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P2V2View, 1);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 3, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
-				checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
+					// Now multipleAndNestedViewsActivateCallsApp1V1View ActivateCallCounts should be 1
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P2V2View, 1);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 3, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
+					checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
 
-				// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 3);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
-				checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
-			});
+					// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 2, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 3);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 4, true);
+					checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 4, true);
+				});
 		},
 
 		//TODO: NOTE problem w/ -contentCons,P2!!! it hides P2,P2S1,P2V2
 		// Currently showing P1,S1,V1 test transition to P2,P2S1,P2V1
 		"testApp.showOrHideViews('-contentCons,P2,P2S1')": function () {
 			this.timeout = 20000;
+			// multipleAndNestedViewsActivateCallsConstraintsSuite1 is having problems on IE10, IE11 and FF
+			if (has("ie") || has("ff")) {
+				this.skip();
+			}
 			return document.getElementById("contentCons_P2_P2S1").parentNode.hide(
 					document.getElementById("contentCons_P2_P2S1").id)
 				.then(function () {
@@ -336,7 +371,9 @@ define([
 			// call unloadApp to cleanup and end the test
 			multipleAndNestedViewsActivateCallsContainer1.parentNode.removeChild(
 				multipleAndNestedViewsActivateCallsContainer1);
-			testApp.unloadApp();
+			if (testApp) {
+				testApp.unloadApp();
+			}
 		}
 	};
 

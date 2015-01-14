@@ -41,8 +41,8 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 				if (this._started) {
 					return this;
 				}
-				var startPromise = Promise(function (resolve) {
-					this._startPromise = resolve;
+				var startPromise = new Promise(function (resolve) {
+					this._startResolve = resolve;
 					return Promise.resolve(this.load()).then(function (controller) {
 						this._createDataStores();
 						this._startup(controller);
@@ -59,7 +59,6 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 						return controller;
 					}
 				}.bind(this));
-				return vcDef;
 			},
 
 			_createDataStores: function () {
@@ -103,8 +102,8 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 				viewUtils.register(this.constraint);
 
 				this._started = true;
-				if (this._startPromise) {
-					this._startPromise(this);
+				if (this._startResolve) {
+					this._startResolve(this);
 				}
 			},
 
@@ -118,13 +117,13 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 
 				//TODO: There is a problem with the order of views being added if no controller is listed
 				//TODO: Seems like order problem can be solved by using ViewBase if it is not set, try this for now!
-				var viewControllerPromise = Promise(function (resolve) {
+				var viewControllerPromise = new Promise(function (resolve) {
 					if (!this.controller) {
 						this.controller = "dapp/ViewBase";
 					}
 					if (!this.controller) {
 						resolve(true);
-						return viewControllerDef;
+						return;
 					} else {
 						path = this.controller.replace(/(\.js)$/, "");
 					}

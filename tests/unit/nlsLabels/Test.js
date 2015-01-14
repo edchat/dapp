@@ -9,10 +9,6 @@ define([
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
 ], function (registerSuite, assert, has, Application, viewUtils, nlsLabelsconfig3) {
-	if (has("ie") === 10) {
-		console.log("Skipping nlsLabelsSuite tests on IE10");
-		return;
-	}
 	// -------------------------------------------------------------------------------------- //
 	// TODO: should add a nested nls test with strings at the parent view available to the child view.
 	// for nlsLabelsSuite transition test
@@ -36,9 +32,12 @@ define([
 		},
 		"test initial view and nls labels": function () {
 			this.timeout = 20000;
+			if (has("ie") === 10) {
+				this.skip();
+			}
 
-			var appStartedPromise3 = new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3);
-			return appStartedPromise3.then(function (app) {
+			return new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3)
+			.then(function (app) {
 				// we are ready to test
 				testApp = app;
 
@@ -72,6 +71,9 @@ define([
 		// Currently showing nlsLabelsAppHome1View test transition to nlsLabelsAppHome3NoControllerView
 		"nlsLabelsNode3.show(nlsLabelsAppHome3NoController)": function () {
 			this.timeout = 20000;
+			if (has("ie") === 10) {
+				this.skip();
+			}
 			return nlsLabelsNode3.show("nlsLabelsAppHome3NoController").then(function () {
 				var nlsLabelsAppHome3NoController = document.getElementById("nlsLabelsAppHome3NoController");
 				checkNodeVisibility(nlsLabelsNode3, nlsLabelsAppHome3NoController);
@@ -97,7 +99,9 @@ define([
 		teardown: function () {
 			// call unloadApp to cleanup and end the test
 			nlsLabelsContainer3.parentNode.removeChild(nlsLabelsContainer3);
-			testApp.unloadApp();
+			if (testApp) {
+				testApp.unloadApp();
+			}
 		}
 	};
 

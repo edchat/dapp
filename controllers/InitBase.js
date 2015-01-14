@@ -105,7 +105,7 @@ define(["require", "dcl/dcl", "lie/dist/lie", "../Controller", "dojo/_base/decla
 				// let's display default view
 				var initialView = this.app.alwaysUseDefaultView ? this.app.defaultView : this.app._startView;
 				var initialParams = this.app.alwaysUseDefaultView ? this.app.defaultParams : this.app._startParams;
-				var displayProm = Promise(function (resolve) {
+				var displayProm = new Promise(function (resolve) {
 					this.app.emit("dapp-display", {
 						// TODO is that really defaultView a good name? Shouldn't it be defaultTarget or defaultView_s_?
 						dest: initialView,
@@ -118,7 +118,7 @@ define(["require", "dcl/dcl", "lie/dist/lie", "../Controller", "dojo/_base/decla
 				if (this.app) {
 					displayProm.then(function () {
 						this.app.setStatus(this.app.STARTED);
-						this.app.appStartedPromise(this.app); // resolve the appStartedPromise
+						this.app.appStartedResolve(this.app); // resolve the appStartedPromise
 					}.bind(this));
 				}
 			}
