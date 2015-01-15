@@ -34,18 +34,18 @@ define([
 			this.timeout = 20000;
 
 			return when(new Application(JSON.parse(stripComments(transitionVisibilityconfig)),
-				transitionVisibilityContainer3)
-			.then(function (app) {
-				// we are ready to test
-				testApp = app;
+					transitionVisibilityContainer3)
+				.then(function (app) {
+					// we are ready to test
+					testApp = app;
 
-				var transitionVisibilityAppHome1 = document.getElementById("transitionVisibilityAppHome1");
-				// check the DOM state to see if we are in the expected state
-				assert.isNotNull(transitionVisibilityNode3, "root transitionVisibilityNode3 must be here");
-				assert.isNotNull(transitionVisibilityAppHome1, "transitionVisibilityAppHome1 view must be here");
+					var transitionVisibilityAppHome1 = document.getElementById("transitionVisibilityAppHome1");
+					// check the DOM state to see if we are in the expected state
+					assert.isNotNull(transitionVisibilityNode3, "root transitionVisibilityNode3 must be here");
+					assert.isNotNull(transitionVisibilityAppHome1, "transitionVisibilityAppHome1 view must be here");
 
-				checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome1);
-			}));
+					checkNodeVisibility(transitionVisibilityNode3, transitionVisibilityAppHome1);
+				}));
 		},
 
 		// NOTE: these tests will show transition the views, but call to before/afterDeactivate are not working here

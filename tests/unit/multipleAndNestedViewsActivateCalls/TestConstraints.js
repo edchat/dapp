@@ -51,7 +51,7 @@ define([
 			}
 
 			return when(new Application(JSON.parse(stripComments(multipleAndNestedViewsActivateCallsconfig1)),
-					multipleAndNestedViewsActivateCallsContainer1).then(function (app) {
+				multipleAndNestedViewsActivateCallsContainer1).then(function (app) {
 				// we are ready to test
 				testApp = app;
 

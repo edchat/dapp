@@ -69,42 +69,36 @@ define(["require", "dcl/dcl", "lie/dist/lie", "delite/Widget", "delite/register"
 					if (tpl) {
 						deps = deps.concat(["requirejs-text/text!" + tpl]);
 					}
-					var loadViewPromise = new Promise(function (resolve) {
+					return new Promise(function (resolve) {
 						require(deps, function () {
 							this.templateString = this.template ?
 								arguments[arguments.length - 1] : "<div></div>";
 							resolve(this);
 						}.bind(this));
 					}.bind(this));
-					return loadViewPromise;
 				}
 			},
 
 			// start view
 			load: dcl.superCall(function (sup) {
 				return function () {
-					var tplPromise = new Promise(function (resolve) {
-						var defDef = sup.call(this);
-						var nlsDef = nls(this);
+					return new Promise(function (resolve) {
 						// when parentView loading is done (controller), proceed with template
-						defDef.then(function (controller) {
-							return Promise.resolve(nlsDef).then(function (nls) {
+						sup.call(this).then(function (controller) {
+							return Promise.resolve(nls(this)).then(function (nls) {
 								// we inherit from the parentView NLS
 								this.nls = {};
 								if (this.parentView) {
 									dcl.mix(this.nls, this.parentView.nls);
 								}
-								if (nls) {
-									// make sure template can access nls doing {{nls.myprop}}
-									dcl.mix(this.nls, nls);
-								}
+								// make sure template can access nls doing {{nls.myprop}}
+								dcl.mix(this.nls, nls);
 								return Promise.resolve(this._loadTemplate()).then(function () {
 									resolve(controller);
 								});
 							}.bind(this));
 						}.bind(this));
 					}.bind(this));
-					return tplPromise;
 				};
 			}),
 

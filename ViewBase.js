@@ -41,14 +41,22 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 				if (this._started) {
 					return this;
 				}
-				var startPromise = new Promise(function (resolve) {
+				/*	return new Promise(function (resolve) {
+					    this._startResolve = resolve;
+						return this.load().bind(this)
+						.then(function (controller) {
+							this._createDataStores();
+							this._startup(controller);
+						}.bind(this))}.bind(this));
+				*/
+				return new Promise(function (resolve) {
 					this._startResolve = resolve;
 					return Promise.resolve(this.load()).then(function (controller) {
 						this._createDataStores();
 						this._startup(controller);
 					}.bind(this));
 				}.bind(this));
-				return startPromise;
+
 			},
 
 			load: function () {
@@ -117,7 +125,7 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 
 				//TODO: There is a problem with the order of views being added if no controller is listed
 				//TODO: Seems like order problem can be solved by using ViewBase if it is not set, try this for now!
-				var viewControllerPromise = new Promise(function (resolve) {
+				return new Promise(function (resolve) {
 					if (!this.controller) {
 						this.controller = "dapp/ViewBase";
 					}
@@ -132,7 +140,6 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 						resolve(controller);
 					});
 				}.bind(this));
-				return viewControllerPromise;
 			},
 
 			init: function () {

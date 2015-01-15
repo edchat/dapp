@@ -50,35 +50,32 @@ define([
 		},
 		beforeEach: function () {
 			return when(new Promise(function (resolve) {
-				setTimeout(function () {
-					resolve();
-				}, 50);
+				setTimeout(resolve, 50);
 			}));
 		},
 		"transitionTypesSuite dapp transitionTypes test initial layout": function () {
 			this.timeout = 10000;
 
 			return when(new Application(JSON.parse(stripComments(transitionTypesconfig)),
-				transitionTypesContainer1))
-			.then(function (app) {
-				// we are ready to test
-				console.log("in transitionType tests app loaded. " + app.id);
-				testApp = app;
+					transitionTypesContainer1))
+				.then(function (app) {
+					// we are ready to test
+					console.log("in transitionType tests app loaded. " + app.id);
+					testApp = app;
 
-				vsNode = document.getElementById("vs");
-				var testId = "aaa";
-				var testNode = document.getElementById(testId);
-				assert.isNotNull(testNode, testId + " must be here");
-				assert.isNotNull(vsNode, "vsNode must be here");
-				checkNodeVisibility(vsNode, testNode);
-			});
+					vsNode = document.getElementById("vs");
+					var testId = "aaa";
+					var testNode = document.getElementById(testId);
+					assert.isNotNull(testNode, testId + " must be here");
+					assert.isNotNull(vsNode, "vsNode must be here");
+					checkNodeVisibility(vsNode, testNode);
+				});
 		},
 
 		"Click Slide BBB1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("slideBBB1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "slide", false, button, vsNode);
@@ -87,8 +84,7 @@ define([
 		"Click SlideV CCC1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("slidevCCC1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ccc", "slidev", false, button, vsNode);
@@ -97,8 +93,7 @@ define([
 		"Click Reveal DDD1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("revealDDD1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ddd", "reveal", false, button, vsNode);
@@ -107,8 +102,7 @@ define([
 		"Click RevealV AAA1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("revealvAAA1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "aaa", "revealv", false, button, vsNode);
@@ -117,8 +111,7 @@ define([
 		"Click Flip BBB1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("flipBBB1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "flip", false, button, vsNode);
@@ -127,8 +120,7 @@ define([
 		"Click Fade CCC1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("fadeCCC1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ccc", "fade", false, button, vsNode);
@@ -137,8 +129,7 @@ define([
 		"Click Cover DDD1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("coverDDD1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ddd", "cover", false, button, vsNode);
@@ -147,8 +138,7 @@ define([
 		"Click Coverv AAA1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("covervAAA1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "aaa", "coverv", false, button, vsNode);
@@ -157,8 +147,7 @@ define([
 		"Click Slide BBB1 again": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("slideBBB1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "slide", false, button, vsNode);
@@ -167,8 +156,7 @@ define([
 		"history.back() to Coverv AAA1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("covervAAA1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "aaa", "coverv", true, button, vsNode);
@@ -177,8 +165,7 @@ define([
 		"history.back() to Cover DDD1": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("coverDDD1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ddd", "cover", true, button, vsNode);
@@ -187,8 +174,7 @@ define([
 		"history.back() to Fade CCC1": function () { //one fail here
 			this.timeout = 10000;
 			var button = document.getElementById("fadeCCC1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ccc", "fade", true, button, vsNode);
@@ -197,8 +183,7 @@ define([
 		"history.back() to Flip BBB1": function () { // one fail here
 			this.timeout = 10000;
 			var button = document.getElementById("flipBBB1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "flip", true, button, vsNode);
@@ -208,8 +193,7 @@ define([
 			this.timeout = 10000;
 			var pNode = document.getElementById("footerll");
 			var button = document.getElementById("nextFooter1");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "footerShow", "slide", false, button, pNode);
@@ -220,8 +204,7 @@ define([
 		"Click RevealV AAA2 with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("revealvAAA2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "aaa", "revealv", true, button, vsNode);
@@ -230,8 +213,7 @@ define([
 		"Click Flip BBB2 with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("flipBBB2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "flip", true, button, vsNode);
@@ -240,8 +222,7 @@ define([
 		"Click Fade CCC2 with vs.show": function () { //one fail here
 			this.timeout = 10000;
 			var button = document.getElementById("fadeCCC2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ccc", "fade", true, button, vsNode);
@@ -250,8 +231,7 @@ define([
 		"Click Cover DDD2 with vs.show": function () { // one fail here
 			this.timeout = 10000;
 			var button = document.getElementById("coverDDD2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ddd", "cover", true, button, vsNode);
@@ -260,8 +240,7 @@ define([
 		"history.back() to Fade CCC2 with vs.show": function () { // one fail here
 			this.timeout = 10000;
 			var button = document.getElementById("fadeCCC2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "ccc", "fade", false, button, vsNode);
@@ -270,8 +249,7 @@ define([
 		"history.back() to Flip BBB2 with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("flipBBB2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "flip", false, button, vsNode);
@@ -280,8 +258,7 @@ define([
 		"history.back() to RevealV AAA2 with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("revealvAAA2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "aaa", "revealv", false, button, vsNode);
@@ -290,8 +267,7 @@ define([
 		"history.forward() to Flip BBB2 with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("flipBBB2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.forward();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "bbb", "flip", true, button, vsNode);
@@ -301,8 +277,7 @@ define([
 			this.timeout = 10000;
 			var pNode = document.getElementById("footerll");
 			var button = document.getElementById("nextFooter2");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 			})).then(function (evt) {
 				checkTransitionDetails(evt, "footer3", "slide", true, button, pNode);
@@ -315,11 +290,12 @@ define([
 			return when(new Promise(function (resolve) {
 				var pNode = document.getElementById("footerll");
 				var sig = pNode.on("delite-after-show", function () {
-					var evt = {}; // setup dummy event for test since no dapp transition is done
-					evt.transition = "slide";
-					evt.reverse = false;
-					evt.dest = "inline";
-					resolve(evt);
+					// setup dummy event for test since no dapp transition is done
+					resolve({
+						transition: "slide",
+						reverse: false,
+						dest: "inline"
+					});
 					sig.remove();
 				});
 				button.click();
@@ -331,8 +307,7 @@ define([
 		"Click slidevAAAil with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("slidevAAAil");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 				button.disabled = true; // for test
 			})).then(function (evt) {
@@ -342,8 +317,7 @@ define([
 		"Click revealBBBil with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("revealBBBil");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 				button.disabled = true; // for test
 			})).then(function (evt) {
@@ -353,8 +327,7 @@ define([
 		"Click flipCCCil with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("flipCCCil");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 				button.disabled = true; // for test
 			})).then(function (evt) {
@@ -364,8 +337,7 @@ define([
 		"Click covervDDDil with vs.show": function () {
 			this.timeout = 10000;
 			var button = document.getElementById("covervDDDil");
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				button.click();
 				button.disabled = true; // for test
 			})).then(function (evt) {
@@ -393,11 +365,14 @@ define([
 		}
 	}
 
-	function setupOnOncePromise(testApp, resolve) {
-		var signal = testApp.on("dapp-finished-transition", function (evt) {
-			resolve(evt);
-			signal.unadvise();
-		});
+	function setupOnOncePromise(testApp, stmts) {
+		return new Promise(function (resolve) {
+			stmts();
+			var signal = testApp.on("dapp-finished-transition", function (evt) {
+				resolve(evt);
+				signal.unadvise();
+			});
+		}.bind(this));
 	}
 
 	function checkNodeVisibility(vs, target) {

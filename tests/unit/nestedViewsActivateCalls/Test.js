@@ -39,6 +39,11 @@ define([
 			// 															config has "parseOnLoad": true
 			nestedViewsActivateCallsNode1 = document.getElementById("nestedViewsActivateCallsApp1dviewStack");
 		},
+		beforeEach: function () {
+			return when(new Promise(function (resolve) {
+				setTimeout(resolve, 20);
+			}));
+		},
 		"test initial view": function () {
 			this.timeout = 20000;
 			if (has("ie") || has("ff") || has("safari")) {
@@ -208,8 +213,7 @@ define([
 			if (has("ie") || has("ff") || has("safari")) {
 				this.skip();
 			}
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(testApp, resolve);
+			return when(setupOnOncePromise(testApp, function () {
 				history.back();
 			}).then(function () {
 				var nestedViewsActivateCallsApp1V7 = document.getElementById("V7");
@@ -251,11 +255,15 @@ define([
 
 	registerSuite(nestedViewsActivateCallsSuite1);
 
-	function setupOnOncePromise(testApp, resolve) {
-		var signal = testApp.on("dapp-finished-transition", function (evt) {
-			resolve(evt);
-			signal.unadvise();
-		});
+
+	function setupOnOncePromise(testApp, stmts) {
+		return new Promise(function (resolve) {
+			stmts();
+			var signal = testApp.on("dapp-finished-transition", function (evt) {
+				resolve(evt);
+				signal.unadvise();
+			});
+		}.bind(this));
 	}
 
 	function checkNodeVisibility(vs, target) {

@@ -62,7 +62,7 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 					if (passedResolve) {
 						passedResolve();
 					}
-				}.bind(this));
+				});
 			},
 
 			createControllers: function (controllers) {
@@ -143,16 +143,16 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 				//
 				var appStoppedPromise = new Promise(function (resolve) {
 					this.setStatus(this.STOPPING);
-					var params = {};
-					params.view = this;
-					params.parentView = this;
-					params.unloadApp = true;
-					params.callback = function () {
-						this.setStatus(this.STOPPED);
-						delete window[this.name]; // remove the global for the app
-						resolve();
-					}.bind(this);
-					this.emit("dapp-unload-view", params);
+					this.emit("dapp-unload-view", {
+						view: this,
+						parentView: this,
+						unloadApp: true,
+						callback: function () {
+							this.setStatus(this.STOPPED);
+							delete window[this.name]; // remove the global for the app
+							resolve();
+						}.bind(this)
+					});
 
 					this.emit("dapp-unload-app", {}); // for controllers to cleanup
 				}.bind(this));
@@ -215,35 +215,26 @@ define(["require", "dcl/dcl", "decor/Stateful", "decor/Evented", "lie/dist/lie",
 					path = "app/" + path;
 				}
 				modules.push("requirejs-text/text!" + path);
+				modules.push("requirejs-domready/domReady!");
 			}
 			return new Promise(function (resolve, reject) {
 				require(modules, function () {
-					var modules = [Application];
-					for (var i = 0; i < config.modules.length; i++) {
-						modules.push(arguments[i]);
-					}
-
-					var ext = {};
-					if (config.template) {
-						ext = {
-							templateString: arguments[arguments.length - 1]
-						};
-					}
+					var configModules = [Application].concat(config.modules);
 					/*global App:true */
-					App = dcl(modules, ext);
+					App = dcl(configModules, config.template ? {
+						templateString: arguments[arguments.length - 1]
+					} : {});
 
-					require(["requirejs-domready/domReady!"], function () {
-						var app = new App(config, node || document.body);
-						// Create global namespace for application.
-						// The global name is application id. For example, modelApp
-						var globalAppName = app.id;
-						if (window[globalAppName]) {
-							dcl.mix(app, window[globalAppName]);
-						}
-						window[globalAppName] = app;
-						app.appStartedResolve = resolve;
-						app.start();
-					});
+					var app = new App(config, node || document.body);
+					// Create global namespace for application.
+					// The global name is application id. For example, modelApp
+					var globalAppName = app.id;
+					if (window[globalAppName]) {
+						dcl.mix(app, window[globalAppName]);
+					}
+					window[globalAppName] = app;
+					app.appStartedResolve = resolve;
+					app.start();
 				}, function (obj) {
 					reject("Application error back from require for modules message =" + obj.message);
 				});

@@ -26,34 +26,28 @@ define(["dcl/dcl", "lie/dist/lie", "../TransitionBase", "../../utils/view"],
 			},
 			// _hideView is called to hide a view
 			_hideView: function (viewTarget, event, isParent, viewPath) {
-				var hidePromise = new Promise(function (resolve) {
-					event.dapp.isParent = isParent;
-					event.dapp.hide = true;
-					event.dapp.viewPath = viewPath;
-					event.dapp.parentView = viewUtils.getParentViewFromViewId(this.app, viewPath.lastViewId);
-					event.dest = event.dapp.parentView.childViews[viewPath.lastViewId].viewName;
-					var self = this;
-					var p = self._getParentNode(event);
-					if (!p.hide) { // should have a hide function, if not
-						//TODO: need a test for this!!
-						console.warn("No hide function available on parentNode for viewTarget =" + viewTarget);
-						event.dapp.nextView = event.dapp.parentView.childViews[viewTarget];
-						var parentSelChild = viewUtils.getSelectedChild(event.dapp.parentView,
-							event.dapp.nextView.constraint);
-						event.dapp.nextView.viewShowing = false;
-						if (event.dapp.nextView === parentSelChild) {
-							viewUtils.setSelectedChild(event.dapp.parentView,
-								event.dapp.nextView.constraint, null, self.app); // remove from selectedChildren
-						}
-						resolve(event);
-					} else {
-						p.hide(event.dapp.viewPath.lastViewId, event).then(function (value) {
-							resolve(value);
-							return value;
-						});
+				event.dapp.isParent = isParent;
+				event.dapp.hide = true;
+				event.dapp.viewPath = viewPath;
+				event.dapp.parentView = viewUtils.getParentViewFromViewId(this.app, viewPath.lastViewId);
+				event.dest = event.dapp.parentView.childViews[viewPath.lastViewId].viewName;
+				var self = this;
+				var p = self._getParentNode(event);
+				if (!p.hide) { // should have a hide function, if not
+					//TODO: need a test for this!!
+					console.warn("No hide function available on parentNode for viewTarget =" + viewTarget);
+					event.dapp.nextView = event.dapp.parentView.childViews[viewTarget];
+					var parentSelChild = viewUtils.getSelectedChild(event.dapp.parentView,
+						event.dapp.nextView.constraint);
+					event.dapp.nextView.viewShowing = false;
+					if (event.dapp.nextView === parentSelChild) {
+						viewUtils.setSelectedChild(event.dapp.parentView,
+							event.dapp.nextView.constraint, null, self.app); // remove from selectedChildren
 					}
-				}.bind(this));
-				return hidePromise;
+					return Promise.resolve(event);
+				} else {
+					return p.hide(event.dapp.viewPath.lastViewId, event);
+				}
 			},
 
 			// _parentIsValid is called to see if p is valid and handle it if it is not

@@ -38,35 +38,37 @@ define([
 			}
 
 			return when(new Application(JSON.parse(stripComments(nlsLabelsconfig3)), nlsLabelsContainer3)
-			.then(function (app) {
-				// we are ready to test
-				testApp = app;
+				.then(function (app) {
+					// we are ready to test
+					testApp = app;
 
-				var nlsLabelsAppHome1 = document.getElementById("nlsLabelsAppHome1");
+					var nlsLabelsAppHome1 = document.getElementById("nlsLabelsAppHome1");
 
-				// Here nlsLabelsAppHome1View should be displayed
-				nlsLabelsAppHome1View = viewUtils.getViewFromViewId(testApp, "nlsLabelsAppHome1");
+					// Here nlsLabelsAppHome1View should be displayed
+					nlsLabelsAppHome1View = viewUtils.getViewFromViewId(testApp, "nlsLabelsAppHome1");
 
-				nlsLabelsAppHome1View.deliver(); // to get handlebars to update now
+					nlsLabelsAppHome1View.deliver(); // to get handlebars to update now
 
-				// check that init has been called on these views
-				assert.isTrue(nlsLabelsAppHome1View.initialized, "nlsLabelsAppHome1View.initialized should be true");
-				// check the DOM state to see if we are in the expected state
-				assert.isNotNull(nlsLabelsNode3, "root nlsLabelsNode3 must be here");
-				assert.isNotNull(nlsLabelsAppHome1, "nlsLabelsAppHome1 view must be here");
-				assert.strictEqual(nlsLabelsAppHome1View._beforeActivateCallCount, 1,
-					"nlsLabelsAppHome1View._beforeActivateCallCount should be 1");
-				assert.isTrue(testApp.hasTestPassed, "testApp.hasTestPassed should be true");
+					// check that init has been called on these views
+					assert.isTrue(nlsLabelsAppHome1View.initialized,
+						"nlsLabelsAppHome1View.initialized should be true");
+					// check the DOM state to see if we are in the expected state
+					assert.isNotNull(nlsLabelsNode3, "root nlsLabelsNode3 must be here");
+					assert.isNotNull(nlsLabelsAppHome1, "nlsLabelsAppHome1 view must be here");
+					assert.strictEqual(nlsLabelsAppHome1View._beforeActivateCallCount, 1,
+						"nlsLabelsAppHome1View._beforeActivateCallCount should be 1");
+					assert.isTrue(testApp.hasTestPassed, "testApp.hasTestPassed should be true");
 
-				checkNodeVisibility(nlsLabelsNode3, nlsLabelsAppHome1);
+					checkNodeVisibility(nlsLabelsNode3, nlsLabelsAppHome1);
 
-				//Test NLS Strings for app and view
-				var testAppNlsLabelDom = document.getElementById("testAppNlsLabel");
-				var testViewNlsLabelDom = document.getElementById("testViewNlsLabel");
-				assert.strictEqual(testAppNlsLabelDom.innerHTML, "Label Zero", "testAppNlsLabel should be Label Zero");
-				assert.strictEqual(testViewNlsLabelDom.innerHTML, "Label One",
-					"testViewNlsLabelDom should be Label One");
-			}));
+					//Test NLS Strings for app and view
+					var testAppNlsLabelDom = document.getElementById("testAppNlsLabel");
+					var testViewNlsLabelDom = document.getElementById("testViewNlsLabel");
+					assert.strictEqual(testAppNlsLabelDom.innerHTML,
+						"Label Zero", "testAppNlsLabel should be Label Zero");
+					assert.strictEqual(testViewNlsLabelDom.innerHTML, "Label One",
+						"testViewNlsLabelDom should be Label One");
+				}));
 		},
 
 		// Currently showing nlsLabelsAppHome1View test transition to nlsLabelsAppHome3NoControllerView

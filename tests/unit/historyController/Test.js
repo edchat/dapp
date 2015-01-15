@@ -54,9 +54,7 @@ define([
 		},
 		beforeEach: function () {
 			return when(new Promise(function (resolve) {
-				setTimeout(function () {
-					resolve();
-				}, 20);
+				setTimeout(resolve, 20);
 			}));
 		},
 		"historyController test initial view": function () {
@@ -98,15 +96,15 @@ define([
 		"show hc1center2 with testApp.showOrHideViews('hc1center2')": function () {
 			this.timeout = 20000;
 			return when(testApp.showOrHideViews('hc1center2')
-			.then(function () {
-				var hc1center2content = document.getElementById("hc1center2");
-				var hc1center2View = viewUtils.getViewFromViewId(testApp, "hc1center2");
-				checkNodeVisibile(hc1center2content);
-				checkActivateCallCount(hc1center2View, 1, true);
-				var currentHash = window.location.hash;
-				assert.strictEqual(currentHash, "#hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1",
-					" currentHash should be #hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1");
-			}));
+				.then(function () {
+					var hc1center2content = document.getElementById("hc1center2");
+					var hc1center2View = viewUtils.getViewFromViewId(testApp, "hc1center2");
+					checkNodeVisibile(hc1center2content);
+					checkActivateCallCount(hc1center2View, 1, true);
+					var currentHash = window.location.hash;
+					assert.strictEqual(currentHash, "#hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1",
+						" currentHash should be #hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1");
+				}));
 		},
 		// Currently showing hc1header1+hc1centerParent+hc1center2+hc1right1+hc1footer1 test
 		// showOrHideViews('hc1center3' with viewParams for hclcenter3
@@ -122,16 +120,16 @@ define([
 				}
 			};
 			return when(testApp.showOrHideViews('hc1center3', params)
-			.then(function () {
-				var hc1center3content = document.getElementById("hc1center3");
-				var hc1center3View = viewUtils.getViewFromViewId(testApp, "hc1center3");
-				checkNodeVisibile(hc1center3content);
-				checkActivateCallCount(hc1center3View, 1, true);
-				var currentHash = window.location.hash;
-				assert.strictEqual(currentHash,
-					"#hc1header1+hc1centerParent+(hc1center3&pTestVal1=value1)+hc1right1+hc1footer1",
-					" currentHash should include (hc1center3&pTestVal1=value1)+hc1right1+hc1footer1");
-			}));
+				.then(function () {
+					var hc1center3content = document.getElementById("hc1center3");
+					var hc1center3View = viewUtils.getViewFromViewId(testApp, "hc1center3");
+					checkNodeVisibile(hc1center3content);
+					checkActivateCallCount(hc1center3View, 1, true);
+					var currentHash = window.location.hash;
+					assert.strictEqual(currentHash,
+						"#hc1header1+hc1centerParent+(hc1center3&pTestVal1=value1)+hc1right1+hc1footer1",
+						" currentHash should include (hc1center3&pTestVal1=value1)+hc1right1+hc1footer1");
+				}));
 		},
 		// Currently showing hc1header1+hc1centerParent+hc1center3+hc1right1+hc1footer1 test
 		// history.back()

@@ -89,36 +89,33 @@ define([
 		},
 		beforeEach: function () {
 			return when(new Promise(function (resolve) {
-				setTimeout(function () {
-					resolve();
-				}, 20);
+				setTimeout(resolve, 20);
 			}));
 		},
 		"Desktop layout test initial views": function () {
 			this.timeout = 10000;
 
 			return when(new Application(JSON.parse(stripComments(responsiveColumnsVisibilityconfig)),
-				responsiveColumnsVisibilityContainer1)
-			.then(function (app) {
-				// we are ready to test
-				console.log("in responsiveColumnsVisibility tests app loaded. " + app.id);
-				rctestApp = app;
+					responsiveColumnsVisibilityContainer1)
+				.then(function (app) {
+					// we are ready to test
+					console.log("in responsiveColumnsVisibility tests app loaded. " + app.id);
+					rctestApp = app;
 
-				rcvsNode = document.getElementById("vs");
-				var testId = "rcaaa";
-				var testNode = document.getElementById(testId);
-				assert.isNotNull(testNode, testId + " must be here");
-				assert.isNotNull(rcvsNode, "rcvsNode must be here");
-				testLayout(leftLayout, '20%');
-				testLayout(centerLayout, 'fill');
-				testLayout(rightLayout, '20%');
-			}));
+					rcvsNode = document.getElementById("vs");
+					var testId = "rcaaa";
+					var testNode = document.getElementById(testId);
+					assert.isNotNull(testNode, testId + " must be here");
+					assert.isNotNull(rcvsNode, "rcvsNode must be here");
+					testLayout(leftLayout, '20%');
+					testLayout(centerLayout, 'fill');
+					testLayout(rightLayout, '20%');
+				}));
 		},
 
 		"Desktop Layout click slide BBB ": function () {
 			this.timeout = 10000;
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(rctestApp, resolve);
+			return when(setupOnOncePromise(rctestApp, function () {
 				var item = document.getElementById("showrcbbb");
 				item.click();
 			}).then(function (evt) {
@@ -130,8 +127,7 @@ define([
 		},
 		"Tablet layout test rcaaa": function () {
 			this.timeout = 10000;
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(rctestApp, resolve);
+			return when(setupOnOncePromise(rctestApp, function () {
 				var item = document.getElementById("showrcaaa");
 				// force Tablet layout
 				rc.breakpoints = "{'phone': '100px', 'tablet': '99000px', 'desktop': '99999px'}";
@@ -152,8 +148,7 @@ define([
 
 		"Tablet Layout click slide BBB": function () {
 			this.timeout = 10000;
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(rctestApp, resolve);
+			return when(setupOnOncePromise(rctestApp, function () {
 				var item = document.getElementById("showrcbbb");
 				item.click();
 			}).then(function (evt) {
@@ -165,8 +160,7 @@ define([
 		},
 		"Phone layout test rcaaa": function () {
 			this.timeout = 10000;
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(rctestApp, resolve);
+			return when(setupOnOncePromise(rctestApp, function () {
 				var item = document.getElementById("showrcaaa");
 				// force Phone layout
 				rc.breakpoints = "{'phone': '98000px', 'tablet': '99000px', 'desktop': '99999px'}";
@@ -187,8 +181,7 @@ define([
 
 		"Phone Layout click slide CCC": function () {
 			this.timeout = 10000;
-			return when(new Promise(function (resolve) {
-				setupOnOncePromise(rctestApp, resolve);
+			return when(setupOnOncePromise(rctestApp, function () {
 				var item = document.getElementById("centershowrcccc");
 				item.click();
 			}).then(function (evt) {
@@ -217,11 +210,14 @@ define([
 		assert.isTrue(evt.reverse ? rev : true, "evt.reverse=" + evt.reverse + " it should be " + rev);
 	}
 
-	function setupOnOncePromise(testApp, resolve) {
-		var signal = testApp.on("dapp-finished-transition", function (evt) {
-			resolve(evt);
-			signal.unadvise();
-		});
+	function setupOnOncePromise(testApp, stmts) {
+		return new Promise(function (resolve) {
+			stmts();
+			var signal = testApp.on("dapp-finished-transition", function (evt) {
+				resolve(evt);
+				signal.unadvise();
+			});
+		}.bind(this));
 	}
 
 	function checkNodeVisibility(vs, target) {

@@ -113,7 +113,7 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 			// _displayView is called to show a view, it will handle nested views by calling _displayParents
 			_displayView: function (viewTarget, event, isParent, viewPath) {
 				var subEvent;
-				var dispviewPromise = new Promise(function (resolve) {
+				return new Promise(function (resolve) {
 					event.dapp.isParent = isParent;
 					event.dapp.viewPath = viewPath;
 					var self = this;
@@ -147,7 +147,6 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 							self._showView(p, subEvent, resolve);
 						});
 				}.bind(this));
-				return dispviewPromise;
 			},
 
 			// _displayParents is called to show parent views before showing the child view for nested views

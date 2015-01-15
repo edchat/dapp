@@ -35,7 +35,7 @@ define(["dcl/dcl", "lie/dist/lie", "../TransitionBase", "../../utils/view",
 
 			// _hideView is called to hide a view
 			_hideView: function (viewTarget, event, isParent, viewPath) {
-				var hidePromise = new Promise(function (resolve) {
+				return new Promise(function (resolve) {
 					event.dapp.isParent = isParent;
 					event.dapp.hide = true;
 					event.dapp.viewPath = viewPath;
@@ -51,7 +51,6 @@ define(["dcl/dcl", "lie/dist/lie", "../TransitionBase", "../../utils/view",
 						return ui.options;
 					}.bind(this));
 				}.bind(this));
-				return hidePromise;
 			},
 
 			// _parentIsValid is called to see if p is valid and handle it if it is not

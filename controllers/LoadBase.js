@@ -52,12 +52,7 @@ define(
 				}.bind(this));
 
 				if (event.setChild) {
-					event.setChild(new Promise(function (resolve) {
-						// use setTimeout to simulate fetch of data, then create a node
-						event.loadPromise.then(function (viewData) {
-							resolve(viewData);
-						});
-					}));
+					event.setChild(event.loadPromise);
 				}
 			},
 

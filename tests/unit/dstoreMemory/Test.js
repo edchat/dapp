@@ -61,10 +61,11 @@ define([
 		},
 		"test initial view": function () {
 			this.timeout = 20000;
+			var d = this.async(10000);
 			if (has("ie") === 10) {
 				this.skip();
 			}
-			return when(new Application(JSON.parse(stripComments(dstoreMemoryconfig1)), dstoreMemoryContainer1)
+			return d.callback(new Application(JSON.parse(stripComments(dstoreMemoryconfig1)), dstoreMemoryContainer1)
 				.then(function (appx) {
 					// we are ready to test
 					testApp = appx;
@@ -91,18 +92,20 @@ define([
 						"element[3].innerHTML should be Selection 4");
 					assert.strictEqual(dstoreMemorylist1Elements[4].innerHTML, "Selection 5",
 						"element[4].innerHTML should be Selection 5");
-
+					d.resolve();
 				}));
 		},
 
 		// Currently showing dstoreMemoryAppHome1 test transition to dstoreMemoryAppHome2
 		"testApp.showOrHideViews('dstoreMemoryAppHome2')": function () {
 			this.timeout = 20000;
+			var d = this.async(10000);
+
 			if (has("ie") === 10) {
 				this.skip();
 			}
 			var label = dstoreMemorylist1Elements[0].innerHTML || "";
-			return when(testApp.showOrHideViews("dstoreMemoryAppHome2", {
+			return d.callback(testApp.showOrHideViews("dstoreMemoryAppHome2", {
 				viewData: {
 					label: label
 				}
@@ -133,6 +136,7 @@ define([
 					"element[3].innerHTML should be Selection 4");
 				assert.strictEqual(dstoreMemorylist2Elements[4].innerHTML, "Selection 10",
 					"element[4].innerHTML should be Selection 5");
+				d.resolve();
 
 			}));
 		},
@@ -140,11 +144,12 @@ define([
 		// Currently showing dstoreMemoryAppHome2 test transition to dstoreMemoryAppHome1
 		"testApp.showOrHideViews('dstoreMemoryAppHome1')": function () {
 			this.timeout = 20000;
+			var d = this.async(10000);
 			if (has("ie") === 10) {
 				this.skip();
 			}
 			var label = dstoreMemorylist2Elements[4].innerHTML || "";
-			return when(testApp.showOrHideViews("dstoreMemoryAppHome1", {
+			return d.callback(testApp.showOrHideViews("dstoreMemoryAppHome1", {
 				viewData: {
 					label: label
 				}
@@ -176,6 +181,7 @@ define([
 					"element[3].innerHTML should be Selection 4");
 				assert.strictEqual(dstoreMemorylist2Elements[4].innerHTML, "Selection 10",
 					"element[4].innerHTML should be Selection 5");
+				d.resolve();
 
 			}));
 		},

@@ -122,25 +122,25 @@ define([
 				.then(function () {
 					return when(multipleAndNestedViewsActivateCallsApp1S1View.containerNode.show('V2')
 						.then(function () {
-						var multipleAndNestedViewsActivateCallsApp1V2 = document.getElementById("content_P1_S1_V2");
-						checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
-							multipleAndNestedViewsActivateCallsApp1V2);
+							var multipleAndNestedViewsActivateCallsApp1V2 = document.getElementById("content_P1_S1_V2");
+							checkNestedNodeVisibility(multipleAndNestedViewsActivateCallsApp1Content,
+								multipleAndNestedViewsActivateCallsApp1V2);
 
-						multipleAndNestedViewsActivateCallsApp1V2View = viewUtils.getViewFromViewId(testApp,
-							"content_P1_S1_V2");
+							multipleAndNestedViewsActivateCallsApp1V2View = viewUtils.getViewFromViewId(testApp,
+								"content_P1_S1_V2");
 
-						// Now multipleAndNestedViewsActivateCallsApp1V1View ActivateCallCounts should be 1
-						checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1);
-						checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2, true);
-						checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3);
-						checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3);
+							// Now multipleAndNestedViewsActivateCallsApp1V1View ActivateCallCounts should be 1
+							checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V2View, 1);
+							checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2, true);
+							checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 3);
+							checkActivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 3);
 
-						// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
-						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 1);
-						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2);
-						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 2, true);
-						checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 2, true);
-					}));
+							// Now multipleAndNestedViewsActivateCallsApp1V1View DeactivateCallCounts should be 1
+							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V7View, 1);
+							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1V1View, 2);
+							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1S1View, 2, true);
+							checkDeactivateCallCount(multipleAndNestedViewsActivateCallsApp1P1View, 2, true);
+						}));
 				})
 				// Currently showing P1_S1_V2 test transition to V7
 				.then(function () {
