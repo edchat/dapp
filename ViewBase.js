@@ -41,17 +41,9 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 				if (this._started) {
 					return this;
 				}
-				/*	return new Promise(function (resolve) {
-					    this._startResolve = resolve;
-						return this.load().bind(this)
-						.then(function (controller) {
-							this._createDataStores();
-							this._startup(controller);
-						}.bind(this))}.bind(this));
-				*/
 				return new Promise(function (resolve) {
 					this._startResolve = resolve;
-					return Promise.resolve(this.load()).then(function (controller) {
+					return this.load().then(function (controller) {
 						this._createDataStores();
 						this._startup(controller);
 					}.bind(this));
@@ -60,8 +52,7 @@ define(["require", "dcl/dcl", "lie/dist/lie", "dapp/utils/view"],
 			},
 
 			load: function () {
-				var vcDef = this._loadViewController();
-				return Promise.resolve(vcDef).then(function (controller) {
+				return Promise.resolve(this._loadViewController()).then(function (controller) {
 					if (controller) {
 						dcl.mix(this, controller);
 						return controller;

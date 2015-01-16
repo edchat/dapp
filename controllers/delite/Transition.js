@@ -63,11 +63,8 @@ define(["dcl/dcl", "lie/dist/lie", "../TransitionBase", "../../utils/view"],
 			},
 
 			// _showView is called to make the final call to show the view
-			_showView: function (p, subEvent, resolve) {
-				p.show(subEvent.dest, subEvent).then(function (value) {
-					resolve(value);
-					return value;
-				});
+			_showView: function (p, subEvent) {
+				return p.show(subEvent.dest, subEvent);
 			}
 		});
 	});

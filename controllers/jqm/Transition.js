@@ -65,15 +65,17 @@ define(["dcl/dcl", "lie/dist/lie", "../TransitionBase", "../../utils/view",
 			},
 
 			// _showView is called to make the final call to show the view
-			_showView: function (p, subEvent, resolve) {
-				//$(":mobile-pagecontainer").pagecontainer("change", subEvent.dest, subEvent);
-				// body does not work, it is not the right div, it is not the pageContainer
-				//$( "body" ).pagecontainer( "change", subEvent.dest, subEvent);
-				$.mobile.pageContainer.pagecontainer("change", subEvent.dest, subEvent);
-				$(document).one("pagecontainertransition", function (complete, ui) {
-					//$(document).one("pagecontainershow", function (complete, ui) {
-					resolve(ui.options);
-					return ui.options;
+			_showView: function (p, subEvent) {
+				return new Promise(function (resolve) {
+					//$(":mobile-pagecontainer").pagecontainer("change", subEvent.dest, subEvent);
+					// body does not work, it is not the right div, it is not the pageContainer
+					//$( "body" ).pagecontainer( "change", subEvent.dest, subEvent);
+					$.mobile.pageContainer.pagecontainer("change", subEvent.dest, subEvent);
+					$(document).one("pagecontainertransition", function (complete, ui) {
+						//$(document).one("pagecontainershow", function (complete, ui) {
+						resolve(ui.options);
+						return ui.options;
+					});
 				});
 			}
 		});

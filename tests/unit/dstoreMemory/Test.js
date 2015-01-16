@@ -59,11 +59,26 @@ define([
 			document.body.appendChild(dstoreMemoryContainer1);
 			dstoreMemoryContainer1.innerHTML = dstoreMemoryHtmlContent1;
 		},
+/*
+		"test PromisesWhen": function () {
+			this.timeout = 100;
+			return when(new Promise(function (resolve) {
+				setTimeout(resolve, 20000);
+			}));
+		},
+
+		"test Promises2": function () {
+			this.timeout = 100;
+			return new Promise(function (resolve) {
+				setTimeout(resolve, 20000);
+			});
+		},
+*/
 		"test initial view": function () {
 			this.timeout = 20000;
 			var d = this.async(10000);
 			if (has("ie") === 10) {
-				this.skip();
+				this.skip("skipping dstoreMemory tests on IE10");
 			}
 			return d.callback(new Application(JSON.parse(stripComments(dstoreMemoryconfig1)), dstoreMemoryContainer1)
 				.then(function (appx) {

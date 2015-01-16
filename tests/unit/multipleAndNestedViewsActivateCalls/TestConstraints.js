@@ -3,6 +3,7 @@ define([
 	"intern!object",
 	"intern/chai!assert",
 	"decor/sniff",
+	"lie/dist/lie",
 	"dojo/when",
 	"dapp/Application",
 	"dapp/utils/view",
@@ -10,7 +11,7 @@ define([
 	"requirejs-text/text!dapp/tests/unit/multipleAndNestedViewsActivateCalls/app1Constraints.json",
 	"deliteful/LinearLayout",
 	"deliteful/ViewStack"
-], function (registerSuite, assert, has, when, Application, viewUtils, register,
+], function (registerSuite, assert, has, Promise, when, Application, viewUtils, register,
 	multipleAndNestedViewsActivateCallsconfig1) {
 
 	// -------------------------------------------------------------------------------------- //
@@ -42,6 +43,11 @@ define([
 			multipleAndNestedViewsActivateCallsNode1 =
 				document.getElementById("multipleAndNestedViewsActivateCallsApp1linearlayout");
 
+		},
+		beforeEach: function () {
+			return when(new Promise(function (resolve) {
+				setTimeout(resolve, 20);
+			}));
 		},
 		"test initial view": function () {
 			this.timeout = 20000;

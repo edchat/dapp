@@ -113,39 +113,36 @@ define(["dcl/dcl", "lie/dist/lie", "../Controller", "../utils/view"],
 			// _displayView is called to show a view, it will handle nested views by calling _displayParents
 			_displayView: function (viewTarget, event, isParent, viewPath) {
 				var subEvent;
-				return new Promise(function (resolve) {
-					event.dapp.isParent = isParent;
-					event.dapp.viewPath = viewPath;
-					var self = this;
-					// wait for parents to be displayed first
-					return Promise.resolve(this._displayParents(viewTarget, event, isParent, viewPath))
-						.then(function (value) {
-							subEvent = Object.create(event);
-							subEvent.dest = viewTarget.split(",").pop();
-							subEvent.dapp.viewPath = viewPath;
-							subEvent.dapp.viewPath.dest = subEvent.dest;
-							subEvent.dapp.isParent = isParent;
+				event.dapp.isParent = isParent;
+				event.dapp.viewPath = viewPath;
+				// wait for parents to be displayed first
+				return Promise.resolve(this._displayParents(viewTarget, event,
+						isParent, viewPath)).then(function (value) {
+					subEvent = Object.create(event);
+					subEvent.dest = viewTarget.split(",").pop();
+					subEvent.dapp.viewPath = viewPath;
+					subEvent.dapp.viewPath.dest = subEvent.dest;
+					subEvent.dapp.isParent = isParent;
 
-							subEvent.dapp.parentView = value.dapp.nextView;
-							var p = self._getParentNode(subEvent) || document.body;
-							if (!self._parentIsValid(p, subEvent.dest, resolve, value)) {
-								return; // p is invalid
-							}
-							subEvent.dapp.parentNode = p;
+					subEvent.dapp.parentView = value.dapp.nextView;
+					var p = this._getParentNode(subEvent) || document.body;
+					if (!this._parentIsValid(p, subEvent.dest, value)) {
+						return; // p is invalid
+					}
+					subEvent.dapp.parentNode = p;
 
-							subEvent.target = p;
-							var viewId = self.app === subEvent.dapp.parentView ? subEvent.dest :
-								viewUtils.getViewIdFromEvent(self.app, subEvent);
-							var viewdef = viewUtils.getViewDefFromViewId(self.app, viewId);
-							var constraint = viewdef && viewdef.constraint ? viewdef.constraint :
-								viewUtils.getDefaultConstraint(viewId, p);
-							var selView = viewUtils.getSelectedChild(subEvent.dapp.parentView, constraint);
-							// if viewId is already the selected view set transition to none.
-							if (selView && selView.id === viewId) {
-								subEvent.transition = "none";
-							}
-							self._showView(p, subEvent, resolve);
-						});
+					subEvent.target = p;
+					var viewId = this.app === subEvent.dapp.parentView ? subEvent.dest :
+						viewUtils.getViewIdFromEvent(this.app, subEvent);
+					var viewdef = viewUtils.getViewDefFromViewId(this.app, viewId);
+					var constraint = viewdef && viewdef.constraint ? viewdef.constraint :
+						viewUtils.getDefaultConstraint(viewId, p);
+					var selView = viewUtils.getSelectedChild(subEvent.dapp.parentView, constraint);
+					// if viewId is already the selected view set transition to none.
+					if (selView && selView.id === viewId) {
+						subEvent.transition = "none";
+					}
+					return this._showView(p, subEvent);
 				}.bind(this));
 			},
 

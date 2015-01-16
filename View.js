@@ -61,44 +61,39 @@ define(["require", "dcl/dcl", "lie/dist/lie", "delite/Widget", "delite/register"
 				// tags:
 				//		private
 				//
-				if (this.templateString) {
-					return true;
-				} else {
-					var tpl = this.template;
-					var deps = this.dependencies ? this.dependencies : [];
-					if (tpl) {
-						deps = deps.concat(["requirejs-text/text!" + tpl]);
-					}
-					return new Promise(function (resolve) {
+				return new Promise(function (resolve) {
+					if (this.templateString) {
+						resolve();
+					} else {
+						var tpl = this.template;
+						var deps = this.dependencies ? this.dependencies : [];
+						if (tpl) {
+							deps = deps.concat(["requirejs-text/text!" + tpl]);
+						}
 						require(deps, function () {
 							this.templateString = this.template ?
 								arguments[arguments.length - 1] : "<div></div>";
-							resolve(this);
+							resolve();
 						}.bind(this));
-					}.bind(this));
-				}
+					}
+				}.bind(this));
 			},
-
 			// start view
 			load: dcl.superCall(function (sup) {
 				return function () {
-					return new Promise(function (resolve) {
-						// when parentView loading is done (controller), proceed with template
-						sup.call(this).then(function (controller) {
-							return Promise.resolve(nls(this)).then(function (nls) {
-								// we inherit from the parentView NLS
-								this.nls = {};
-								if (this.parentView) {
-									dcl.mix(this.nls, this.parentView.nls);
-								}
-								// make sure template can access nls doing {{nls.myprop}}
-								dcl.mix(this.nls, nls);
-								return Promise.resolve(this._loadTemplate()).then(function () {
-									resolve(controller);
-								});
-							}.bind(this));
-						}.bind(this));
-					}.bind(this));
+					// when parentView loading is done (controller), proceed with template
+					var controller = sup.call(this);
+					return nls(this).then(function (nls) {
+						// we inherit from the parentView NLS
+						this.nls = {};
+						if (this.parentView) {
+							dcl.mix(this.nls, this.parentView.nls);
+						}
+						// make sure template can access nls doing {{nls.myprop}}
+						dcl.mix(this.nls, nls);
+					}.bind(this)).then(this._loadTemplate.bind(this)).then(function () {
+							return controller;
+						});
 				};
 			}),
 
